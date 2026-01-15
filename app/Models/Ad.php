@@ -21,6 +21,7 @@ class Ad extends Model
         'currency',
         'negotiable',
         'location_text',
+        'postcode_id',
         'status',
         'published_at',
         'expires_at',
@@ -35,6 +36,7 @@ class Ad extends Model
         'meta' => 'array',
         'price' => 'integer',
         'views_count' => 'integer',
+        'postcode_id' => 'integer',
     ];
 
     public function user()
@@ -45,6 +47,11 @@ class Ad extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function postcode()
+    {
+        return $this->belongsTo(Postcode::class);
     }
 
     public function images()
