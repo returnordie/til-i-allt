@@ -353,6 +353,12 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                                 </Link>
                                             </li>
                                             <li>
+                                                <Link className="dropdown-item tt-menuitem" href={route('account.deals.index')}>
+                                                    <span className="tt-mi">{Ico.list}</span>
+                                                    Mín viðskipti
+                                                </Link>
+                                            </li>
+                                            <li>
                                                 <hr className="dropdown-divider" />
                                             </li>
                                             <li>

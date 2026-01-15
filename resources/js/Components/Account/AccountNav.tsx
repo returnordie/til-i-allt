@@ -29,24 +29,6 @@ export default function AccountNav() {
             desc: 'Breyta lykilorði',
             activeWhen: (u) => u.startsWith('/mitt-svaedi/oryggi'),
         },
-         {
-           href: route('account.ads.index'),
-           title: 'Mínar auglýsingar',
-           desc: 'Yfirlit, framlengja, tölfræði',
-           activeWhen: (u) => u.startsWith('/mitt-svaedi/auglysingar'),
-         },
-        {
-            href: route('conversations.index'),
-            title: 'Skilaboð',
-            desc: 'Innhólf og þínir þræðir',
-            activeWhen: (u) => u.startsWith('/mitt-svaedi/skilabod'),
-        },
-        {
-            href: route('account.deals.index'),
-            title: 'Viðskipti',
-            desc: 'Staðfesting og yfirlit',
-            activeWhen: (u) => u.startsWith('/mitt-svaedi/vidskipti'),
-        },
     ];
 
     return (
