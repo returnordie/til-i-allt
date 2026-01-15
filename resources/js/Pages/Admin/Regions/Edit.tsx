@@ -29,10 +29,10 @@ export default function Edit({ region }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Svæði #{region.id}
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Breyta svæði
                     </h1>
                 </div>
@@ -40,52 +40,53 @@ export default function Edit({ region }: EditProps) {
         >
             <Head title={`Svæði ${region.name}`} />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div>
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col-md-6">
                         <InputLabel htmlFor="name" value="Nafn" />
                         <TextInput
                             id="name"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="slug" value="Slug" />
                         <TextInput
                             id="slug"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.slug}
                             onChange={(e) => setData('slug', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="sort_order" value="Röðun" />
                         <TextInput
                             id="sort_order"
                             type="number"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.sort_order}
                             onChange={(e) =>
                                 setData('sort_order', Number(e.target.value))
                             }
                         />
                     </div>
-                    <div className="flex items-center gap-2 pt-6">
+                        <div className="col-md-6 d-flex align-items-center gap-2 pt-2">
                         <Checkbox
                             checked={data.is_active}
                             onChange={(e) =>
                                 setData('is_active', e.target.checked)
                             }
                         />
-                        <span className="text-sm text-slate-600">
+                            <span className="text-muted">
                             Virkt svæði
                         </span>
                     </div>
-                </div>
+                    </div>
 
-                <div className="mt-6 flex justify-end">
+                    <div className="mt-4 d-flex justify-content-end">
                     <PrimaryButton
                         onClick={() =>
                             put(route('admin.regions.update', region.id))
@@ -94,6 +95,7 @@ export default function Edit({ region }: EditProps) {
                     >
                         Vista breytingar
                     </PrimaryButton>
+                </div>
                 </div>
             </section>
         </AdminLayout>

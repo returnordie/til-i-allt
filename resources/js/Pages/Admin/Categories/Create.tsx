@@ -26,10 +26,10 @@ export default function Create({ sections, parents }: CreateProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Flokkar
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Nýr flokkur
                     </h1>
                 </div>
@@ -37,31 +37,32 @@ export default function Create({ sections, parents }: CreateProps) {
         >
             <Head title="Nýr flokkur" />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div>
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col-md-6">
                         <InputLabel htmlFor="name" value="Nafn" />
                         <TextInput
                             id="name"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="slug" value="Slug" />
                         <TextInput
                             id="slug"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.slug}
                             onChange={(e) => setData('slug', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="section" value="Deild" />
                         <select
                             id="section"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            className="form-select mt-1"
                             value={data.section}
                             onChange={(e) => setData('section', e.target.value)}
                         >
@@ -72,11 +73,11 @@ export default function Create({ sections, parents }: CreateProps) {
                             ))}
                         </select>
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="parent" value="Foreldri" />
                         <select
                             id="parent"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            className="form-select mt-1"
                             value={data.parent_id}
                             onChange={(e) => setData('parent_id', e.target.value)}
                         >
@@ -88,56 +89,57 @@ export default function Create({ sections, parents }: CreateProps) {
                             ))}
                         </select>
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="icon" value="Tákn" />
                         <TextInput
                             id="icon"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.icon}
                             onChange={(e) => setData('icon', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="hero_art" value="Hero art" />
                         <TextInput
                             id="hero_art"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.hero_art}
                             onChange={(e) => setData('hero_art', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="sort_order" value="Röðun" />
                         <TextInput
                             id="sort_order"
                             type="number"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.sort_order}
                             onChange={(e) =>
                                 setData('sort_order', Number(e.target.value))
                             }
                         />
                     </div>
-                    <div className="flex items-center gap-2 pt-6">
+                        <div className="col-md-6 d-flex align-items-center gap-2 pt-2">
                         <Checkbox
                             checked={data.is_active}
                             onChange={(e) =>
                                 setData('is_active', e.target.checked)
                             }
                         />
-                        <span className="text-sm text-slate-600">
+                            <span className="text-muted">
                             Virkur flokkur
                         </span>
                     </div>
-                </div>
+                    </div>
 
-                <div className="mt-6 flex justify-end">
+                    <div className="mt-4 d-flex justify-content-end">
                     <PrimaryButton
                         onClick={() => post(route('admin.categories.store'))}
                         disabled={processing}
                     >
                         Stofna flokk
                     </PrimaryButton>
+                </div>
                 </div>
             </section>
         </AdminLayout>

@@ -37,10 +37,10 @@ export default function Edit({ ad, categories, statusOptions }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Auglýsing #{ad.id}
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Breyta auglýsingu
                     </h1>
                 </div>
@@ -48,23 +48,24 @@ export default function Edit({ ad, categories, statusOptions }: EditProps) {
         >
             <Head title={`Auglýsing ${ad.title}`} />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div className="md:col-span-2">
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col-12">
                         <InputLabel htmlFor="title" value="Titill" />
                         <TextInput
                             id="title"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
                             required
                         />
                     </div>
-                    <div>
+                    <div className="col-md-6">
                         <InputLabel htmlFor="status" value="Staða" />
                         <select
                             id="status"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            className="form-select mt-1"
                             value={data.status}
                             onChange={(e) => setData('status', e.target.value)}
                         >
@@ -75,11 +76,11 @@ export default function Edit({ ad, categories, statusOptions }: EditProps) {
                             ))}
                         </select>
                     </div>
-                    <div>
+                    <div className="col-md-6">
                         <InputLabel htmlFor="category" value="Flokkur" />
                         <select
                             id="category"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            className="form-select mt-1"
                             value={data.category_id}
                             onChange={(e) =>
                                 setData('category_id', e.target.value)
@@ -93,59 +94,60 @@ export default function Edit({ ad, categories, statusOptions }: EditProps) {
                             ))}
                         </select>
                     </div>
-                    <div>
+                    <div className="col-md-6">
                         <InputLabel htmlFor="price" value="Verð" />
                         <TextInput
                             id="price"
                             type="number"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.price}
                             onChange={(e) => setData('price', e.target.value)}
                         />
                     </div>
-                    <div>
+                    <div className="col-md-6">
                         <InputLabel htmlFor="currency" value="Gjaldeyrir" />
                         <TextInput
                             id="currency"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.currency}
                             onChange={(e) =>
                                 setData('currency', e.target.value)
                             }
                         />
                     </div>
-                    <div>
+                    <div className="col-md-6">
                         <InputLabel htmlFor="expires_at" value="Rennur út" />
                         <TextInput
                             id="expires_at"
                             type="date"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.expires_at}
                             onChange={(e) =>
                                 setData('expires_at', e.target.value)
                             }
                         />
                     </div>
-                    <div className="flex items-center gap-2 pt-6">
+                    <div className="col-md-6 d-flex align-items-center gap-2 pt-2">
                         <Checkbox
                             checked={data.negotiable}
                             onChange={(e) =>
                                 setData('negotiable', e.target.checked)
                             }
                         />
-                        <span className="text-sm text-slate-600">
+                        <span className="text-muted">
                             Verð samningshæft
                         </span>
                     </div>
                 </div>
 
-                <div className="mt-6 flex justify-end">
+                <div className="mt-4 d-flex justify-content-end">
                     <PrimaryButton
                         onClick={() => put(route('admin.ads.update', ad.id))}
                         disabled={processing}
                     >
                         Vista breytingar
                     </PrimaryButton>
+                </div>
                 </div>
             </section>
         </AdminLayout>

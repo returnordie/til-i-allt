@@ -23,10 +23,10 @@ export default function Index({ regions }: RegionsPageProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Svæði
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Stjórna svæðum
                     </h1>
                 </div>
@@ -34,72 +34,74 @@ export default function Index({ regions }: RegionsPageProps) {
         >
             <Head title="Svæði" />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-slate-600">
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="d-flex align-items-center justify-content-between">
+                        <p className="small text-muted mb-0">
                         {regions.meta.total} svæði
                     </p>
                     <Link
                         href={route('admin.regions.create')}
-                        className="rounded-lg border border-slate-900 px-4 py-2 text-sm font-semibold text-slate-900"
+                        className="btn btn-outline-dark"
                     >
                         Nýtt svæði
                     </Link>
                 </div>
 
-                <div className="mt-6 overflow-x-auto">
-                    <table className="min-w-full text-left text-sm">
-                        <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                            <tr>
-                                <th className="px-3 py-3">Nafn</th>
-                                <th className="px-3 py-3">Slug</th>
-                                <th className="px-3 py-3">Röðun</th>
-                                <th className="px-3 py-3">Staða</th>
-                                <th className="px-3 py-3 text-right">Aðgerðir</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {regions.data.map((region) => (
-                                <tr key={region.id} className="hover:bg-slate-50">
-                                    <td className="px-3 py-3 font-medium text-slate-900">
-                                        {region.name}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {region.slug}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {region.sort_order}
-                                    </td>
-                                    <td className="px-3 py-3">
-                                        <span
-                                            className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                                                region.is_active
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-rose-100 text-rose-700'
-                                            }`}
-                                        >
-                                            {region.is_active
-                                                ? 'Virkur'
-                                                : 'Óvirkur'}
-                                        </span>
-                                    </td>
-                                    <td className="px-3 py-3 text-right">
-                                        <Link
-                                            href={route(
-                                                'admin.regions.edit',
-                                                region.id,
-                                            )}
-                                            className="text-sm font-semibold text-slate-900 hover:text-slate-600"
-                                        >
-                                            Breyta
-                                        </Link>
-                                    </td>
+                    <div className="table-responsive mt-4">
+                        <table className="table table-hover align-middle mb-0">
+                            <thead className="table-light">
+                                <tr>
+                                    <th>Nafn</th>
+                                    <th>Slug</th>
+                                    <th>Röðun</th>
+                                    <th>Staða</th>
+                                    <th className="text-end">Aðgerðir</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {regions.data.map((region) => (
+                                    <tr key={region.id}>
+                                        <td className="fw-semibold">
+                                            {region.name}
+                                        </td>
+                                        <td className="text-muted">
+                                            {region.slug}
+                                        </td>
+                                        <td className="text-muted">
+                                            {region.sort_order}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`badge ${
+                                                    region.is_active
+                                                        ? 'bg-success'
+                                                        : 'bg-danger'
+                                                }`}
+                                            >
+                                                {region.is_active
+                                                    ? 'Virkur'
+                                                    : 'Óvirkur'}
+                                            </span>
+                                        </td>
+                                        <td className="text-end">
+                                            <Link
+                                                href={route(
+                                                    'admin.regions.edit',
+                                                    region.id,
+                                                )}
+                                                className="btn btn-sm btn-outline-secondary"
+                                            >
+                                                Breyta
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <Pagination links={regions.links} />
                 </div>
-                <Pagination links={regions.links} />
             </section>
         </AdminLayout>
     );

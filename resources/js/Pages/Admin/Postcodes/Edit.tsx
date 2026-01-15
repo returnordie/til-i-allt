@@ -30,10 +30,10 @@ export default function Edit({ postcode, regions }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Póstnúmer #{postcode.id}
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Breyta póstnúmeri
                     </h1>
                 </div>
@@ -41,31 +41,32 @@ export default function Edit({ postcode, regions }: EditProps) {
         >
             <Head title={`Póstnúmer ${postcode.code}`} />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div>
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col-md-6">
                         <InputLabel htmlFor="code" value="Póstnúmer" />
                         <TextInput
                             id="code"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.code}
                             onChange={(e) => setData('code', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="name" value="Nafn" />
                         <TextInput
                             id="name"
-                            className="mt-1 block w-full"
+                            className="mt-1"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                         />
                     </div>
-                    <div>
+                        <div className="col-md-6">
                         <InputLabel htmlFor="region" value="Svæði" />
                         <select
                             id="region"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            className="form-select mt-1"
                             value={data.region_id}
                             onChange={(e) =>
                                 setData('region_id', Number(e.target.value))
@@ -78,20 +79,20 @@ export default function Edit({ postcode, regions }: EditProps) {
                             ))}
                         </select>
                     </div>
-                    <div className="flex items-center gap-2 pt-6">
+                        <div className="col-md-6 d-flex align-items-center gap-2 pt-2">
                         <Checkbox
                             checked={data.is_active}
                             onChange={(e) =>
                                 setData('is_active', e.target.checked)
                             }
                         />
-                        <span className="text-sm text-slate-600">
+                            <span className="text-muted">
                             Virkt póstnúmer
                         </span>
                     </div>
-                </div>
+                    </div>
 
-                <div className="mt-6 flex justify-end">
+                    <div className="mt-4 d-flex justify-content-end">
                     <PrimaryButton
                         onClick={() =>
                             put(
@@ -102,6 +103,7 @@ export default function Edit({ postcode, regions }: EditProps) {
                     >
                         Vista breytingar
                     </PrimaryButton>
+                </div>
                 </div>
             </section>
         </AdminLayout>

@@ -1,9 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 export default function Authenticated({
     header,
@@ -12,185 +9,105 @@ export default function Authenticated({
     const user = usePage().props.auth.user;
     const isAdmin = user?.role === 'admin';
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
-
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+        <div className="min-vh-100 bg-light">
+            <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+                <div className="container">
+                    <Link
+                        href="/"
+                        className="navbar-brand d-flex align-items-center gap-2"
+                    >
+                        <ApplicationLogo
+                            className="text-dark"
+                            style={{ height: '36px', width: 'auto' }}
+                        />
+                    </Link>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
+                    <button
+                        className="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                    >
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div className="collapse navbar-collapse" id="mainNavbar">
+                        <ul className="navbar-nav me-auto">
+                            <li className="nav-item">
+                                <Link
                                     href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    className={`nav-link ${
+                                        route().current('dashboard')
+                                            ? 'active'
+                                            : ''
+                                    }`}
                                 >
                                     Dashboard
-                                </NavLink>
-                                {isAdmin && (
-                                    <NavLink
+                                </Link>
+                            </li>
+                            {isAdmin && (
+                                <li className="nav-item">
+                                    <Link
                                         href={route('admin.dashboard')}
-                                        active={route().current('admin.*')}
+                                        className={`nav-link ${
+                                            route().current('admin.*')
+                                                ? 'active'
+                                                : ''
+                                        }`}
                                     >
                                         Admin
-                                    </NavLink>
-                                )}
-                            </div>
-                        </div>
+                                    </Link>
+                                </li>
+                            )}
+                        </ul>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
+                        <ul className="navbar-nav ms-auto">
+                            <li className="nav-item dropdown">
+                                <button
+                                    className="btn btn-outline-secondary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    {user.name}
+                                </button>
+                                <ul className="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <Link
                                             href={route('profile.edit')}
+                                            className="dropdown-item"
                                         >
                                             Profile
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
+                                            className="dropdown-item"
                                         >
                                             Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                        {isAdmin && (
-                            <ResponsiveNavLink
-                                href={route('admin.dashboard')}
-                                active={route().current('admin.*')}
-                            >
-                                Admin
-                            </ResponsiveNavLink>
-                        )}
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
 
             {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
+                <header className="bg-white border-bottom">
+                    <div className="container py-4">{header}</div>
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="container py-4">{children}</main>
         </div>
     );
 }

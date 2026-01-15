@@ -44,10 +44,10 @@ export default function Dashboard({ stats, recentUsers, recentAds }: DashboardPr
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Admin
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Yfirlit stjórnborðs
                     </h1>
                 </div>
@@ -55,102 +55,117 @@ export default function Dashboard({ stats, recentUsers, recentAds }: DashboardPr
         >
             <Head title="Admin stjórnborð" />
 
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <section className="row g-4">
                 {statCards.map((card) => (
-                    <Link
-                        key={card.key}
-                        href={route(card.routeName)}
-                        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 hover:shadow"
-                    >
-                        <p className="text-sm font-medium text-slate-500">
-                            {card.label}
-                        </p>
-                        <p className="mt-2 text-3xl font-semibold text-slate-900">
-                            {stats[card.key]}
-                        </p>
-                        <p className="mt-3 text-xs font-medium text-slate-400">
-                            Sjá nánar →
-                        </p>
-                    </Link>
+                    <div key={card.key} className="col-md-6 col-xl-3">
+                        <Link
+                            href={route(card.routeName)}
+                            className="card h-100 shadow-sm text-decoration-none"
+                        >
+                            <div className="card-body">
+                                <p className="small text-muted fw-semibold mb-2">
+                                    {card.label}
+                                </p>
+                                <p className="display-6 fw-semibold text-dark mb-2">
+                                    {stats[card.key]}
+                                </p>
+                                <p className="small text-muted mb-0">
+                                    Sjá nánar →
+                                </p>
+                            </div>
+                        </Link>
+                    </div>
                 ))}
             </section>
 
-            <section className="grid gap-6 lg:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">
+            <section className="row g-4">
+                <div className="col-lg-6">
+                    <div className="card shadow-sm h-100">
+                        <div className="card-body">
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <h2 className="h5 fw-semibold mb-0">
                             Nýjustu notendur
-                        </h2>
-                        <Link
-                            href={route('admin.users.index')}
-                            className="text-sm font-medium text-slate-500 transition hover:text-slate-900"
-                        >
-                            Skoða alla
-                        </Link>
-                    </div>
-                    <div className="mt-4 space-y-3">
-                        {recentUsers.map((user) => (
-                            <div
-                                key={user.id}
-                                className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3"
-                            >
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-900">
-                                        {user.name}
-                                    </p>
-                                    <p className="text-xs text-slate-500">
-                                        {user.email}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-medium uppercase text-slate-400">
-                                        {user.role}
-                                    </p>
-                                    <p className="text-xs text-slate-400">
-                                        {user.created_at ?? '—'}
-                                    </p>
-                                </div>
+                                </h2>
+                                <Link
+                                    href={route('admin.users.index')}
+                                    className="btn btn-link px-0"
+                                >
+                                    Skoða alla
+                                </Link>
                             </div>
-                        ))}
+                            <div className="d-flex flex-column gap-3">
+                                {recentUsers.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        className="border rounded-3 bg-light px-3 py-2 d-flex align-items-center justify-content-between"
+                                    >
+                                        <div>
+                                            <p className="mb-1 fw-semibold">
+                                                {user.name}
+                                            </p>
+                                            <p className="mb-0 small text-muted">
+                                                {user.email}
+                                            </p>
+                                        </div>
+                                        <div className="text-end">
+                                            <p className="mb-1 small text-uppercase text-muted fw-semibold">
+                                                {user.role}
+                                            </p>
+                                            <p className="mb-0 small text-muted">
+                                                {user.created_at ?? '—'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">
+                <div className="col-lg-6">
+                    <div className="card shadow-sm h-100">
+                        <div className="card-body">
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <h2 className="h5 fw-semibold mb-0">
                             Nýjustu auglýsingar
-                        </h2>
-                        <Link
-                            href={route('admin.ads.index')}
-                            className="text-sm font-medium text-slate-500 transition hover:text-slate-900"
-                        >
-                            Skoða allar
-                        </Link>
-                    </div>
-                    <div className="mt-4 space-y-3">
-                        {recentAds.map((ad) => (
-                            <div
-                                key={ad.id}
-                                className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <p className="text-sm font-semibold text-slate-900">
-                                        {ad.title}
-                                    </p>
-                                    <span className="rounded-full bg-slate-200 px-2 py-1 text-xs font-semibold uppercase text-slate-600">
-                                        {ad.status}
-                                    </span>
-                                </div>
-                                <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
-                                    <span>
-                                        {ad.user?.name ? `Eigandi: ${ad.user.name}` : 'Enginn eigandi'}
-                                    </span>
-                                    <span>
-                                        {ad.price ? `${ad.price} ${ad.currency ?? ''}` : '—'}
-                                    </span>
-                                </div>
+                                </h2>
+                                <Link
+                                    href={route('admin.ads.index')}
+                                    className="btn btn-link px-0"
+                                >
+                                    Skoða allar
+                                </Link>
                             </div>
-                        ))}
+                            <div className="d-flex flex-column gap-3">
+                                {recentAds.map((ad) => (
+                                    <div
+                                        key={ad.id}
+                                        className="border rounded-3 bg-light px-3 py-2"
+                                    >
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <p className="mb-1 fw-semibold">
+                                                {ad.title}
+                                            </p>
+                                            <span className="badge bg-secondary text-uppercase">
+                                                {ad.status}
+                                            </span>
+                                        </div>
+                                        <div className="d-flex align-items-center justify-content-between small text-muted">
+                                            <span>
+                                                {ad.user?.name
+                                                    ? `Eigandi: ${ad.user.name}`
+                                                    : 'Enginn eigandi'}
+                                            </span>
+                                            <span>
+                                                {ad.price
+                                                    ? `${ad.price} ${ad.currency ?? ''}`
+                                                    : '—'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
