@@ -1,5 +1,7 @@
+import Modal from '@/Components/Modal';
 import AppLayout from '@/Layouts/AppLayout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 type AdRow = {
     id: number;
@@ -59,6 +61,20 @@ function statusMeta(status: AdRow['status']) {
 export default function Index() {
     const { props } = usePage<PageProps>();
     const { filters, counts, extendOptions, ads } = props;
+    const [soldAd, setSoldAd] = useState<AdRow | null>(null);
+    const {
+        data: soldData,
+        setData: setSoldData,
+        patch: submitSold,
+        processing: soldProcessing,
+        reset: resetSold,
+        clearErrors: clearSoldErrors,
+        errors: soldErrors,
+    } = useForm({
+        status: 'sold',
+        buyer_identifier: '',
+        sold_outside: false,
+    });
 
     const setFilter = (status: string) => {
         router.get(route('account.ads.index'), { status, q: filters.q }, { preserveScroll: true, preserveState: true });
@@ -70,6 +86,27 @@ export default function Index() {
 
     const extend = (ad: AdRow, days: number) => {
         router.patch(ad.links.extend, { days }, { preserveScroll: true });
+    };
+
+    const openSoldModal = (ad: AdRow) => {
+        setSoldAd(ad);
+        resetSold();
+        clearSoldErrors();
+    };
+
+    const closeSoldModal = () => {
+        setSoldAd(null);
+        resetSold();
+        clearSoldErrors();
+    };
+
+    const confirmSold = () => {
+        if (!soldAd) return;
+
+        submitSold(soldAd.links.status, {
+            preserveScroll: true,
+            onSuccess: () => closeSoldModal(),
+        });
     };
 
     const filterButtons = [
@@ -133,7 +170,9 @@ export default function Index() {
 
                                         <div className="flex-grow-1">
                                             <div className="d-flex justify-content-between gap-2">
-                                                <div className="fw-semibold">{ad.title}</div>
+                                                <a className="fw-semibold text-decoration-none" href={ad.links.show}>
+                                                    {ad.title}
+                                                </a>
                                                 <span className={`badge ${sm.badge}`}>{sm.label}</span>
                                             </div>
 
@@ -144,18 +183,10 @@ export default function Index() {
                                             <div className="text-muted small">
                                                 Birting: {fmtDate(ad.published_at)} · Rennur út: {fmtDate(ad.expires_at)}
                                             </div>
-                                            {ad.status === 'sold' ? (
-                                                <div className="text-muted small">
-                                                    Kaupandi: {ad.buyer?.name ?? (ad.sold_outside ? 'Selt utan vefsins' : 'Enginn')}
-                                                </div>
-                                            ) : null}
                                         </div>
                                     </div>
 
                                     <div className="d-flex flex-wrap gap-2 mt-3">
-                                        <a className="btn btn-outline-dark btn-sm" href={ad.links.show}>
-                                            Skoða
-                                        </a>
                                         {ad.status !== 'sold' ? (
                                             <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
                                                 Breyta
@@ -185,7 +216,7 @@ export default function Index() {
                                         ) : null}
 
                                         {ad.status !== 'sold' ? (
-                                            <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'sold')}>
+                                            <button className="btn btn-outline-dark btn-sm" onClick={() => openSoldModal(ad)}>
                                                 Merkja selt
                                             </button>
                                         ) : null}
@@ -223,16 +254,13 @@ export default function Index() {
                                                         ) : null}
                                                     </div>
                                                     <div>
-                                                        <div className="fw-semibold">{ad.title}</div>
+                                                        <a className="fw-semibold text-decoration-none" href={ad.links.show}>
+                                                            {ad.title}
+                                                        </a>
                                                         <div className="text-muted small">
                                                             {ad.price !== null ? `${ad.price.toLocaleString()} ${ad.currency}` : '—'} ·{' '}
                                                             {ad.category?.name ?? ''}
                                                         </div>
-                                                        {ad.status === 'sold' ? (
-                                                            <div className="text-muted small">
-                                                                Kaupandi: {ad.buyer?.name ?? (ad.sold_outside ? 'Selt utan vefsins' : 'Enginn')}
-                                                            </div>
-                                                        ) : null}
                                                     </div>
                                                 </div>
                                             </td>
@@ -247,9 +275,6 @@ export default function Index() {
 
                                             <td className="text-end">
                                                 <div className="d-inline-flex flex-wrap gap-2 justify-content-end">
-                                                    <a className="btn btn-outline-dark btn-sm" href={ad.links.show}>
-                                                        Skoða
-                                                    </a>
                                                     {ad.status !== 'sold' ? (
                                                         <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
                                                             Breyta
@@ -277,7 +302,7 @@ export default function Index() {
                                                     ) : null}
 
                                                     {ad.status !== 'sold' ? (
-                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'sold')}>
+                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => openSoldModal(ad)}>
                                                             Selt
                                                         </button>
                                                     ) : null}
@@ -319,6 +344,56 @@ export default function Index() {
                         </ul>
                     </nav>
                 ) : null}
+
+                <Modal show={Boolean(soldAd)} onClose={closeSoldModal}>
+                    <div className="p-4">
+                        <h2 className="h5 mb-3">Merkja auglýsingu selda</h2>
+                        <p className="text-muted small mb-3">
+                            Sláðu inn notandanafn eða ID kaupanda sem er skráður í kerfinu. Ef salan fór fram utan vefsins
+                            skaltu haka við viðeigandi valmöguleika.
+                        </p>
+                        <div className="mb-3">
+                            <label className="form-label fw-semibold" htmlFor="buyer-identifier">
+                                Kaupandi (ID eða notendanafn)
+                            </label>
+                            <input
+                                id="buyer-identifier"
+                                className="form-control"
+                                value={soldData.buyer_identifier}
+                                onChange={(event) => setSoldData('buyer_identifier', event.target.value)}
+                                disabled={soldData.sold_outside}
+                            />
+                            {soldErrors.buyer_identifier ? (
+                                <div className="text-danger small mt-2">{soldErrors.buyer_identifier}</div>
+                            ) : null}
+                        </div>
+                        <div className="form-check mb-3">
+                            <input
+                                id="sold-outside"
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={soldData.sold_outside}
+                                onChange={(event) => setSoldData('sold_outside', event.target.checked)}
+                            />
+                            <label className="form-check-label" htmlFor="sold-outside">
+                                Selt utan vefsins
+                            </label>
+                        </div>
+                        <div className="d-flex justify-content-end gap-2">
+                            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={closeSoldModal}>
+                                Hætta við
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-warning btn-sm"
+                                onClick={confirmSold}
+                                disabled={soldProcessing}
+                            >
+                                Staðfesta söluna
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         </AppLayout>
     );

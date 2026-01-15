@@ -152,7 +152,7 @@ export default function Index() {
                                                                 </Link>
                                                             ) : deal.review?.has_review ? (
                                                                 <Link href={deal.review.link} className="btn btn-outline-secondary btn-sm">
-                                                                    Skoða umsögn
+                                                                    Umsögn
                                                                 </Link>
                                                             ) : (
                                                                 <span className="text-muted small">—</span>

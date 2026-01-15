@@ -25,6 +25,7 @@ class DealReviewController extends Controller
 
         $isSeller = (int) $deal->seller_id === (int) $user->id;
         $ratee = $isSeller ? $deal->buyer : $deal->seller;
+        $rateeRole = $isSeller ? 'Kaupandi' : 'Seljandi';
 
         $reviews = DealReview::query()
             ->where('deal_id', $deal->id)
@@ -61,6 +62,7 @@ class DealReviewController extends Controller
                 'id' => $ratee->id,
                 'name' => $ratee->name,
                 'profile_url' => $ratee->username ? route('users.show', $ratee->username) : null,
+                'role' => $rateeRole,
             ] : null,
             'existingReview' => $existingReview ? [
                 'rating' => $existingReview->rating,
