@@ -9,13 +9,16 @@ type AdRow = {
     currency: string;
     section: string;
 
-    status: 'draft' | 'active' | 'paused' | 'sold' | 'archived' | 'expired';
+    status: 'active' | 'inactive' | 'sold';
     published_at: string | null;
     expires_at: string | null;
     views_count: number;
 
     category: { slug: string | null; name: string | null };
     main_image_url: string | null;
+    buyer: { id: number; name: string } | null;
+    sold_outside: boolean;
+    can_extend: boolean;
 
     links: {
         edit: string;
@@ -43,18 +46,12 @@ function fmtDate(s: string | null) {
 
 function statusMeta(status: AdRow['status']) {
     switch (status) {
-        case 'draft':
-            return { label: 'Drög', badge: 'text-bg-secondary' };
         case 'active':
             return { label: 'Virk', badge: 'text-bg-success' };
-        case 'paused':
-            return { label: 'Í pásu', badge: 'text-bg-warning' };
+        case 'inactive':
+            return { label: 'Óvirk', badge: 'text-bg-secondary' };
         case 'sold':
-            return { label: 'Seld', badge: 'text-bg-dark' };
-        case 'archived':
-            return { label: 'Geymd', badge: 'text-bg-light' };
-        case 'expired':
-            return { label: 'Útrunnin', badge: 'text-bg-danger' };
+            return { label: 'Frágengin', badge: 'text-bg-dark' };
         default:
             return { label: status, badge: 'text-bg-secondary' };
     }
@@ -72,7 +69,7 @@ export default function Index() {
         router.get(route('account.ads.index'), { status: filters.status, q }, { preserveScroll: true, preserveState: true });
     };
 
-    const patchStatus = (ad: AdRow, status: AdRow['status'] | 'active' | 'paused' | 'sold' | 'archived' | 'draft') => {
+    const patchStatus = (ad: AdRow, status: AdRow['status'] | 'active' | 'inactive' | 'sold') => {
         router.patch(ad.links.status, { status }, { preserveScroll: true });
     };
 
@@ -82,12 +79,9 @@ export default function Index() {
 
     const filterButtons = [
         { key: 'all', label: 'Allt' },
-        { key: 'draft', label: 'Drög' },
-        { key: 'active', label: 'Virk' },
-        { key: 'paused', label: 'Í pásu' },
-        { key: 'expired', label: 'Útrunnin' },
-        { key: 'sold', label: 'Seld' },
-        { key: 'archived', label: 'Geymd' },
+        { key: 'active', label: 'Virkar' },
+        { key: 'inactive', label: 'Óvirkar' },
+        { key: 'sold', label: 'Frágengið' },
     ];
 
     return (
@@ -153,7 +147,6 @@ export default function Index() {
                         <div className="d-md-none">
                             {ads.data.map((ad) => {
                                 const sm = statusMeta(ad.status);
-                                const canExtend = !['sold', 'archived', 'draft'].includes(ad.status);
                                 return (
                                     <div className="card mb-3" key={ad.id}>
                                         <div className="card-body">
@@ -177,6 +170,11 @@ export default function Index() {
                                                     <div className="text-muted small">
                                                         Birting: {fmtDate(ad.published_at)} · Rennur út: {fmtDate(ad.expires_at)}
                                                     </div>
+                                                    {ad.status === 'sold' ? (
+                                                        <div className="text-muted small">
+                                                            Kaupandi: {ad.buyer?.name ?? (ad.sold_outside ? 'Selt utan vefsins' : 'Enginn')}
+                                                        </div>
+                                                    ) : null}
                                                 </div>
                                             </div>
 
@@ -184,29 +182,25 @@ export default function Index() {
                                                 <a className="btn btn-outline-dark btn-sm" href={ad.links.show}>
                                                     Skoða
                                                 </a>
-                                                <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
-                                                    Breyta
-                                                </a>
-
-                                                {ad.status === 'draft' ? (
-                                                    <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
-                                                        Birta
-                                                    </button>
+                                                {ad.status !== 'sold' ? (
+                                                    <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
+                                                        Breyta
+                                                    </a>
                                                 ) : null}
 
                                                 {ad.status === 'active' ? (
-                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'paused')}>
-                                                        Pása
+                                                    <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
+                                                        Óvirkja
                                                     </button>
                                                 ) : null}
 
-                                                {ad.status === 'paused' || ad.status === 'expired' ? (
+                                                {ad.status === 'inactive' ? (
                                                     <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
                                                         Virkja
                                                     </button>
                                                 ) : null}
 
-                                                {canExtend ? (
+                                                {ad.can_extend ? (
                                                     <>
                                                         {extendOptions.map((d) => (
                                                             <button key={d} className="btn btn-outline-secondary btn-sm" onClick={() => extend(ad, d)}>
@@ -216,15 +210,9 @@ export default function Index() {
                                                     </>
                                                 ) : null}
 
-                                                {!['sold', 'archived'].includes(ad.status) ? (
+                                                {ad.status !== 'sold' ? (
                                                     <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'sold')}>
                                                         Merkja selt
-                                                    </button>
-                                                ) : null}
-
-                                                {ad.status !== 'archived' ? (
-                                                    <button className="btn btn-outline-secondary btn-sm" onClick={() => patchStatus(ad, 'archived')}>
-                                                        Geyma
                                                     </button>
                                                 ) : null}
                                             </div>
@@ -250,7 +238,6 @@ export default function Index() {
                                     <tbody>
                                     {ads.data.map((ad) => {
                                         const sm = statusMeta(ad.status);
-                                        const canExtend = !['sold', 'archived', 'draft'].includes(ad.status);
 
                                         return (
                                             <tr key={ad.id}>
@@ -263,12 +250,17 @@ export default function Index() {
                                                         </div>
                                                         <div>
                                                             <div className="fw-semibold">{ad.title}</div>
-                                                            <div className="text-muted small">
-                                                                {ad.price !== null ? `${ad.price.toLocaleString()} ${ad.currency}` : '—'} · {ad.category?.name ?? ''}
-                                                            </div>
-                                                        </div>
+                                                    <div className="text-muted small">
+                                                        {ad.price !== null ? `${ad.price.toLocaleString()} ${ad.currency}` : '—'} · {ad.category?.name ?? ''}
                                                     </div>
-                                                </td>
+                                                    {ad.status === 'sold' ? (
+                                                        <div className="text-muted small">
+                                                            Kaupandi: {ad.buyer?.name ?? (ad.sold_outside ? 'Selt utan vefsins' : 'Enginn')}
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                        </td>
 
                                                 <td>
                                                     <span className={`badge ${sm.badge}`}>{sm.label}</span>
@@ -283,29 +275,25 @@ export default function Index() {
                                                         <a className="btn btn-outline-dark btn-sm" href={ad.links.show}>
                                                             Skoða
                                                         </a>
-                                                        <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
-                                                            Breyta
-                                                        </a>
-
-                                                        {ad.status === 'draft' ? (
-                                                            <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
-                                                                Birta
-                                                            </button>
+                                                        {ad.status !== 'sold' ? (
+                                                            <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
+                                                                Breyta
+                                                            </a>
                                                         ) : null}
 
                                                         {ad.status === 'active' ? (
-                                                            <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'paused')}>
-                                                                Pása
+                                                            <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
+                                                                Óvirkja
                                                             </button>
                                                         ) : null}
 
-                                                        {ad.status === 'paused' || ad.status === 'expired' ? (
+                                                        {ad.status === 'inactive' ? (
                                                             <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
                                                                 Virkja
                                                             </button>
                                                         ) : null}
 
-                                                        {canExtend ? (
+                                                        {ad.can_extend ? (
                                                             extendOptions.map((d) => (
                                                                 <button key={d} className="btn btn-outline-secondary btn-sm" onClick={() => extend(ad, d)}>
                                                                     +{d} dagar
@@ -313,15 +301,9 @@ export default function Index() {
                                                             ))
                                                         ) : null}
 
-                                                        {!['sold', 'archived'].includes(ad.status) ? (
+                                                        {ad.status !== 'sold' ? (
                                                             <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'sold')}>
                                                                 Selt
-                                                            </button>
-                                                        ) : null}
-
-                                                        {ad.status !== 'archived' ? (
-                                                            <button className="btn btn-outline-secondary btn-sm" onClick={() => patchStatus(ad, 'archived')}>
-                                                                Geyma
                                                             </button>
                                                         ) : null}
                                                     </div>

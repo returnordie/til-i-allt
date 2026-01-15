@@ -20,6 +20,10 @@ class AdPolicy
 
     public function update(User $user, Ad $ad): bool
     {
+        if ($ad->status === 'sold') {
+            return false;
+        }
+
         return $user->isAdmin() || $ad->user_id === $user->id;
     }
 

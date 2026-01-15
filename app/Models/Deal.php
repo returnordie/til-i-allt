@@ -49,6 +49,22 @@ class Deal extends Model
         return $this->hasMany(DealReview::class);
     }
 
+    public function reviewsOpenAt()
+    {
+        if (!$this->completed_at) {
+            return null;
+        }
+
+        return $this->completed_at->copy()->addHours(24);
+    }
+
+    public function reviewsAreOpen(): bool
+    {
+        $openAt = $this->reviewsOpenAt();
+
+        return $openAt !== null && now()->greaterThanOrEqualTo($openAt);
+    }
+
     public function isParticipant(int $userId): bool
     {
         return $userId === (int) $this->seller_id || $userId === (int) $this->buyer_id;

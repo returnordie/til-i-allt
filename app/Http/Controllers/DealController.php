@@ -21,11 +21,11 @@ class DealController extends Controller
             'currency' => ['nullable', 'string', 'size:3'],
         ]);
 
-        // þú getur valið: annaðhvort alltaf create, eða “reuse” current proposed/confirmed
+        // þú getur valið: annaðhvort alltaf create, eða “reuse” current active
         $deal = Deal::query()
             ->where('ad_id', $ad->id)
             ->where('seller_id', $user->id)
-            ->whereIn('status', ['proposed', 'confirmed'])
+            ->whereIn('status', ['active'])
             ->latest('id')
             ->first();
 
@@ -33,7 +33,7 @@ class DealController extends Controller
             $deal = new Deal([
                 'ad_id' => $ad->id,
                 'seller_id' => $user->id,
-                'status' => 'proposed',
+                'status' => 'active',
                 'currency' => $data['currency'] ?? 'ISK',
             ]);
         }
@@ -70,47 +70,49 @@ class DealController extends Controller
         $user = $request->user();
 
         $data = $request->validate([
-            'status' => ['required', 'in:proposed,confirmed,completed,canceled,disputed'],
+            'status' => ['required', 'in:active,inactive,completed'],
         ]);
 
         $to = $data['status'];
 
         // aðgangsstýring (einföld og practical)
-        // - seljandi: má alltaf cancel/dispute/complete
-        // - kaupandi: má confirm (og optionally dispute)
+        // - seljandi: má stjórna stöðu
+        // - kaupandi: má hætta við innan 24 klst eftir frágang
         $isSeller = (int) $deal->seller_id === (int) $user->id;
         $isBuyer  = $deal->buyer_id && (int) $deal->buyer_id === (int) $user->id;
 
         abort_unless($isSeller || $isBuyer, 403);
 
-        if ($to === 'confirmed') {
-            abort_unless($isBuyer || $isSeller, 403);
-            abort_if(!$deal->buyer_id, 422, 'Það þarf að vera valinn kaupandi.');
-            $deal->status = 'confirmed';
-            $deal->confirmed_at = $deal->confirmed_at ?? now();
-        }
+        if ($deal->status === 'completed') {
+            if ($to !== 'inactive') {
+                abort(422, 'Viðskiptum er lokið.');
+            }
 
-        if ($to === 'completed') {
-            abort_unless($isSeller, 403); // þú getur leyft buyer líka ef þú vilt
-            abort_if(!$deal->buyer_id, 422, 'Það þarf að vera valinn kaupandi.');
-            $deal->status = 'completed';
-            $deal->completed_at = $deal->completed_at ?? now();
-        }
+            abort_unless($isBuyer, 403);
 
-        if ($to === 'canceled') {
-            abort_unless($isSeller, 403);
-            $deal->status = 'canceled';
+            $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
+            abort_if(!$windowEndsAt || now()->greaterThan($windowEndsAt), 422, 'Það er ekki hægt að hætta við eftir 24 klst.');
+
+            $deal->status = 'inactive';
             $deal->canceled_at = $deal->canceled_at ?? now();
-        }
+        } else {
+            if ($to === 'completed') {
+                abort_unless($isSeller, 403);
+                abort_if(!$deal->buyer_id, 422, 'Það þarf að vera valinn kaupandi.');
+                $deal->status = 'completed';
+                $deal->completed_at = $deal->completed_at ?? now();
+            }
 
-        if ($to === 'disputed') {
-            // leyfa báðum
-            $deal->status = 'disputed';
-        }
+            if ($to === 'inactive') {
+                abort_unless($isSeller, 403);
+                $deal->status = 'inactive';
+                $deal->canceled_at = $deal->canceled_at ?? now();
+            }
 
-        if ($to === 'proposed') {
-            abort_unless($isSeller, 403);
-            $deal->status = 'proposed';
+            if ($to === 'active') {
+                abort_unless($isSeller, 403);
+                $deal->status = 'active';
+            }
         }
 
         $deal->save();

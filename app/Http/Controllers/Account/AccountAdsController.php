@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ExtendAccountAdRequest;
 use App\Http\Requests\Account\UpdateAccountAdStatusRequest;
 use App\Models\Ad;
+use App\Models\Deal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,21 +33,20 @@ class AccountAdsController extends Controller
                 });
         };
 
+        $inactiveScope = function ($query) use ($expiredScope) {
+            $query->whereIn('status', ['draft', 'paused', 'archived'])
+                ->orWhere($expiredScope);
+        };
+
         // Counts (active/paused exclude expired-by-date)
         $counts = [
             'all' => (clone $base)->count(),
-            'draft' => (clone $base)->where('status', 'draft')->count(),
             'active' => (clone $base)->where('status', 'active')
                 ->where(function ($q) {
                     $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
                 })->count(),
-            'paused' => (clone $base)->where('status', 'paused')
-                ->where(function ($q) {
-                    $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
-                })->count(),
             'sold' => (clone $base)->where('status', 'sold')->count(),
-            'archived' => (clone $base)->where('status', 'archived')->count(),
-            'expired' => (clone $base)->where($expiredScope)->count(),
+            'inactive' => (clone $base)->where($inactiveScope)->count(),
         ];
 
         $query = Ad::query()
@@ -56,6 +56,7 @@ class AccountAdsController extends Controller
                 'images' => function ($q) {
                     $q->orderByDesc('is_main')->orderBy('sort_order')->whereNull('deleted_at');
                 },
+                'latestDeal.buyer:id,name',
             ]);
 
         if ($q !== '') {
@@ -66,15 +67,15 @@ class AccountAdsController extends Controller
         }
 
         if ($status !== 'all') {
-            if ($status === 'expired') {
-                $query->where($expiredScope);
-            } elseif (in_array($status, ['active', 'paused'], true)) {
-                $query->where('status', $status)
+            if ($status === 'inactive') {
+                $query->where($inactiveScope);
+            } elseif ($status === 'active') {
+                $query->where('status', 'active')
                     ->where(function ($q) {
                         $q->whereNull('expires_at')->orWhere('expires_at', '>=', now());
                     });
-            } else {
-                $query->where('status', $status);
+            } elseif ($status === 'sold') {
+                $query->where('status', 'sold');
             }
         }
 
@@ -88,7 +89,17 @@ class AccountAdsController extends Controller
                 && $ad->expires_at->isPast()
                 && in_array($ad->status, ['active', 'paused'], true);
 
-            $displayStatus = $isExpired ? 'expired' : $ad->status;
+            $displayStatus = 'active';
+
+            if ($ad->status === 'sold') {
+                $displayStatus = 'sold';
+            } elseif ($isExpired || in_array($ad->status, ['draft', 'paused', 'archived'], true)) {
+                $displayStatus = 'inactive';
+            }
+
+            $latestDeal = $ad->latestDeal;
+            $buyer = $latestDeal?->buyer;
+            $soldOutside = $latestDeal && !$latestDeal->buyer_id;
 
             return [
                 'id' => $ad->id,
@@ -107,7 +118,14 @@ class AccountAdsController extends Controller
                     'name' => $ad->category?->name,
                 ],
 
+                'buyer' => $buyer ? [
+                    'id' => $buyer->id,
+                    'name' => $buyer->name,
+                ] : null,
+                'sold_outside' => $soldOutside,
+
                 'main_image_url' => $mainUrl,
+                'can_extend' => !in_array($ad->status, ['sold', 'archived', 'draft'], true),
 
                 'links' => [
                     'edit' => route('ads.edit', $ad),
@@ -140,9 +158,8 @@ class AccountAdsController extends Controller
 
         $status = $request->validated()['status'];
 
-        // Basic guards
-        if ($ad->status === 'archived' && $status === 'active') {
-            // allow re-activate archived if you want; keep allowed here
+        if ($ad->status === 'sold' && $status !== 'sold') {
+            return back()->with('error', 'Seld auglýsing er ekki hægt að endurvekja eða breyta.');
         }
 
         if ($status === 'active') {
@@ -157,7 +174,38 @@ class AccountAdsController extends Controller
             }
         }
 
-        $ad->status = $status;
+        if ($status === 'inactive') {
+            $ad->status = 'paused';
+        } else {
+            $ad->status = $status;
+        }
+
+        if ($status === 'sold') {
+            $deal = Deal::query()
+                ->where('ad_id', $ad->id)
+                ->where('seller_id', $ad->user_id)
+                ->latest('id')
+                ->first();
+
+            if (!$deal) {
+                $deal = new Deal([
+                    'ad_id' => $ad->id,
+                    'seller_id' => $ad->user_id,
+                    'buyer_id' => null,
+                    'status' => 'completed',
+                    'price_final' => $ad->price,
+                    'currency' => $ad->currency ?? 'ISK',
+                ]);
+            }
+
+            $deal->status = 'completed';
+            $deal->completed_at = $deal->completed_at ?? now();
+            $deal->meta = array_merge($deal->meta ?? [], [
+                'sold_outside' => !$deal->buyer_id,
+            ]);
+            $deal->save();
+        }
+
         $ad->save();
 
         return back()->with('success', 'Staða uppfærð.');
