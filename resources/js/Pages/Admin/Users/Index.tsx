@@ -38,95 +38,94 @@ export default function Index({ filters, users }: UsersPageProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-muted text-uppercase small mb-1">
+                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
                         Notendur
                     </p>
-                    <h1 className="h3 mb-0">Stjórna notendum</h1>
+                    <h1 className="text-2xl font-semibold text-slate-900">
+                        Stjórna notendum
+                    </h1>
                 </div>
             }
         >
             <Head title="Notendur" />
 
-            <section className="card shadow-sm">
-                <div className="card-body">
-                    <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between">
-                        <div className="text-muted small">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-slate-600">
                             {users.meta.total} notendur
-                        </div>
-                        <form onSubmit={submit} className="d-flex gap-2">
-                            <input
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                className="form-control"
-                                placeholder="Leita eftir nafni, email eða notendanafni"
-                            />
-                            <button
-                                type="submit"
-                                className="btn btn-dark"
-                            >
-                                Leita
-                            </button>
-                        </form>
+                        </p>
                     </div>
-
-                    <div className="table-responsive mt-4">
-                        <table className="table align-middle">
-                            <thead className="table-light">
-                                <tr>
-                                    <th>Nafn</th>
-                                    <th>Email</th>
-                                    <th>Notendanafn</th>
-                                    <th>Hlutverk</th>
-                                    <th>Staða</th>
-                                    <th className="text-end">Aðgerðir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.data.map((user) => (
-                                    <tr key={user.id}>
-                                        <td className="fw-semibold">
-                                            {user.name}
-                                        </td>
-                                        <td>{user.email}</td>
-                                        <td>{user.username ?? '—'}</td>
-                                        <td>
-                                            <span className="badge text-bg-secondary text-uppercase">
-                                                {user.role}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span
-                                                className={`badge ${
-                                                    user.is_active
-                                                        ? 'text-bg-success'
-                                                        : 'text-bg-danger'
-                                                }`}
-                                            >
-                                                {user.is_active
-                                                    ? 'Virkur'
-                                                    : 'Óvirkur'}
-                                            </span>
-                                        </td>
-                                        <td className="text-end">
-                                            <Link
-                                                href={route(
-                                                    'admin.users.edit',
-                                                    user.id,
-                                                )}
-                                                className="btn btn-sm btn-outline-dark"
-                                            >
-                                                Breyta
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <Pagination links={users.links} />
+                    <form onSubmit={submit} className="flex w-full gap-2 md:w-auto">
+                        <input
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none"
+                            placeholder="Leita eftir nafni, email eða notendanafni"
+                        />
+                        <button
+                            type="submit"
+                            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                        >
+                            Leita
+                        </button>
+                    </form>
                 </div>
+
+                <div className="mt-6 overflow-x-auto">
+                    <table className="min-w-full text-left text-sm">
+                        <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                            <tr>
+                                <th className="px-3 py-3">Nafn</th>
+                                <th className="px-3 py-3">Email</th>
+                                <th className="px-3 py-3">Notendanafn</th>
+                                <th className="px-3 py-3">Hlutverk</th>
+                                <th className="px-3 py-3">Staða</th>
+                                <th className="px-3 py-3 text-right">Aðgerðir</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {users.data.map((user) => (
+                                <tr key={user.id} className="hover:bg-slate-50">
+                                    <td className="px-3 py-3 font-medium text-slate-900">
+                                        {user.name}
+                                    </td>
+                                    <td className="px-3 py-3 text-slate-600">
+                                        {user.email}
+                                    </td>
+                                    <td className="px-3 py-3 text-slate-600">
+                                        {user.username ?? '—'}
+                                    </td>
+                                    <td className="px-3 py-3">
+                                        <span className="rounded-full bg-slate-200 px-2 py-1 text-xs font-semibold text-slate-700">
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-3 py-3">
+                                        <span
+                                            className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                                                user.is_active
+                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                    : 'bg-rose-100 text-rose-700'
+                                            }`}
+                                        >
+                                            {user.is_active ? 'Virkur' : 'Óvirkur'}
+                                        </span>
+                                    </td>
+                                    <td className="px-3 py-3 text-right">
+                                        <Link
+                                            href={route('admin.users.edit', user.id)}
+                                            className="text-sm font-semibold text-slate-900 hover:text-slate-600"
+                                        >
+                                            Breyta
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <Pagination links={users.links} />
             </section>
         </AdminLayout>
     );

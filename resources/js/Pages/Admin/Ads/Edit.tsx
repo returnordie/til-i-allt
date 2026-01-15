@@ -1,3 +1,7 @@
+import Checkbox from '@/Components/Checkbox';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -33,154 +37,115 @@ export default function Edit({ ad, categories, statusOptions }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-muted text-uppercase small mb-1">
+                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
                         Auglýsing #{ad.id}
                     </p>
-                    <h1 className="h3 mb-0">Breyta auglýsingu</h1>
+                    <h1 className="text-2xl font-semibold text-slate-900">
+                        Breyta auglýsingu
+                    </h1>
                 </div>
             }
         >
             <Head title={`Auglýsing ${ad.title}`} />
 
-            <section className="card shadow-sm">
-                <div className="card-body">
-                    <div className="row g-3">
-                        <div className="col-12">
-                            <label htmlFor="title" className="form-label">
-                                Titill
-                            </label>
-                            <input
-                                id="title"
-                                className="form-control"
-                                value={data.title}
-                                onChange={(e) =>
-                                    setData('title', e.target.value)
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <label htmlFor="status" className="form-label">
-                                Staða
-                            </label>
-                            <select
-                                id="status"
-                                className="form-select"
-                                value={data.status}
-                                onChange={(e) =>
-                                    setData('status', e.target.value)
-                                }
-                            >
-                                {statusOptions.map((option) => (
-                                    <option key={option} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="col-md-6">
-                            <label htmlFor="category" className="form-label">
-                                Flokkur
-                            </label>
-                            <select
-                                id="category"
-                                className="form-select"
-                                value={data.category_id}
-                                onChange={(e) =>
-                                    setData('category_id', e.target.value)
-                                }
-                            >
-                                <option value="">—</option>
-                                {categories.map((category) => (
-                                    <option
-                                        key={category.id}
-                                        value={category.id}
-                                    >
-                                        {category.section} · {category.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="col-md-6">
-                            <label htmlFor="price" className="form-label">
-                                Verð
-                            </label>
-                            <input
-                                id="price"
-                                type="number"
-                                className="form-control"
-                                value={data.price}
-                                onChange={(e) =>
-                                    setData('price', e.target.value)
-                                }
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <label
-                                htmlFor="currency"
-                                className="form-label"
-                            >
-                                Gjaldeyrir
-                            </label>
-                            <input
-                                id="currency"
-                                className="form-control"
-                                value={data.currency}
-                                onChange={(e) =>
-                                    setData('currency', e.target.value)
-                                }
-                            />
-                        </div>
-                        <div className="col-md-6">
-                            <label
-                                htmlFor="expires_at"
-                                className="form-label"
-                            >
-                                Rennur út
-                            </label>
-                            <input
-                                id="expires_at"
-                                type="date"
-                                className="form-control"
-                                value={data.expires_at}
-                                onChange={(e) =>
-                                    setData('expires_at', e.target.value)
-                                }
-                            />
-                        </div>
-                        <div className="col-12">
-                            <div className="form-check form-switch">
-                                <input
-                                    id="negotiable"
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    checked={data.negotiable}
-                                    onChange={(e) =>
-                                        setData('negotiable', e.target.checked)
-                                    }
-                                />
-                                <label
-                                    htmlFor="negotiable"
-                                    className="form-check-label"
-                                >
-                                    Verð samningshæft
-                                </label>
-                            </div>
-                        </div>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="md:col-span-2">
+                        <InputLabel htmlFor="title" value="Titill" />
+                        <TextInput
+                            id="title"
+                            className="mt-1 block w-full"
+                            value={data.title}
+                            onChange={(e) => setData('title', e.target.value)}
+                            required
+                        />
                     </div>
-
-                    <div className="d-flex justify-content-end mt-4">
-                        <button
-                            type="button"
-                            className="btn btn-dark"
-                            onClick={() =>
-                                put(route('admin.ads.update', ad.id))
-                            }
-                            disabled={processing}
+                    <div>
+                        <InputLabel htmlFor="status" value="Staða" />
+                        <select
+                            id="status"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            value={data.status}
+                            onChange={(e) => setData('status', e.target.value)}
                         >
-                            Vista breytingar
-                        </button>
+                            {statusOptions.map((option) => (
+                                <option key={option} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
                     </div>
+                    <div>
+                        <InputLabel htmlFor="category" value="Flokkur" />
+                        <select
+                            id="category"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                            value={data.category_id}
+                            onChange={(e) =>
+                                setData('category_id', e.target.value)
+                            }
+                        >
+                            <option value="">—</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.section} · {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="price" value="Verð" />
+                        <TextInput
+                            id="price"
+                            type="number"
+                            className="mt-1 block w-full"
+                            value={data.price}
+                            onChange={(e) => setData('price', e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="currency" value="Gjaldeyrir" />
+                        <TextInput
+                            id="currency"
+                            className="mt-1 block w-full"
+                            value={data.currency}
+                            onChange={(e) =>
+                                setData('currency', e.target.value)
+                            }
+                        />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="expires_at" value="Rennur út" />
+                        <TextInput
+                            id="expires_at"
+                            type="date"
+                            className="mt-1 block w-full"
+                            value={data.expires_at}
+                            onChange={(e) =>
+                                setData('expires_at', e.target.value)
+                            }
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 pt-6">
+                        <Checkbox
+                            checked={data.negotiable}
+                            onChange={(e) =>
+                                setData('negotiable', e.target.checked)
+                            }
+                        />
+                        <span className="text-sm text-slate-600">
+                            Verð samningshæft
+                        </span>
+                    </div>
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                    <PrimaryButton
+                        onClick={() => put(route('admin.ads.update', ad.id))}
+                        disabled={processing}
+                    >
+                        Vista breytingar
+                    </PrimaryButton>
                 </div>
             </section>
         </AdminLayout>

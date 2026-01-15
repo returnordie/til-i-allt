@@ -1,3 +1,7 @@
+import Checkbox from '@/Components/Checkbox';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -33,71 +37,57 @@ export default function Edit({ user, roles }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-muted text-uppercase small mb-1">
+                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
                         Notandi #{user.id}
                     </p>
-                    <h1 className="h3 mb-0">Breyta notanda</h1>
+                    <h1 className="text-2xl font-semibold text-slate-900">
+                        Breyta notanda
+                    </h1>
                 </div>
             }
         >
             <Head title={`Notandi ${user.name}`} />
 
-            <section className="card shadow-sm">
-                <div className="card-body">
-                    <div className="row g-3">
-                        <div className="col-md-6">
-                            <label htmlFor="name" className="form-label">
-                                Nafn
-                            </label>
-                            <input
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col gap-6">
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <InputLabel htmlFor="name" value="Nafn" />
+                            <TextInput
                                 id="name"
-                                className="form-control"
+                                className="mt-1 block w-full"
                                 value={data.name}
-                                onChange={(e) =>
-                                    setData('name', e.target.value)
-                                }
+                                onChange={(e) => setData('name', e.target.value)}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label htmlFor="email" className="form-label">
-                                Email
-                            </label>
-                            <input
+                        <div>
+                            <InputLabel htmlFor="email" value="Email" />
+                            <TextInput
                                 id="email"
                                 type="email"
-                                className="form-control"
+                                className="mt-1 block w-full"
                                 value={data.email}
-                                onChange={(e) =>
-                                    setData('email', e.target.value)
-                                }
+                                onChange={(e) => setData('email', e.target.value)}
                                 required
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label htmlFor="username" className="form-label">
-                                Notendanafn
-                            </label>
-                            <input
+                        <div>
+                            <InputLabel htmlFor="username" value="Notendanafn" />
+                            <TextInput
                                 id="username"
-                                className="form-control"
+                                className="mt-1 block w-full"
                                 value={data.username}
-                                onChange={(e) =>
-                                    setData('username', e.target.value)
-                                }
+                                onChange={(e) => setData('username', e.target.value)}
                             />
                         </div>
-                        <div className="col-md-6">
-                            <label htmlFor="role" className="form-label">
-                                Hlutverk
-                            </label>
+                        <div>
+                            <InputLabel htmlFor="role" value="Hlutverk" />
                             <select
                                 id="role"
-                                className="form-select"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                                 value={data.role}
-                                onChange={(e) =>
-                                    setData('role', e.target.value)
-                                }
+                                onChange={(e) => setData('role', e.target.value)}
                             >
                                 {roles.map((role) => (
                                     <option key={role} value={role}>
@@ -106,79 +96,50 @@ export default function Edit({ user, roles }: EditProps) {
                                 ))}
                             </select>
                         </div>
-                        <div className="col-12">
-                            <div className="form-check form-switch">
-                                <input
-                                    id="is_active"
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    checked={data.is_active}
-                                    onChange={(e) =>
-                                        setData('is_active', e.target.checked)
-                                    }
-                                />
-                                <label
-                                    htmlFor="is_active"
-                                    className="form-check-label"
-                                >
-                                    Virkur aðgangur
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-check form-switch">
-                                <input
-                                    id="show_name"
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    checked={data.show_name}
-                                    onChange={(e) =>
-                                        setData('show_name', e.target.checked)
-                                    }
-                                />
-                                <label
-                                    htmlFor="show_name"
-                                    className="form-check-label"
-                                >
-                                    Sýna nafn
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col-md-6">
-                            <div className="form-check form-switch">
-                                <input
-                                    id="show_phone"
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    checked={data.show_phone}
-                                    onChange={(e) =>
-                                        setData('show_phone', e.target.checked)
-                                    }
-                                />
-                                <label
-                                    htmlFor="show_phone"
-                                    className="form-check-label"
-                                >
-                                    Sýna síma
-                                </label>
-                            </div>
-                        </div>
                     </div>
 
-                    <div className="d-flex justify-content-between align-items-center mt-4">
-                        <span className="text-muted small">
+                    <div className="grid gap-3 md:grid-cols-3">
+                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                            <Checkbox
+                                checked={data.is_active}
+                                onChange={(e) =>
+                                    setData('is_active', e.target.checked)
+                                }
+                            />
+                            Virkur aðgangur
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                            <Checkbox
+                                checked={data.show_name}
+                                onChange={(e) =>
+                                    setData('show_name', e.target.checked)
+                                }
+                            />
+                            Sýna nafn
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                            <Checkbox
+                                checked={data.show_phone}
+                                onChange={(e) =>
+                                    setData('show_phone', e.target.checked)
+                                }
+                            />
+                            Sýna síma
+                        </label>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                        <p className="text-xs text-slate-400">
                             Stofnað: {user.created_at ?? '—'}
-                        </span>
-                        <button
-                            type="button"
-                            className="btn btn-dark"
+                        </p>
+                        <PrimaryButton
                             onClick={() =>
                                 put(route('admin.users.update', user.id))
                             }
                             disabled={processing}
                         >
                             Vista breytingar
-                        </button>
+                        </PrimaryButton>
                     </div>
                 </div>
             </section>
