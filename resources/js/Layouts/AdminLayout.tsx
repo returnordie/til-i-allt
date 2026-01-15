@@ -1,48 +1,44 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 
-export default function Authenticated({
+const navItems = [
+    { label: 'Yfirlit', route: 'admin.dashboard', active: 'admin.dashboard' },
+    { label: 'Notendur', route: 'admin.users.index', active: 'admin.users.*' },
+    { label: 'Auglýsingar', route: 'admin.ads.index', active: 'admin.ads.*' },
+    { label: 'Flokkar', route: 'admin.categories.index', active: 'admin.categories.*' },
+    { label: 'Svæði', route: 'admin.regions.index', active: 'admin.regions.*' },
+    { label: 'Póstnúmer', route: 'admin.postcodes.index', active: 'admin.postcodes.*' },
+];
+
+export default function AdminLayout({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
-    const isAdmin = user?.role === 'admin';
-
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
+        <div className="min-h-screen bg-slate-100">
+            <nav className="border-b border-slate-200 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
-
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
-                                {isAdmin && (
-                                    <NavLink
-                                        href={route('admin.dashboard')}
-                                        active={route().current('admin.*')}
-                                    >
-                                        Admin
-                                    </NavLink>
-                                )}
-                            </div>
+                        <div className="flex items-center gap-6">
+                            <Link href="/" className="flex items-center gap-2">
+                                <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                <span className="text-sm font-semibold text-gray-700">
+                                    Admin stjórnborð
+                                </span>
+                            </Link>
+                            <Link
+                                href={route('dashboard')}
+                                className="hidden text-sm font-medium text-gray-500 transition hover:text-gray-900 sm:inline-flex"
+                            >
+                                Til baka í notandaborð
+                            </Link>
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
@@ -73,9 +69,7 @@ export default function Authenticated({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
+                                        <Dropdown.Link href={route('profile.edit')}>
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
@@ -140,20 +134,15 @@ export default function Authenticated({
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                        {isAdmin && (
+                        {navItems.map((item) => (
                             <ResponsiveNavLink
-                                href={route('admin.dashboard')}
-                                active={route().current('admin.*')}
+                                key={item.route}
+                                href={route(item.route)}
+                                active={route().current(item.active)}
                             >
-                                Admin
+                                {item.label}
                             </ResponsiveNavLink>
-                        )}
+                        ))}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
@@ -182,15 +171,41 @@ export default function Authenticated({
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
+            <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="py-8">
+                    {header && (
+                        <header className="flex flex-col gap-2">
+                            {header}
+                        </header>
+                    )}
+                    <div className="mt-6 grid gap-6 lg:grid-cols-[240px_1fr]">
+                        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Stjórnun
+                            </p>
+                            <nav className="mt-4 space-y-1">
+                                {navItems.map((item) => (
+                                    <Link
+                                        key={item.route}
+                                        href={route(item.route)}
+                                        className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition ${
+                                            route().current(item.active)
+                                                ? 'bg-slate-900 text-white'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        {item.label}
+                                        <span className="text-xs text-slate-400">
+                                            ›
+                                        </span>
+                                    </Link>
+                                ))}
+                            </nav>
+                        </aside>
+                        <section className="space-y-6">{children}</section>
                     </div>
-                </header>
-            )}
-
-            <main>{children}</main>
+                </div>
+            </main>
         </div>
     );
 }

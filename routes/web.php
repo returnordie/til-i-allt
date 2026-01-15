@@ -18,6 +18,12 @@ use App\Http\Controllers\Account\AccountNotificationController;
 use App\Http\Controllers\Account\AccountPasswordController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Admin\AdController as AdminAdController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PostcodeController as AdminPostcodeController;
+use App\Http\Controllers\Admin\RegionController as AdminRegionController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 Route::get('/', [AdController::class, 'home'])->name('home');
 
 Route::get('/{section}', [AdController::class, 'section'])
@@ -98,7 +104,35 @@ Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
 });
 
 Route::middleware(['auth', 'can:admin'])->group(function () {
-    // admin routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+
+        Route::get('/ads', [AdminAdController::class, 'index'])->name('ads.index');
+        Route::get('/ads/{ad}/edit', [AdminAdController::class, 'edit'])->name('ads.edit');
+        Route::put('/ads/{ad}', [AdminAdController::class, 'update'])->name('ads.update');
+
+        Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+        Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+        Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+
+        Route::get('/regions', [AdminRegionController::class, 'index'])->name('regions.index');
+        Route::get('/regions/create', [AdminRegionController::class, 'create'])->name('regions.create');
+        Route::post('/regions', [AdminRegionController::class, 'store'])->name('regions.store');
+        Route::get('/regions/{region}/edit', [AdminRegionController::class, 'edit'])->name('regions.edit');
+        Route::put('/regions/{region}', [AdminRegionController::class, 'update'])->name('regions.update');
+
+        Route::get('/postcodes', [AdminPostcodeController::class, 'index'])->name('postcodes.index');
+        Route::get('/postcodes/create', [AdminPostcodeController::class, 'create'])->name('postcodes.create');
+        Route::post('/postcodes', [AdminPostcodeController::class, 'store'])->name('postcodes.store');
+        Route::get('/postcodes/{postcode}/edit', [AdminPostcodeController::class, 'edit'])->name('postcodes.edit');
+        Route::put('/postcodes/{postcode}', [AdminPostcodeController::class, 'update'])->name('postcodes.update');
+    });
 });
 
 use App\Http\Controllers\DealController;
