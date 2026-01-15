@@ -35,6 +35,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->index(['ad_id', 'type', 'starts_at']);
+            $table->index(['type', 'status', 'starts_at', 'ends_at']);
+
         });
     }
 

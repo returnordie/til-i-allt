@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class AdImage extends Model
 {
@@ -23,13 +24,22 @@ class AdImage extends Model
         'sort_order' => 'integer',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (self $img) {
+            if (empty($img->public_id)) {
+                $img->public_id = (string) Str::ulid();
+            }
+        });
+    }
+
     public function ad()
     {
         return $this->belongsTo(Ad::class);
     }
+
     public function getRouteKeyName(): string
     {
         return 'public_id';
     }
-
 }

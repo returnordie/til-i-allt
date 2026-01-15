@@ -12,8 +12,10 @@ class Category extends Model
     protected $fillable = [
         'parent_id',
         'section',
+        'hero_art',
         'name',
         'slug',
+        'icon',
         'sort_order',
         'is_active',
     ];
@@ -35,5 +37,12 @@ class Category extends Model
     public function ads()
     {
         return $this->hasMany(Ad::class);
+    }
+
+    public function attributes()
+    {
+        return $this->belongsToMany(\App\Models\AttributeDefinition::class, 'category_attribute')
+            ->withPivot(['required','sort_order'])
+            ->orderByPivot('sort_order');
     }
 }

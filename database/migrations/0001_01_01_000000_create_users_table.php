@@ -28,7 +28,20 @@ return new class extends Migration
             $table->string('last_login_ip_hash', 64)->nullable();
             $table->string('last_login_ua_hash', 64)->nullable();
             $table->string('role')->default('user');
-            $table->string('is_active')->default(true);
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamp('username_changed_at')->nullable()->index();
+
+            $table->string('preferred_contact_method', 16)->default('message')->default('any')->index();
+            $table->string('best_call_time', 64)->nullable();
+            $table->string('contact_note', 140)->nullable();
+
+            $table->boolean('email_on_message')->default(true)->index();
+            $table->boolean('email_on_notifications')->default(true)->index();
+            $table->boolean('email_on_system')->default(true)->index();
+            $table->boolean('email_on_ad_expiring')->default(true)->index();
+            $table->boolean('email_on_ad_expired')->default(true)->index();
+
             $table->timestamp('banned_at')->nullable();
             $table->string('ban_reason')->nullable();
             $table->rememberToken();

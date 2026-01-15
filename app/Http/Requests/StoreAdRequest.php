@@ -3,27 +3,29 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAdRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return $this->user() !== null;
-    }
-
     public function rules(): array
     {
         return [
-            'section' => ['required', 'in:solutorg,bilatorg,fasteignir'],
-            'ad_type' => ['required', 'in:for_sale,wanted'], // eða þín gildi
-            'category_id' => ['required', 'exists:categories,id'],
-            'title' => ['required', 'string', 'min:6', 'max:120'],
-            'price' => ['nullable', 'integer', 'min:0', 'max:9999999999'],
-            'description' => ['required', 'string', 'min:20', 'max:10000'],
+            'section' => ['required', Rule::in(['solutorg','bilatorg','fasteignir'])],
+            'category_slug' => ['required','string'],
+            'subcategory_slug' => ['nullable','string'],
 
-            'images' => ['nullable', 'array', 'max:12'],
-            'images.*' => ['file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:8192'],
-            'main_image_index' => ['nullable', 'integer', 'min:0', 'max:11'],
+            // samþykkjum bæði naming, normalizum í controller
+            'listing_type' => ['required', Rule::in(['sell','want','for_sale','wanted'])],
+
+            'title' => ['required','string','min:3','max:120'],
+            'price' => ['nullable','numeric','min:0','max:9999999999'],
+            'description' => ['nullable','string','max:20000'],
+
+            'attributes' => ['sometimes','array'],
+
+            'images' => ['nullable','array','max:15'],
+            'images.*' => ['file','image','mimes:jpg,jpeg,png,webp','max:8192'],
+            'main_image_index' => ['nullable','integer','min:0','max:14'],
         ];
     }
 }

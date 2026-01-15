@@ -5,13 +5,24 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\Account\AccountAdsController;
 use App\Http\Controllers\AdController;
-use App\Http\Controllers\AdReportController;
-use App\Http\Controllers\DealController;
-use App\Http\Controllers\DealReviewController;
+//use App\Http\Controllers\AdReportController;
+//use App\Http\Controllers\DealController;
+//use App\Http\Controllers\DealReviewController;
+use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\AdImageController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\Account\AccountSettingsController;
+use App\Http\Controllers\Account\AccountNotificationController;
+use App\Http\Controllers\Account\AccountPasswordController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
-use App\Http\Controllers\AdImageController;
+Route::get('/', [AdController::class, 'home'])->name('home');
+
+Route::get('/{section}', [AdController::class, 'section'])
+    ->whereIn('section', ['solutorg','bilatorg','fasteignir'])
+    ->name('ads.section');
 
 
 Route::get('/{section}/{categorySlug}', [AdController::class, 'index'])
@@ -59,20 +70,47 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/spjall', [ConversationController::class, 'index'])->name('conversations.index');
 
-    Route::get('/spjall/{conversation}', [ConversationController::class, 'show'])
-        ->middleware('can:view,conversation')
-        ->name('conversations.show');
+Route::get('/u/{user:username}', [UserProfileController::class, 'show'])
+    ->name('users.show');
 
-    Route::post('/spjall/{conversation}/messages', [MessageController::class, 'store'])
-        ->middleware('can:send,conversation')
-        ->name('messages.store');
+Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
+    Route::get('stillingar', [AccountSettingsController::class, 'edit'])->name('account.settings.edit');
+    Route::put('stillingar', [AccountSettingsController::class, 'update'])->name('account.settings.update');
+
+    Route::get('tilkynningar', [AccountNotificationController::class, 'edit'])->name('account.notifications.edit');
+    Route::put('tilkynningar', [AccountNotificationController::class, 'update'])->name('account.notifications.update');
+
+    Route::get('oryggi', [AccountPasswordController::class, 'edit'])->name('account.security.edit');
+    Route::put('oryggi/lykilord', [AccountPasswordController::class, 'update'])->name('account.security.password.update');
+
+     Route::get('auglysingar', [AccountAdsController::class, 'index'])
+        ->name('account.ads.index');
+
+    Route::patch('auglysingar/{ad}/status', [AccountAdsController::class, 'setStatus'])
+        ->name('account.ads.status');
+
+    Route::patch('auglysingar/{ad}/extend', [AccountAdsController::class, 'extend'])
+        ->name('account.ads.extend');
+
+
+
 });
 
 Route::middleware(['auth', 'can:admin'])->group(function () {
     // admin routes
+});
+
+use App\Http\Controllers\DealController;
+use App\Http\Controllers\DealReviewController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/ads/{ad}/deals', [DealController::class, 'store'])->name('deals.store');
+
+    Route::patch('/deals/{deal}/buyer', [DealController::class, 'setBuyer'])->name('deals.setBuyer');
+    Route::patch('/deals/{deal}/status', [DealController::class, 'setStatus'])->name('deals.setStatus');
+
+    Route::post('/deals/{deal}/reviews', [DealReviewController::class, 'store'])->name('dealReviews.store');
 });
 
 
@@ -80,14 +118,35 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
 Route::get('/i/{adImage}', [AdImageController::class, 'show'])->name('ad-images.show');
 
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
+    Route::get('skilabod', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('skilabod/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
+
+    Route::patch('skilabod/{conversation}/read', [ConversationController::class, 'markRead'])->name('conversations.read');
+    Route::patch('skilabod/{conversation}/archive', [ConversationController::class, 'toggleArchive'])->name('conversations.archive');
+    Route::patch('skilabod/{conversation}/close', [ConversationController::class, 'close'])->name('conversations.close');
+    Route::patch('skilabod/{conversation}/block', [ConversationController::class, 'block'])->name('conversations.block');
+
+    Route::post('skilabod/{conversation}/messages', [MessageController::class, 'store'])->name('messages.store');
+
+    // Support (valfrjálst núna)
+    Route::post('skilabod/support', [ConversationController::class, 'startSupport'])->name('conversations.support.start');
+
+    Route::get('tilkynningar/innbox', [AccountNotificationController::class, 'index'])
+        ->name('notifications.inbox');
+
+    Route::patch('tilkynningar/innbox/read-all', [AccountNotificationController::class, 'markAllRead'])
+        ->name('notifications.readAll');
+
+    // "Open" markar sem lesið og redirectar á data.url
+    Route::get('tilkynningar/innbox/{notification}/open', [AccountNotificationController::class, 'open'])
+        ->name('notifications.open');
 });
+
+// Starta / opna þráð frá auglýsingu
+Route::middleware(['auth', 'verified'])->post('/ads/{ad}/skilabod', [ConversationController::class, 'startForAd'])
+    ->name('conversations.startForAd');
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

@@ -1,51 +1,59 @@
-import PrimaryButton from '@/Components/PrimaryButton';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+// resources/js/Pages/Auth/VerifyEmail.tsx
+
+import React from 'react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Link, useForm } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
-
         post(route('verification.send'));
     };
 
     return (
-        <GuestLayout>
-            <Head title="Email Verification" />
-
-            <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
-            </div>
+        <>
+            <h1 className="h4 mb-1">Staðfesta netfang</h1>
+            <p className="text-muted mb-4">
+                Smelltu á hlekkinn sem við sendum í tölvupósti til að staðfesta netfangið þitt.
+                Ef þú fékkst ekki póstinn getum við sent annan.
+            </p>
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+                <div className="alert alert-success" role="alert">
+                    Nýr staðfestingarhlekkur hefur verið sendur á netfangið sem þú skráðir.
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>
-                        Resend Verification Email
-                    </PrimaryButton>
+            <form onSubmit={submit} noValidate>
+                <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                        {processing ? 'Sendi…' : 'Senda staðfestingarpóst aftur'}
+                    </button>
 
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="btn btn-outline-secondary"
                     >
-                        Log Out
+                        Skrá út
                     </Link>
                 </div>
             </form>
-        </GuestLayout>
+        </>
     );
 }
+
+VerifyEmail.layout = (page: React.ReactNode) => (
+    <AppLayout
+        title="Staðfesta netfang"
+        centered
+        container
+        mainClassName="bg-light"
+        headerProps={{ hideCatbar: true }}
+    >
+        {page}
+    </AppLayout>
+);

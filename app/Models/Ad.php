@@ -49,7 +49,15 @@ class Ad extends Model
 
     public function images()
     {
-        return $this->hasMany(AdImage::class)->orderBy('sort_order');
+        return $this->hasMany(\App\Models\AdImage::class)
+            ->orderBy('sort_order'); // ✅ EKKI withTrashed()
+    }
+
+    public function imagesWithTrashed()
+    {
+        return $this->hasMany(\App\Models\AdImage::class)
+            ->withTrashed()
+            ->orderBy('sort_order');
     }
 
     public function promotions()
@@ -62,8 +70,23 @@ class Ad extends Model
         return $this->hasMany(AdViewUnique::class);
     }
 
+
     protected static function booted(): void
     {
+        static::saving(function (Ad $ad) {
+            if ($ad->status === 'active') {
+                // published_at must exist
+                $ad->published_at ??= now();
+
+                // expires_at must be in the future (or null if you want no expiry)
+                $days = (int) config('tia.ad_default_duration_days', 30);
+
+                if (!$ad->expires_at || $ad->expires_at->isPast()) {
+                    $ad->expires_at = now()->addDays($days);
+                }
+            }
+        });
+
         static::deleting(function (Ad $ad) {
             // Soft delete cascade (FK gerir þetta ekki)
             if (! $ad->isForceDeleting()) {
@@ -81,5 +104,10 @@ class Ad extends Model
             $ad->images()->withTrashed()->restore();
             $ad->promotions()->withTrashed()->restore();
         });
+    }
+
+    public function attributeValues()
+    {
+        return $this->hasMany(\App\Models\AdAttributeValue::class);
     }
 }

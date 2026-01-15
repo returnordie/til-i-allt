@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class DealReview extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'deal_id',
@@ -19,7 +19,6 @@ class DealReview extends Model
     ];
 
     protected $casts = [
-        'rating' => 'integer',
         'meta' => 'array',
     ];
 

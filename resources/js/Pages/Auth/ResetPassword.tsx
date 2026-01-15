@@ -1,100 +1,105 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+// resources/js/Pages/Auth/ResetPassword.tsx
 
-export default function ResetPassword({
-    token,
-    email,
-}: {
+import React from 'react';
+import AppLayout from '@/Layouts/AppLayout';
+import { useForm } from '@inertiajs/react';
+
+type ResetPasswordForm = {
     token: string;
     email: string;
-}) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        token: token,
-        email: email,
+    password: string;
+    password_confirmation: string;
+};
+
+export default function ResetPassword({ token, email }: { token: string; email: string }) {
+    const { data, setData, post, processing, errors, reset } = useForm<ResetPasswordForm>({
+        token,
+        email,
         password: '',
         password_confirmation: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
-
         post(route('password.store'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
 
     return (
-        <GuestLayout>
-            <Head title="Reset Password" />
+        <>
+            <h1 className="h4 mb-1">Endurstilla lykilorð</h1>
+            <p className="text-muted mb-4">Veldu nýtt lykilorð fyrir aðganginn þinn.</p>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <form onSubmit={submit} noValidate>
+                <input type="hidden" name="token" value={data.token} />
 
-                    <TextInput
+                <div className="mb-3">
+                    <label htmlFor="email" className="form-label">Netfang</label>
+                    <input
                         id="email"
-                        type="email"
                         name="email"
+                        type="email"
+                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                         value={data.email}
-                        className="mt-1 block w-full"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
+                        required
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
+                <div className="mb-3">
+                    <label htmlFor="password" className="form-label">Nýtt lykilorð</label>
+                    <input
                         id="password"
-                        type="password"
                         name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
                         type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                        value={data.password}
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        autoFocus
+                        onChange={(e) => setData('password', e.target.value)}
+                        required
                     />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
+                    {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
-                    </PrimaryButton>
+                <div className="mb-4">
+                    <label htmlFor="password_confirmation" className="form-label">Staðfesta nýtt lykilorð</label>
+                    <input
+                        id="password_confirmation"
+                        name="password_confirmation"
+                        type="password"
+                        className={`form-control ${errors.password_confirmation ? 'is-invalid' : ''}`}
+                        value={data.password_confirmation}
+                        autoComplete="new-password"
+                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                        required
+                    />
+                    {errors.password_confirmation && (
+                        <div className="invalid-feedback">{errors.password_confirmation}</div>
+                    )}
+                </div>
+
+                <div className="d-flex justify-content-end">
+                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                        {processing ? 'Vista…' : 'Endurstilla lykilorð'}
+                    </button>
                 </div>
             </form>
-        </GuestLayout>
+        </>
     );
 }
+
+ResetPassword.layout = (page: React.ReactNode) => (
+    <AppLayout
+        title="Endurstilla lykilorð"
+        centered
+        container
+        mainClassName="bg-light"
+        headerProps={{ hideCatbar: true }}
+    >
+        {page}
+    </AppLayout>
+);

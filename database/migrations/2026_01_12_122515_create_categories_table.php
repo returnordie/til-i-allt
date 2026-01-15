@@ -19,8 +19,11 @@ return new class extends Migration
                     ->constrained('categories')
                     ->nullOnDelete();
 
+                $table->string('hero_art', 80)->nullable();
+
                 // marketplace | vehicles | real_estate
                 $table->string('section', 32)->index();
+                $table->string('icon', 80)->nullable();
 
                 $table->string('name');
                 $table->string('slug');
@@ -30,7 +33,7 @@ return new class extends Migration
                 $table->timestamps();
                 $table->softDeletes();
                 $table->unique(['section', 'parent_id', 'slug', 'deleted_at']);
-
+                $table->index(['section', 'icon']);
             });
     }
 

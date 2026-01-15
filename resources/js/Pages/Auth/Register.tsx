@@ -1,121 +1,143 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import React from 'react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Link, useForm } from '@inertiajs/react';
+
+type RegisterForm = {
+    name: string;
+    username: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+};
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
         name: '',
+        username: '',
         email: '',
         password: '',
         password_confirmation: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
-
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
 
     return (
-        <GuestLayout>
-            <Head title="Register" />
+        <>
+            <h1 className="h4 mb-1">Búa til aðgang</h1>
+            <p className="text-muted mb-4">Nýskráðu þig til að setja inn auglýsingar.</p>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
+            <form onSubmit={submit} noValidate>
+                <div className="mb-3">
+                    <label htmlFor="name" className="form-label">Nafn</label>
+                    <input
                         id="name"
                         name="name"
+                        type="text"
+                        className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                         value={data.name}
-                        className="mt-1 block w-full"
                         autoComplete="name"
-                        isFocused={true}
+                        autoFocus
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
-
-                    <InputError message={errors.name} className="mt-2" />
+                    {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
+                <div className="mb-3">
+                    <label htmlFor="username" className="form-label">Notandanafn</label>
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+                        value={data.username}
                         autoComplete="username"
+                        onChange={(e) => setData('username', e.target.value.toLowerCase())}
+                        required
+                    />
+                    {errors.username ? (
+                        <div className="invalid-feedback">{errors.username}</div>
+                    ) : (
+                        <div className="form-text">
+                            Notað í slóðinni: <span className="text-muted">/u/{data.username || 'notandanafn'}</span> (lágstafir, tölur og _)
+                        </div>
+                    )}
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="email" className="form-label">Netfang</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                        value={data.email}
+                        autoComplete="email"
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
+                <div className="mb-3">
+                    <label htmlFor="password" className="form-label">Lykilorð</label>
+                    <input
                         id="password"
-                        type="password"
                         name="password"
+                        type="password"
+                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                         value={data.password}
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
+                    {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
+                <div className="mb-4">
+                    <label htmlFor="password_confirmation" className="form-label">Staðfesta lykilorð</label>
+                    <input
                         id="password_confirmation"
-                        type="password"
                         name="password_confirmation"
+                        type="password"
+                        className={`form-control ${errors.password_confirmation ? 'is-invalid' : ''}`}
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        onChange={(e) => setData('password_confirmation', e.target.value)}
                         required
                     />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
+                    {errors.password_confirmation && (
+                        <div className="invalid-feedback">{errors.password_confirmation}</div>
+                    )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
+                <div className="d-flex align-items-center justify-content-between">
+                    <Link href={route('login')} className="link-secondary text-decoration-none">
+                        Nú þegar með aðgang?
                     </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
+                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                        {processing ? 'Skrái…' : 'Nýskrá'}
+                    </button>
                 </div>
             </form>
-        </GuestLayout>
+        </>
     );
 }
+
+Register.layout = (page: React.ReactNode) => (
+    <AppLayout
+        title="Nýskráning"
+        centered
+        container
+        mainClassName="bg-light"
+        headerProps={{ hideCatbar: true }}
+    >
+        {page}
+    </AppLayout>
+);

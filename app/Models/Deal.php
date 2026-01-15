@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Deal extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'ad_id',
@@ -23,7 +23,6 @@ class Deal extends Model
     ];
 
     protected $casts = [
-        'price_final' => 'integer',
         'confirmed_at' => 'datetime',
         'completed_at' => 'datetime',
         'canceled_at' => 'datetime',
@@ -48,5 +47,10 @@ class Deal extends Model
     public function reviews()
     {
         return $this->hasMany(DealReview::class);
+    }
+
+    public function isParticipant(int $userId): bool
+    {
+        return $userId === (int) $this->seller_id || $userId === (int) $this->buyer_id;
     }
 }
