@@ -8,6 +8,19 @@ use Illuminate\Http\Request;
 
 class DealController extends Controller
 {
+    private function syncAdStatus(Deal $deal): void
+    {
+        $deal->loadMissing('ad');
+        $ad = $deal->ad;
+
+        if (!$ad || $ad->status === 'sold') {
+            return;
+        }
+
+        $ad->status = $deal->buyer_id ? 'inactive' : 'active';
+        $ad->save();
+    }
+
     public function store(Request $request, Ad $ad)
     {
         $user = $request->user();
@@ -50,6 +63,7 @@ class DealController extends Controller
             $deal->confirmed_at = $newBuyerId ? now() : null;
         }
         $deal->save();
+        $this->syncAdStatus($deal);
 
         return back()->with('success', 'Viðskipti stofnuð.');
     }
@@ -75,6 +89,7 @@ class DealController extends Controller
             $deal->confirmed_at = $data['buyer_id'] ? now() : null;
         }
         $deal->save();
+        $this->syncAdStatus($deal);
 
         return back()->with('success', 'Kaupandi uppfærður.');
     }
@@ -108,19 +123,13 @@ class DealController extends Controller
         }
 
         if ($to === 'inactive') {
-            if ($deal->status === 'completed') {
-                abort_unless($isBuyer || $isSeller, 403);
+            abort_unless($isSeller || $isBuyer, 403);
+            abort_if($deal->status === 'completed', 422, 'Viðskiptum er lokið.');
 
-                $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
-                abort_if(!$windowEndsAt || now()->greaterThan($windowEndsAt), 422, 'Það er ekki hægt að hætta við eftir 24 klst.');
-
-                $deal->status = 'inactive';
-                $deal->canceled_at = $deal->canceled_at ?? now();
-            } else {
-                abort_unless($isSeller || $isBuyer, 403);
-                $deal->status = 'inactive';
-                $deal->canceled_at = $deal->canceled_at ?? now();
-            }
+            $deal->status = 'inactive';
+            $deal->canceled_at = $deal->canceled_at ?? now();
+            $deal->buyer_id = null;
+            $deal->confirmed_at = null;
         }
 
         if ($to === 'active') {
@@ -129,6 +138,7 @@ class DealController extends Controller
         }
 
         $deal->save();
+        $this->syncAdStatus($deal);
 
         return back()->with('success', 'Staða viðskipta uppfærð.');
     }

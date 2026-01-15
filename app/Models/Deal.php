@@ -55,7 +55,9 @@ class Deal extends Model
             return null;
         }
 
-        return $this->completed_at->copy();
+        $delayHours = (int) config('tia.deal_review_delay_hours', 0);
+
+        return $this->completed_at->copy()->addHours(max(0, $delayHours));
     }
 
     public function reviewsAreOpen(): bool
@@ -64,9 +66,18 @@ class Deal extends Model
             return false;
         }
 
+        $openAt = $this->reviewsOpenAt();
+        if (!$openAt) {
+            return false;
+        }
+
         $windowEndsAt = $this->completed_at->copy()->addDays(14);
 
-        return now()->betweenIncluded($this->completed_at, $windowEndsAt);
+        if ($openAt->greaterThan($windowEndsAt)) {
+            return false;
+        }
+
+        return now()->betweenIncluded($openAt, $windowEndsAt);
     }
 
     public function isParticipant(int $userId): bool
