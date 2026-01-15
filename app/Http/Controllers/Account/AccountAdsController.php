@@ -7,6 +7,7 @@ use App\Http\Requests\Account\ExtendAccountAdRequest;
 use App\Http\Requests\Account\UpdateAccountAdStatusRequest;
 use App\Models\Ad;
 use App\Models\Deal;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -156,7 +157,8 @@ class AccountAdsController extends Controller
     {
         $this->authorize('update', $ad);
 
-        $status = $request->validated()['status'];
+        $data = $request->validated();
+        $status = $data['status'];
 
         if ($ad->status === 'sold' && $status !== 'sold') {
             return back()->with('error', 'Seld auglýsing er ekki hægt að endurvekja eða breyta.');
@@ -181,6 +183,26 @@ class AccountAdsController extends Controller
         }
 
         if ($status === 'sold') {
+            $buyerId = null;
+            $buyerIdentifier = isset($data['buyer_identifier']) ? trim((string) $data['buyer_identifier']) : '';
+            $soldOutside = (bool) ($data['sold_outside'] ?? false);
+
+            if (!$soldOutside && $buyerIdentifier !== '') {
+                $buyer = ctype_digit($buyerIdentifier)
+                    ? User::query()->where('id', (int) $buyerIdentifier)->first()
+                    : User::query()->where('username', $buyerIdentifier)->first();
+
+                if (!$buyer) {
+                    return back()->withErrors(['buyer_identifier' => 'Kaupandi fannst ekki.']);
+                }
+
+                if ((int) $buyer->id === (int) $ad->user_id) {
+                    return back()->withErrors(['buyer_identifier' => 'Þú getur ekki skráð sjálfan þig sem kaupanda.']);
+                }
+
+                $buyerId = $buyer->id;
+            }
+
             $deal = Deal::query()
                 ->where('ad_id', $ad->id)
                 ->where('seller_id', $ad->user_id)
@@ -200,8 +222,9 @@ class AccountAdsController extends Controller
 
             $deal->status = 'completed';
             $deal->completed_at = $deal->completed_at ?? now();
+            $deal->buyer_id = $soldOutside ? null : $buyerId;
             $deal->meta = array_merge($deal->meta ?? [], [
-                'sold_outside' => !$deal->buyer_id,
+                'sold_outside' => $soldOutside || !$deal->buyer_id,
             ]);
             $deal->save();
         }
