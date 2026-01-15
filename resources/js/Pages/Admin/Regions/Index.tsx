@@ -19,6 +19,12 @@ interface RegionsPageProps {
 }
 
 export default function Index({ regions }: RegionsPageProps) {
+    const safeRegions = regions ?? {
+        data: [],
+        links: [],
+        meta: { total: 0, from: null, to: null },
+    };
+
     return (
         <AdminLayout
             header={
@@ -38,15 +44,15 @@ export default function Index({ regions }: RegionsPageProps) {
                 <div className="card-body">
                     <div className="d-flex align-items-center justify-content-between">
                         <p className="small text-muted mb-0">
-                        {regions.meta.total} svæði
-                    </p>
-                    <Link
-                        href={route('admin.regions.create')}
-                        className="btn btn-outline-dark"
-                    >
-                        Nýtt svæði
-                    </Link>
-                </div>
+                            {safeRegions.meta.total} svæði
+                        </p>
+                        <Link
+                            href={route('admin.regions.create')}
+                            className="btn btn-outline-dark"
+                        >
+                            Nýtt svæði
+                        </Link>
+                    </div>
 
                     <div className="table-responsive mt-4">
                         <table className="table table-hover align-middle mb-0">
@@ -60,7 +66,7 @@ export default function Index({ regions }: RegionsPageProps) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {regions.data.map((region) => (
+                                {safeRegions.data.map((region) => (
                                     <tr key={region.id}>
                                         <td className="fw-semibold">
                                             {region.name}
@@ -100,7 +106,7 @@ export default function Index({ regions }: RegionsPageProps) {
                             </tbody>
                         </table>
                     </div>
-                    <Pagination links={regions.links} />
+                    <Pagination links={safeRegions.links} />
                 </div>
             </section>
         </AdminLayout>

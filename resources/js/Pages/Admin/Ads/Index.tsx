@@ -25,8 +25,15 @@ interface AdsPageProps {
 }
 
 export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
-    const [search, setSearch] = useState(filters.search ?? '');
-    const [status, setStatus] = useState(filters.status ?? '');
+    const safeFilters = filters ?? { search: '', status: '' };
+    const safeStatusOptions = statusOptions ?? [];
+    const safeAds = ads ?? {
+        data: [],
+        links: [],
+        meta: { total: 0, from: null, to: null },
+    };
+    const [search, setSearch] = useState(safeFilters.search ?? '');
+    const [status, setStatus] = useState(safeFilters.status ?? '');
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -56,8 +63,8 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                 <div className="card-body">
                     <div className="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between">
                         <p className="small text-muted mb-0">
-                        {ads.meta.total} auglýsingar
-                    </p>
+                            {safeAds.meta.total} auglýsingar
+                        </p>
                         <form
                             onSubmit={submit}
                             className="d-flex flex-column flex-sm-row gap-2"
@@ -78,7 +85,7 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                                 className="form-select"
                             >
                                 <option value="">Allar stöður</option>
-                                {statusOptions.map((option) => (
+                                {safeStatusOptions.map((option) => (
                                     <option key={option} value={option}>
                                         {option}
                                     </option>
@@ -103,7 +110,7 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {ads.data.map((ad) => (
+                                {safeAds.data.map((ad) => (
                                     <tr key={ad.id}>
                                         <td className="fw-semibold">
                                             {ad.title}
@@ -140,7 +147,7 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                             </tbody>
                         </table>
                     </div>
-                    <Pagination links={ads.links} />
+                    <Pagination links={safeAds.links} />
                 </div>
             </section>
         </AdminLayout>

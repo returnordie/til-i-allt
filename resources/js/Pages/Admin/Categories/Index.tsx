@@ -24,7 +24,14 @@ interface CategoriesPageProps {
 }
 
 export default function Index({ filters, sections, categories }: CategoriesPageProps) {
-    const [section, setSection] = useState(filters.section ?? '');
+    const safeFilters = filters ?? { section: '' };
+    const safeSections = sections ?? [];
+    const safeCategories = categories ?? {
+        data: [],
+        links: [],
+        meta: { total: 0, from: null, to: null },
+    };
+    const [section, setSection] = useState(safeFilters.section ?? '');
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -62,7 +69,7 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
                                 className="form-select"
                             >
                                 <option value="">Allar deildir</option>
-                                {sections.map((item) => (
+                                {safeSections.map((item) => (
                                     <option key={item} value={item}>
                                         {item}
                                     </option>
@@ -94,7 +101,7 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
                                 </tr>
                             </thead>
                             <tbody>
-                                {categories.data.map((category) => (
+                                {safeCategories.data.map((category) => (
                                     <tr key={category.id}>
                                         <td className="fw-semibold">
                                             {category.name}
@@ -140,7 +147,7 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
                             </tbody>
                         </table>
                     </div>
-                    <Pagination links={categories.links} />
+                    <Pagination links={safeCategories.links} />
                 </div>
             </section>
         </AdminLayout>
