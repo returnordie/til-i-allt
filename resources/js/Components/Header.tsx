@@ -187,6 +187,10 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
     const profileHref = user?.username ? route('users.show', user.username) : route('account.settings.edit');
     const profileLabel = user?.username ? 'Notendasíðan mín' : 'Búa til notendanafn';
+    const markAllNotificationsRead = () => {
+        if (unreadNotif === 0) return;
+        router.patch(route('notifications.readAll'), {}, { preserveScroll: true, preserveState: true });
+    };
 
     return (
         <header className="tt-header">
@@ -273,15 +277,14 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                             aria-expanded="false"
                                             aria-label="Tilkynningar"
                                             title="Tilkynningar"
+                                            onClick={markAllNotificationsRead}
                                         >
                                             {Ico.bell}
-                                            {unreadNotif > 0 ? <span className="tt-badge">{unreadNotif > 99 ? '99+' : unreadNotif}</span> : null}
                                         </button>
 
                                         <div className="dropdown-menu dropdown-menu-end tt-drop">
                                             <div className="tt-drophead">
                                                 <div className="tt-drophead-title">Tilkynningar</div>
-                                                {unreadNotif > 0 ? <span className="tt-pill">{unreadNotif}</span> : null}
                                             </div>
 
                                             <div className="tt-droplist">
