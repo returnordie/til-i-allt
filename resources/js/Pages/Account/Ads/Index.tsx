@@ -194,21 +194,26 @@ export default function Index() {
                                         ) : null}
 
                                         {ad.status === 'active' ? (
-                                            <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
-                                                Óvirkja
+                                            <button type="button" className="btn btn-outline-warning btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
+                                                Gera óvirkt
                                             </button>
                                         ) : null}
 
                                         {ad.status === 'inactive' ? (
-                                            <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
-                                                Virkja
+                                            <button type="button" className="btn btn-warning btn-sm" onClick={() => patchStatus(ad, 'active')}>
+                                                Gera virkt
                                             </button>
                                         ) : null}
 
                                         {ad.can_extend ? (
                                             <>
                                                 {extendOptions.map((d) => (
-                                                    <button key={d} className="btn btn-outline-secondary btn-sm" onClick={() => extend(ad, d)}>
+                                                    <button
+                                                        key={d}
+                                                        type="button"
+                                                        className="btn btn-outline-warning btn-sm"
+                                                        onClick={() => extend(ad, d)}
+                                                    >
                                                         +{d} dagar
                                                     </button>
                                                 ))}
@@ -216,7 +221,7 @@ export default function Index() {
                                         ) : null}
 
                                         {ad.status !== 'sold' ? (
-                                            <button className="btn btn-outline-dark btn-sm" onClick={() => openSoldModal(ad)}>
+                                            <button type="button" className="btn btn-warning btn-sm" onClick={() => openSoldModal(ad)}>
                                                 Merkja selt
                                             </button>
                                         ) : null}
@@ -282,28 +287,37 @@ export default function Index() {
                                                     ) : null}
 
                                                     {ad.status === 'active' ? (
-                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
-                                                            Óvirkja
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-outline-warning btn-sm"
+                                                            onClick={() => patchStatus(ad, 'inactive')}
+                                                        >
+                                                            Gera óvirkt
                                                         </button>
                                                     ) : null}
 
                                                     {ad.status === 'inactive' ? (
-                                                        <button className="btn btn-dark btn-sm" onClick={() => patchStatus(ad, 'active')}>
-                                                            Virkja
+                                                        <button type="button" className="btn btn-warning btn-sm" onClick={() => patchStatus(ad, 'active')}>
+                                                            Gera virkt
                                                         </button>
                                                     ) : null}
 
                                                     {ad.can_extend ? (
                                                         extendOptions.map((d) => (
-                                                            <button key={d} className="btn btn-outline-secondary btn-sm" onClick={() => extend(ad, d)}>
+                                                            <button
+                                                                key={d}
+                                                                type="button"
+                                                                className="btn btn-outline-warning btn-sm"
+                                                                onClick={() => extend(ad, d)}
+                                                            >
                                                                 +{d} dagar
                                                             </button>
                                                         ))
                                                     ) : null}
 
                                                     {ad.status !== 'sold' ? (
-                                                        <button className="btn btn-outline-dark btn-sm" onClick={() => openSoldModal(ad)}>
-                                                            Selt
+                                                        <button type="button" className="btn btn-warning btn-sm" onClick={() => openSoldModal(ad)}>
+                                                            Merkja selt
                                                         </button>
                                                     ) : null}
                                                 </div>
