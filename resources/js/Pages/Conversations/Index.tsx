@@ -64,7 +64,7 @@ export default function Index() {
                                                     router.get(route('conversations.index'), { filter: k, q: filters.q }, { preserveState: true, preserveScroll: true })
                                                 }
                                             >
-                                                {k === 'inbox' ? 'Innhólf' : k === 'archived' ? 'Geymt' : 'Allt'}
+                                                {k === 'inbox' ? 'Innhólf' : k === 'archived' ? 'Falin skilaboð' : 'Allt'}
                                             </button>
                                         );
                                     })}
