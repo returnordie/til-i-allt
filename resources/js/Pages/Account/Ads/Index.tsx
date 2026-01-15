@@ -1,10 +1,4 @@
 import AppLayout from '@/Layouts/AppLayout';
-import {
-    Dialog,
-    DialogPanel,
-    Transition,
-    TransitionChild,
-} from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react';
 
@@ -65,51 +59,68 @@ function Modal({
         }
     };
 
-    const maxWidthClass = {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
+    const modalSizeClass = {
+        sm: 'modal-sm',
+        md: '',
+        lg: 'modal-lg',
+        xl: 'modal-xl',
+        '2xl': 'modal-xl',
     }[maxWidth];
 
-    return (
-        <Transition show={show} leave="duration-200">
-            <Dialog
-                as="div"
-                id="modal"
-                open={show}
-                className="fixed inset-0 z-50 flex transform items-center overflow-y-auto px-4 py-6 transition-all sm:px-0"
-                onClose={close}
-                initialFocus={initialFocus}
-            >
-                <TransitionChild
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="absolute inset-0 bg-gray-500/75" />
-                </TransitionChild>
+    useEffect(() => {
+        if (!show) return;
 
-                <TransitionChild
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enterTo="opacity-100 translate-y-0 sm:scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                    <DialogPanel
-                        className={`mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
-                    >
-                        {children}
-                    </DialogPanel>
-                </TransitionChild>
-            </Dialog>
-        </Transition>
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        };
+    }, [show]);
+
+    useEffect(() => {
+        if (!show || !initialFocus?.current) return;
+        requestAnimationFrame(() => initialFocus.current?.focus());
+    }, [show, initialFocus]);
+
+    useEffect(() => {
+        if (!show || !closeable) return;
+
+        const handleKeydown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                close();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeydown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    }, [show, closeable]);
+
+    if (!show) return null;
+
+    return (
+        <>
+            <div
+                id="modal"
+                className="modal fade show d-block"
+                role="dialog"
+                aria-modal="true"
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) {
+                        close();
+                    }
+                }}
+            >
+                <div className={`modal-dialog modal-dialog-centered ${modalSizeClass}`}>
+                    <div className="modal-content">{children}</div>
+                </div>
+            </div>
+            <div className="modal-backdrop fade show" />
+        </>
     );
 }
 
