@@ -9,8 +9,8 @@ use App\Http\Controllers\Account\AccountAdsController;
 use App\Http\Controllers\Account\AccountDealsController;
 use App\Http\Controllers\AdController;
 //use App\Http\Controllers\AdReportController;
-//use App\Http\Controllers\DealController;
-//use App\Http\Controllers\DealReviewController;
+use App\Http\Controllers\DealController;
+use App\Http\Controllers\DealReviewController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\AdImageController;
 use App\Http\Controllers\SectionController;
@@ -97,6 +97,10 @@ Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
     Route::get('vidskipti', [AccountDealsController::class, 'index'])
         ->name('account.deals.index');
 
+    Route::get('vidskipti/{deal}/umsogn', [DealReviewController::class, 'create'])
+        ->middleware('can:view,deal')
+        ->name('account.deals.review');
+
     Route::patch('auglysingar/{ad}/status', [AccountAdsController::class, 'setStatus'])
         ->name('account.ads.status');
 
@@ -138,9 +142,6 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
         Route::put('/postcodes/{postcode}', [AdminPostcodeController::class, 'update'])->name('postcodes.update');
     });
 });
-
-use App\Http\Controllers\DealController;
-use App\Http\Controllers\DealReviewController;
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/ads/{ad}/deals', [DealController::class, 'store'])->name('deals.store');

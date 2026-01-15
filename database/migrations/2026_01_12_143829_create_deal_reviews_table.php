@@ -26,7 +26,7 @@ return new class extends Migration
                 ->constrained('users')
                 ->restrictOnDelete();
 
-            // 1-5
+            // 0-5
             $table->unsignedTinyInteger('rating')->index();
 
             $table->text('comment')->nullable();
