@@ -30,9 +30,23 @@ type AdShowProps = {
         section: SectionKey;
         slug: string;
         listing_type?: 'sell' | 'want' | null;
+        location_text?: string | null;
+        views_count?: number;
         category: { name: string | null; slug: string | null };
+        postcode?: {
+            id: number;
+            code: string;
+            name: string | null;
+            region?: { id: number; name: string } | null;
+        } | null;
         images: AdImage[];
-        seller: { id: number; display: string; phone: string | null };
+        seller: {
+            id: number;
+            display: string;
+            phone: string | null;
+            rating?: { avg: number; count: number };
+            links?: { profile: string };
+        };
         attributes?: AttributeItem[];
     };
 };
@@ -59,6 +73,12 @@ function formatISK(value: number | null) {
 function listingTypeLabel(t?: 'sell' | 'want' | null) {
     if (!t) return null;
     return t === 'sell' ? 'Til sölu' : 'Óskast';
+}
+
+function Stars({ avg }: { avg: number }) {
+    const full = Math.max(0, Math.min(5, Math.floor(avg)));
+    const stars = Array.from({ length: 5 }, (_, i) => (i < full ? '★' : '☆')).join('');
+    return <span className="fs-6" aria-label={`Einkunn ${avg} af 5`}>{stars}</span>;
 }
 
 function fmtNumber(n: any) {
@@ -106,6 +126,11 @@ export default function Show({ ad }: AdShowProps) {
 
     const backHref = ad.category?.slug ? route('ads.index', { section: ad.section, categorySlug: ad.category.slug }) : '/';
     const showTitle = ad.title?.trim() || 'Auglýsing';
+    const locationParts = [
+        ad.postcode ? `${ad.postcode.code}${ad.postcode.name ? ` ${ad.postcode.name}` : ''}` : null,
+        ad.location_text || null,
+    ].filter(Boolean);
+    const locationLabel = locationParts.join(' · ');
 
     const onDelete = () => {
         if (!confirm('Ertu viss um að þú viljir eyða þessari auglýsingu?')) return;
@@ -208,7 +233,13 @@ export default function Show({ ad }: AdShowProps) {
                         <div className="d-flex flex-wrap gap-3 align-items-center">
                             <div className="tt-ad-price fs-4">{formatISK(ad.price)}</div>
                             <div className="text-muted small">#{ad.id} · {ad.slug}</div>
+                            {ad.views_count !== undefined ? (
+                                <div className="text-muted small">Skoðanir: {ad.views_count}</div>
+                            ) : null}
                         </div>
+                        {locationLabel ? (
+                            <div className="text-muted small mt-1">{locationLabel}</div>
+                        ) : null}
                     </div>
 
                     <div className="d-flex flex-wrap gap-2">
@@ -331,6 +362,15 @@ export default function Show({ ad }: AdShowProps) {
 
                         <div className="fs-5 fw-bold mb-3">{ad.seller.display}</div>
 
+                        {ad.seller.rating ? (
+                            <div className="d-flex align-items-center gap-2 mb-3">
+                                <Stars avg={ad.seller.rating.avg} />
+                                <span className="text-muted small">
+                                    {ad.seller.rating.avg.toFixed(1)} ({ad.seller.rating.count})
+                                </span>
+                            </div>
+                        ) : null}
+
                         <div className="d-grid gap-2">
                             <button
                                 className="btn btn-dark"
@@ -338,6 +378,12 @@ export default function Show({ ad }: AdShowProps) {
                             >
                                 Senda skilaboð
                             </button>
+
+                            {ad.seller.links?.profile ? (
+                                <Link className="btn tt-btn-ghost" href={ad.seller.links.profile}>
+                                    Skoða prófíl
+                                </Link>
+                            ) : null}
 
                             {ad.seller.phone ? (
                                 <a className="btn tt-btn-ghost" href={`tel:${ad.seller.phone}`}>

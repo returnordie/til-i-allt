@@ -18,6 +18,8 @@ class UpdateAdRequest extends FormRequest
             'title' => ['required','string','min:3','max:120'],
             'price' => ['nullable','numeric','min:0','max:9999999999'],
             'description' => ['nullable','string','max:20000'],
+            'location_text' => ['nullable','string','max:120'],
+            'postcode_id' => ['nullable','integer','exists:postcodes,id'],
             'attributes' => ['sometimes','array'],
 
             'images' => ['nullable','array','max:15'],

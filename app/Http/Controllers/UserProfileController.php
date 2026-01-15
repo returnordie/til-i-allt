@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ad;
+use App\Models\DealReview;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -77,9 +78,14 @@ class UserProfileController extends Controller
             ];
         });
 
-        // Dummy rating (tengjum deal_reviews seinna)
-        $ratingAvg = 0.0;
-        $ratingCount = 0;
+        $ratingSummary = DealReview::query()
+            ->where('ratee_id', $user->id)
+            ->whereNull('deleted_at')
+            ->selectRaw('AVG(rating) as avg, COUNT(*) as count')
+            ->first();
+
+        $ratingAvg = $ratingSummary?->avg ? (float) $ratingSummary->avg : 0.0;
+        $ratingCount = (int) ($ratingSummary?->count ?? 0);
 
         return Inertia::render('Users/Show', [
             'profile' => [
