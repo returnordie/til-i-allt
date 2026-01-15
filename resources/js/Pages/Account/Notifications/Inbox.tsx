@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 type N = {
     id: string;
@@ -51,14 +51,6 @@ export default function Inbox() {
                                 <h1 className="h4 mb-0">Tilkynningar</h1>
                                 <div className="text-muted small">Ólesið: {unreadCount}</div>
                             </div>
-
-                            <button
-                                className="btn btn-outline-dark btn-sm"
-                                onClick={() => router.patch(route('notifications.readAll'), {}, { preserveScroll: true })}
-                                disabled={unreadCount === 0}
-                            >
-                                Merkja allt sem lesið
-                            </button>
                         </div>
 
                         {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
