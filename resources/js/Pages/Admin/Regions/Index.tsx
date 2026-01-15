@@ -19,10 +19,10 @@ interface RegionsPageProps {
 }
 
 export default function Index({ regions }: RegionsPageProps) {
-    const safeRegions = regions ?? {
-        data: [],
-        links: [],
-        meta: { total: 0, from: null, to: null },
+    const safeRegions = {
+        data: regions?.data ?? [],
+        links: regions?.links ?? [],
+        meta: regions?.meta ?? { total: 0, from: null, to: null },
     };
 
     return (

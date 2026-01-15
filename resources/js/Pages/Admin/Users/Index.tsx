@@ -24,10 +24,10 @@ interface UsersPageProps {
 
 export default function Index({ filters, users }: UsersPageProps) {
     const safeFilters = filters ?? { search: '' };
-    const safeUsers = users ?? {
-        data: [],
-        links: [],
-        meta: { total: 0, from: null, to: null },
+    const safeUsers = {
+        data: users?.data ?? [],
+        links: users?.links ?? [],
+        meta: users?.meta ?? { total: 0, from: null, to: null },
     };
     const [search, setSearch] = useState(safeFilters.search ?? '');
 

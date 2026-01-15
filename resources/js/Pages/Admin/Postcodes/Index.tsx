@@ -24,10 +24,10 @@ interface PostcodesPageProps {
 export default function Index({ filters, regions, postcodes }: PostcodesPageProps) {
     const safeFilters = filters ?? { region_id: null };
     const safeRegions = regions ?? [];
-    const safePostcodes = postcodes ?? {
-        data: [],
-        links: [],
-        meta: { total: 0, from: null, to: null },
+    const safePostcodes = {
+        data: postcodes?.data ?? [],
+        links: postcodes?.links ?? [],
+        meta: postcodes?.meta ?? { total: 0, from: null, to: null },
     };
     const [regionId, setRegionId] = useState(
         safeFilters.region_id ? String(safeFilters.region_id) : '',

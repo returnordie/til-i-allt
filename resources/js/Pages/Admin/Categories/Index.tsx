@@ -26,10 +26,10 @@ interface CategoriesPageProps {
 export default function Index({ filters, sections, categories }: CategoriesPageProps) {
     const safeFilters = filters ?? { section: '' };
     const safeSections = sections ?? [];
-    const safeCategories = categories ?? {
-        data: [],
-        links: [],
-        meta: { total: 0, from: null, to: null },
+    const safeCategories = {
+        data: categories?.data ?? [],
+        links: categories?.links ?? [],
+        meta: categories?.meta ?? { total: 0, from: null, to: null },
     };
     const [section, setSection] = useState(safeFilters.section ?? '');
 
