@@ -26,11 +26,13 @@ class DealReviewController extends Controller
         $isSeller = (int) $deal->seller_id === (int) $user->id;
         $ratee = $isSeller ? $deal->buyer : $deal->seller;
 
-        $existingReview = DealReview::query()
+        $reviews = DealReview::query()
             ->where('deal_id', $deal->id)
-            ->where('rater_id', $user->id)
             ->latest('id')
-            ->first();
+            ->get();
+
+        $existingReview = $reviews->firstWhere('rater_id', $user->id);
+        $otherReview = $reviews->firstWhere('rater_id', '!=', $user->id);
 
         $canReview = Gate::allows('createReview', $deal) && !$existingReview;
 
@@ -64,6 +66,12 @@ class DealReviewController extends Controller
                 'rating' => $existingReview->rating,
                 'comment' => $existingReview->comment,
                 'created_at' => $existingReview->created_at?->toDateTimeString(),
+            ] : null,
+            'otherReview' => $existingReview && $otherReview ? [
+                'rating' => $otherReview->rating,
+                'comment' => $otherReview->comment,
+                'created_at' => $otherReview->created_at?->toDateTimeString(),
+                'rater_name' => $otherReview->rater_id === $deal->seller_id ? $deal->seller?->name : $deal->buyer?->name,
             ] : null,
             'canReview' => $canReview,
             'storeUrl' => route('dealReviews.store', $deal),

@@ -25,10 +25,15 @@ type ExistingReview = {
     created_at: string | null;
 };
 
+type OtherReview = ExistingReview & {
+    rater_name: string | null;
+};
+
 type PageProps = {
     deal: DealInfo;
     ratee: RateeInfo | null;
     existingReview: ExistingReview | null;
+    otherReview: OtherReview | null;
     canReview: boolean;
     storeUrl: string;
     flash?: { success?: string; error?: string };
@@ -45,7 +50,8 @@ function renderStars(count: number) {
 
 export default function Review() {
     const { props } = usePage<PageProps>();
-    const { deal, ratee, existingReview, canReview, storeUrl } = props;
+    const { deal, ratee, existingReview, otherReview, canReview, storeUrl } = props;
+    const showBothReviews = Boolean(existingReview && otherReview);
 
     const { data, setData, post, processing, errors } = useForm({
         rating: existingReview?.rating ?? 0,
@@ -117,7 +123,51 @@ export default function Review() {
                                     </div>
                                 </div>
 
-                                {existingReview ? (
+                                {showBothReviews ? (
+                                    <div className="mb-4">
+                                        <div className="fw-semibold mb-2">Umsagnir frá báðum aðilum</div>
+                                        <div className="row g-3">
+                                            <div className="col-12 col-lg-6">
+                                                <div className="border rounded p-3 h-100 bg-light">
+                                                    <div className="fw-semibold">Þín umsögn</div>
+                                                    <div className="small text-muted">Skráð: {fmtDate(existingReview?.created_at ?? null)}</div>
+                                                    <div className="mt-2">
+                                                        <span className="me-2">Stjörnur:</span>
+                                                        <span className="fw-semibold">
+                                                            {existingReview?.rating} {renderStars(existingReview?.rating ?? 0)}
+                                                        </span>
+                                                    </div>
+                                                    {existingReview?.comment ? (
+                                                        <div className="mt-2">
+                                                            <div className="text-muted small">Athugasemd</div>
+                                                            <div>{existingReview.comment}</div>
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-lg-6">
+                                                <div className="border rounded p-3 h-100 bg-light">
+                                                    <div className="fw-semibold">
+                                                        Umsögn frá {otherReview?.rater_name ?? 'viðskiptaaðila'}
+                                                    </div>
+                                                    <div className="small text-muted">Skráð: {fmtDate(otherReview?.created_at ?? null)}</div>
+                                                    <div className="mt-2">
+                                                        <span className="me-2">Stjörnur:</span>
+                                                        <span className="fw-semibold">
+                                                            {otherReview?.rating} {renderStars(otherReview?.rating ?? 0)}
+                                                        </span>
+                                                    </div>
+                                                    {otherReview?.comment ? (
+                                                        <div className="mt-2">
+                                                            <div className="text-muted small">Athugasemd</div>
+                                                            <div>{otherReview.comment}</div>
+                                                        </div>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : existingReview ? (
                                     <div className="alert alert-info">
                                         <div className="fw-semibold">Umsögn skráð</div>
                                         <div className="small text-muted">Skráð: {fmtDate(existingReview.created_at)}</div>
