@@ -464,19 +464,17 @@ export default function Index() {
                     initialFocus={soldData.sold_outside ? cancelSoldRef : buyerIdentifierRef}
                 >
                     <div className="p-4">
-                        <h2 className="h5 mb-3">Merkja auglýsingu selda</h2>
+                        <h2 className="h5 mb-3">Merkja kaupenda</h2>
                         <p className="text-muted small mb-3">
-                            Sláðu inn auðkenni (ID) kaupanda sem er skráður í kerfinu. Ef salan fór fram utan vefsins skaltu
-                            haka við viðeigandi valmöguleika.
+                            Sláðu inn notandanafn kaupanda eða hakaðu við ef salan fór fram utan vefsins.
                         </p>
                         <div className="mb-3">
                             <label className="form-label fw-semibold" htmlFor="buyer-identifier">
-                                Kaupandi (ID)
+                                Kaupandi (notandanafn)
                             </label>
                             <input
                                 id="buyer-identifier"
                                 className="form-control"
-                                inputMode="numeric"
                                 value={soldData.buyer_identifier}
                                 onChange={(event) => setSoldData('buyer_identifier', event.target.value)}
                                 disabled={soldData.sold_outside}
@@ -501,7 +499,7 @@ export default function Index() {
                         <div className="d-flex justify-content-end gap-2">
                             <button
                                 type="button"
-                                className="btn btn-outline-secondary btn-sm"
+                                className="btn btn-danger btn-sm"
                                 onClick={closeSoldModal}
                                 ref={cancelSoldRef}
                             >
