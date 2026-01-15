@@ -30,21 +30,30 @@ class AccountDealsController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $dealIds = $deals->getCollection()->pluck('id');
+
         $reviewedDealIds = DealReview::query()
             ->where('rater_id', $user->id)
-            ->whereIn('deal_id', $deals->getCollection()->pluck('id'))
+            ->whereIn('deal_id', $dealIds)
             ->pluck('deal_id')
             ->all();
 
         $reviewedLookup = array_flip($reviewedDealIds);
+        $reviewStats = DealReview::query()
+            ->whereIn('deal_id', $dealIds)
+            ->selectRaw('deal_id, count(*) as review_count, avg(rating) as average_rating')
+            ->groupBy('deal_id')
+            ->get()
+            ->keyBy('deal_id');
 
-        $deals = $deals->through(function (Deal $deal) use ($user, $reviewedLookup) {
+        $deals = $deals->through(function (Deal $deal) use ($user, $reviewedLookup, $reviewStats) {
             $isSeller = (int) $deal->seller_id === (int) $user->id;
             $canCancel = $isSeller
                 && $deal->status === 'active'
                 && (bool) $deal->buyer_id;
             $hasReview = isset($reviewedLookup[$deal->id]);
             $reviewOpen = $deal->reviewsAreOpen();
+            $summary = $reviewStats->get($deal->id);
 
             return [
                 'id' => $deal->id,
@@ -81,6 +90,10 @@ class AccountDealsController extends Controller
                         && !$hasReview,
                     'has_review' => $hasReview,
                     'is_open' => $reviewOpen,
+                    'summary' => $summary ? [
+                        'count' => (int) $summary->review_count,
+                        'average_rating' => (float) $summary->average_rating,
+                    ] : null,
                     'link' => route('account.deals.review', $deal),
                 ],
                 'links' => [

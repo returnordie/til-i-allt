@@ -1,8 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
-const ratingOptions = [0, 1, 2, 3, 4, 5];
+const ratingOptions = [1, 2, 3, 4, 5];
 
 type DealInfo = {
     id: number;
@@ -49,9 +50,11 @@ export default function Review() {
     const { deal, ratee, existingReview, otherReview, canReview, storeUrl } = props;
     const showBothReviews = Boolean(existingReview && otherReview);
     const pageTitle = existingReview ? 'Umsögn' : 'Gefa umsögn';
+    const [hoverRating, setHoverRating] = useState<number | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        rating: existingReview?.rating ?? 0,
+        rating: existingReview?.rating ?? 5,
         comment: existingReview?.comment ?? '',
     });
 
@@ -95,23 +98,6 @@ export default function Review() {
 
                         <div className="card">
                             <div className="card-body">
-                                <div className="mb-3">
-                                    <div className="fw-semibold">Móttakandi</div>
-                                    <div className="text-muted">
-                                        {ratee?.profile_url ? (
-                                            <Link href={ratee.profile_url}>{ratee.name}</Link>
-                                        ) : (
-                                            ratee?.name ?? '—'
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="alert alert-secondary mb-4">
-                                    Umsögn verður ekki sýnileg hinum aðila fyrr en eftir viku. Þegar sá tími rennur út
-                                    birtist umsögnin bæði hjá viðkomandi og á notendasíðu, og þá er ekki lengur hægt að
-                                    gefa umsögn til baka.
-                                </div>
-
                                 {showBothReviews ? (
                                     <div className="mb-4">
                                         <div className="fw-semibold mb-2">Umsagnir frá báðum aðilum</div>
@@ -175,17 +161,44 @@ export default function Review() {
                                 {canReview ? (
                                     <form onSubmit={submit} className="mt-4">
                                         <div className="mb-3">
-                                            <label className="form-label fw-semibold">Stjörnur (0-5)</label>
-                                            <div className="d-flex flex-wrap gap-2">
+                                            <label className="form-label fw-semibold">Stjörnur</label>
+                                            <div
+                                                className="d-flex align-items-center gap-2"
+                                                onPointerLeave={() => {
+                                                    setHoverRating(null);
+                                                    setIsDragging(false);
+                                                }}
+                                                onPointerUp={() => setIsDragging(false)}
+                                            >
                                                 {ratingOptions.map((value) => (
                                                     <button
                                                         key={value}
                                                         type="button"
-                                                        className={`btn btn-sm ${data.rating === value ? 'btn-warning' : 'btn-outline-warning'}`}
+                                                        className="btn p-0 border-0 bg-transparent"
                                                         onClick={() => setData('rating', value)}
+                                                        onMouseEnter={() => setHoverRating(value)}
+                                                        onFocus={() => setHoverRating(value)}
+                                                        onBlur={() => setHoverRating(null)}
+                                                        onPointerDown={(event) => {
+                                                            event.preventDefault();
+                                                            setIsDragging(true);
+                                                            setData('rating', value);
+                                                        }}
+                                                        onPointerEnter={() => {
+                                                            if (isDragging) {
+                                                                setData('rating', value);
+                                                            }
+                                                        }}
+                                                        aria-label={`${value} stjörnur`}
                                                     >
-                                                        <span className="me-1">{value}</span>
-                                                        <span aria-hidden="true">{renderStars(value)}</span>
+                                                        <span
+                                                            className={`fs-3 ${
+                                                                (hoverRating ?? data.rating) >= value ? 'text-warning' : 'text-muted'
+                                                            }`}
+                                                            aria-hidden="true"
+                                                        >
+                                                            ★
+                                                        </span>
                                                     </button>
                                                 ))}
                                             </div>
@@ -194,7 +207,7 @@ export default function Review() {
 
                                         <div className="mb-3">
                                             <label className="form-label fw-semibold" htmlFor="comment">
-                                                Athugasemd (valfrjálst)
+                                                Hnitmiðuð og málefnaleg umsögn.
                                             </label>
                                             <textarea
                                                 id="comment"
@@ -202,6 +215,7 @@ export default function Review() {
                                                 rows={4}
                                                 value={data.comment}
                                                 onChange={(event) => setData('comment', event.target.value)}
+                                                placeholder="Hvað gékk vel? (valfrjálst)"
                                             />
                                             {errors.comment ? <div className="text-danger small mt-2">{errors.comment}</div> : null}
                                         </div>
@@ -217,6 +231,12 @@ export default function Review() {
                                 )}
                             </div>
                         </div>
+
+                        <p className="text-muted small mt-3 mb-0">
+                            Umsögnin þín birtist ekki fyrr en hinn aðilinn hefur einnig skilað inn umsögn. Hafi engin umsögn
+                            borist innan 7 daga frá því að kaupin voru samþykkt, lokast fyrir innsendingu umsagna og sú umsögn
+                            sem hefur borist verður þá birt.
+                        </p>
                     </div>
                 </div>
             </div>

@@ -23,6 +23,7 @@ type DealRow = {
         can_review: boolean;
         has_review: boolean;
         is_open: boolean;
+        summary: { count: number; average_rating: number } | null;
         link: string;
     };
 };
@@ -51,6 +52,38 @@ function statusMeta(status: DealRow['status']) {
 function fmtDate(s: string | null) {
     if (!s) return '—';
     return new Date(s).toLocaleDateString('is-IS');
+}
+
+function renderStarRating(rating: number) {
+    const rounded = Math.round(rating * 2) / 2;
+
+    return (
+        <span className="d-inline-flex align-items-center gap-1" aria-label={`Einkunn ${rounded.toFixed(1)} af 5`}>
+            {Array.from({ length: 5 }, (_, index) => {
+                const starValue = index + 1;
+                const isFull = rounded >= starValue;
+                const isHalf = !isFull && rounded + 0.5 >= starValue;
+
+                if (isHalf) {
+                    return (
+                        <span key={starValue} className="position-relative d-inline-block" style={{ width: '1em' }}>
+                            <span className="text-muted">★</span>
+                            <span className="position-absolute top-0 start-0 overflow-hidden text-warning" style={{ width: '50%' }}>
+                                ★
+                            </span>
+                        </span>
+                    );
+                }
+
+                return (
+                    <span key={starValue} className={isFull ? 'text-warning' : 'text-muted'}>
+                        ★
+                    </span>
+                );
+            })}
+            <span className="text-muted small ms-1">{rounded.toFixed(1)}</span>
+        </span>
+    );
 }
 
 export default function Index() {
@@ -96,13 +129,14 @@ export default function Index() {
                                             <th>Aðili</th>
                                             <th>Staða</th>
                                             <th>Dagsetning</th>
+                                            <th>Stjörnur</th>
                                             <th className="text-end">Aðgerðir</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {deals.data.length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} className="text-center text-muted py-4">
+                                                <td colSpan={6} className="text-center text-muted py-4">
                                                     Engin viðskipti fundust.
                                                 </td>
                                             </tr>
@@ -132,6 +166,13 @@ export default function Index() {
                                                             {!deal.completed_at && deal.canceled_at ? `Hætt við: ${fmtDate(deal.canceled_at)}` : null}
                                                             {!deal.completed_at && !deal.canceled_at ? `Merkt: ${fmtDate(deal.confirmed_at)}` : null}
                                                         </td>
+                                                        <td className="text-muted small">
+                                                            {deal.review.summary && deal.review.summary.count >= 2 ? (
+                                                                renderStarRating(deal.review.summary.average_rating)
+                                                            ) : (
+                                                                <span className="text-muted">—</span>
+                                                            )}
+                                                        </td>
                                                         <td className="text-end">
                                                             {deal.can_respond ? (
                                                                 <div className="btn-group btn-group-sm" role="group">
@@ -147,11 +188,11 @@ export default function Index() {
                                                                     Hætta við
                                                                 </button>
                                                             ) : deal.review?.can_review ? (
-                                                                <Link href={deal.review.link} className="btn btn-outline-warning btn-sm">
+                                                                <Link href={deal.review.link} className="btn btn-warning btn-sm">
                                                                     Gefa umsögn
                                                                 </Link>
                                                             ) : deal.review?.has_review ? (
-                                                                <Link href={deal.review.link} className="btn btn-outline-secondary btn-sm">
+                                                                <Link href={deal.review.link} className="btn btn-warning btn-sm">
                                                                     Umsögn
                                                                 </Link>
                                                             ) : (
