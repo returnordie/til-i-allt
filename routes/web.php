@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use App\Http\Controllers\Account\AccountAdsController;
+use App\Http\Controllers\Account\AccountDealsController;
 use App\Http\Controllers\AdController;
 //use App\Http\Controllers\AdReportController;
 //use App\Http\Controllers\DealController;
@@ -90,8 +91,11 @@ Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
     Route::get('oryggi', [AccountPasswordController::class, 'edit'])->name('account.security.edit');
     Route::put('oryggi/lykilord', [AccountPasswordController::class, 'update'])->name('account.security.password.update');
 
-     Route::get('auglysingar', [AccountAdsController::class, 'index'])
+    Route::get('auglysingar', [AccountAdsController::class, 'index'])
         ->name('account.ads.index');
+
+    Route::get('vidskipti', [AccountDealsController::class, 'index'])
+        ->name('account.deals.index');
 
     Route::patch('auglysingar/{ad}/status', [AccountAdsController::class, 'setStatus'])
         ->name('account.ads.status');

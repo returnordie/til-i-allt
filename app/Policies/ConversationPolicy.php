@@ -27,4 +27,9 @@ class ConversationPolicy
     {
         return $this->view($user, $conversation);
     }
+
+    public function update(User $user, Conversation $conversation): bool
+    {
+        return $this->view($user, $conversation);
+    }
 }
