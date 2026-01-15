@@ -23,7 +23,13 @@ interface UsersPageProps {
 }
 
 export default function Index({ filters, users }: UsersPageProps) {
-    const [search, setSearch] = useState(filters.search ?? '');
+    const safeFilters = filters ?? { search: '' };
+    const safeUsers = users ?? {
+        data: [],
+        links: [],
+        meta: { total: 0, from: null, to: null },
+    };
+    const [search, setSearch] = useState(safeFilters.search ?? '');
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -54,8 +60,8 @@ export default function Index({ filters, users }: UsersPageProps) {
                     <div className="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-md-between">
                         <div>
                             <p className="small text-muted mb-0">
-                            {users.meta.total} notendur
-                        </p>
+                                {safeUsers.meta.total} notendur
+                            </p>
                         </div>
                         <form
                             onSubmit={submit}
@@ -88,7 +94,7 @@ export default function Index({ filters, users }: UsersPageProps) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.data.map((user) => (
+                                {safeUsers.data.map((user) => (
                                     <tr key={user.id}>
                                         <td className="fw-semibold">
                                             {user.name}
@@ -133,7 +139,7 @@ export default function Index({ filters, users }: UsersPageProps) {
                             </tbody>
                         </table>
                     </div>
-                    <Pagination links={users.links} />
+                    <Pagination links={safeUsers.links} />
                 </div>
             </section>
         </AdminLayout>

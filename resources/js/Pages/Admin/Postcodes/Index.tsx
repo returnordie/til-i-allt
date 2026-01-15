@@ -22,8 +22,15 @@ interface PostcodesPageProps {
 }
 
 export default function Index({ filters, regions, postcodes }: PostcodesPageProps) {
+    const safeFilters = filters ?? { region_id: null };
+    const safeRegions = regions ?? [];
+    const safePostcodes = postcodes ?? {
+        data: [],
+        links: [],
+        meta: { total: 0, from: null, to: null },
+    };
     const [regionId, setRegionId] = useState(
-        filters.region_id ? String(filters.region_id) : '',
+        safeFilters.region_id ? String(safeFilters.region_id) : '',
     );
 
     const submit = (event: FormEvent) => {
@@ -62,7 +69,7 @@ export default function Index({ filters, regions, postcodes }: PostcodesPageProp
                                 className="form-select"
                             >
                                 <option value="">Öll svæði</option>
-                                {regions.map((region) => (
+                                {safeRegions.map((region) => (
                                     <option key={region.id} value={region.id}>
                                         {region.name}
                                     </option>
@@ -92,7 +99,7 @@ export default function Index({ filters, regions, postcodes }: PostcodesPageProp
                                 </tr>
                             </thead>
                             <tbody>
-                                {postcodes.data.map((postcode) => (
+                                {safePostcodes.data.map((postcode) => (
                                     <tr key={postcode.id}>
                                         <td className="fw-semibold">
                                             {postcode.code}
@@ -132,7 +139,7 @@ export default function Index({ filters, regions, postcodes }: PostcodesPageProp
                             </tbody>
                         </table>
                     </div>
-                    <Pagination links={postcodes.links} />
+                    <Pagination links={safePostcodes.links} />
                 </div>
             </section>
         </AdminLayout>
