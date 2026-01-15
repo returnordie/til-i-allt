@@ -14,17 +14,29 @@ class AccountDealsController extends Controller
         $user = $request->user();
 
         $deals = Deal::query()
-            ->where('buyer_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query
+                    ->where('buyer_id', $user->id)
+                    ->orWhere('seller_id', $user->id);
+            })
             ->with([
                 'ad:id,title,section,slug,category_id',
                 'ad.category:id,slug',
                 'seller:id,name',
+                'buyer:id,name',
             ])
             ->latest('id')
             ->paginate(20)
             ->withQueryString();
 
-        $deals = $deals->through(function (Deal $deal) {
+        $deals = $deals->through(function (Deal $deal) use ($user) {
+            $isSeller = (int) $deal->seller_id === (int) $user->id;
+            $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
+            $canCancel = $isSeller
+                && $deal->status === 'completed'
+                && $windowEndsAt
+                && now()->lessThanOrEqualTo($windowEndsAt);
+
             return [
                 'id' => $deal->id,
                 'status' => $deal->status,
@@ -37,6 +49,11 @@ class AccountDealsController extends Controller
                     'id' => $deal->seller->id,
                     'name' => $deal->seller->name,
                 ] : null,
+                'buyer' => $deal->buyer ? [
+                    'id' => $deal->buyer->id,
+                    'name' => $deal->buyer->name,
+                ] : null,
+                'is_seller' => $isSeller,
                 'ad' => $deal->ad ? [
                     'title' => $deal->ad->title,
                     'link' => route('ads.show', [
@@ -46,7 +63,8 @@ class AccountDealsController extends Controller
                         'slug' => $deal->ad->slug,
                     ]),
                 ] : null,
-                'can_respond' => $deal->status === 'active' && (bool) $deal->confirmed_at,
+                'can_respond' => !$isSeller && $deal->status === 'active' && (bool) $deal->confirmed_at,
+                'can_cancel' => $canCancel,
                 'links' => [
                     'set_status' => route('deals.setStatus', $deal),
                 ],

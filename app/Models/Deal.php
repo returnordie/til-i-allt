@@ -55,14 +55,18 @@ class Deal extends Model
             return null;
         }
 
-        return $this->completed_at->copy()->addHours(24);
+        return $this->completed_at->copy();
     }
 
     public function reviewsAreOpen(): bool
     {
-        $openAt = $this->reviewsOpenAt();
+        if (!$this->completed_at) {
+            return false;
+        }
 
-        return $openAt !== null && now()->greaterThanOrEqualTo($openAt);
+        $windowEndsAt = $this->completed_at->copy()->addDays(14);
+
+        return now()->betweenIncluded($this->completed_at, $windowEndsAt);
     }
 
     public function isParticipant(int $userId): bool
