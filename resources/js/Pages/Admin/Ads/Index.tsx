@@ -27,10 +27,10 @@ interface AdsPageProps {
 export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
     const safeFilters = filters ?? { search: '', status: '' };
     const safeStatusOptions = statusOptions ?? [];
-    const safeAds = ads ?? {
-        data: [],
-        links: [],
-        meta: { total: 0, from: null, to: null },
+    const safeAds = {
+        data: ads?.data ?? [],
+        links: ads?.links ?? [],
+        meta: ads?.meta ?? { total: 0, from: null, to: null },
     };
     const [search, setSearch] = useState(safeFilters.search ?? '');
     const [status, setStatus] = useState(safeFilters.status ?? '');
