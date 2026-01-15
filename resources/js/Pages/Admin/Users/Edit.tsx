@@ -37,10 +37,10 @@ export default function Edit({ user, roles }: EditProps) {
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Notandi #{user.id}
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Breyta notanda
                     </h1>
                 </div>
@@ -48,44 +48,44 @@ export default function Edit({ user, roles }: EditProps) {
         >
             <Head title={`Notandi ${user.name}`} />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex flex-col gap-6">
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col-md-6">
                             <InputLabel htmlFor="name" value="Nafn" />
                             <TextInput
                                 id="name"
-                                className="mt-1 block w-full"
+                                className="mt-1"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                             />
                         </div>
-                        <div>
+                        <div className="col-md-6">
                             <InputLabel htmlFor="email" value="Email" />
                             <TextInput
                                 id="email"
                                 type="email"
-                                className="mt-1 block w-full"
+                                className="mt-1"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                             />
                         </div>
-                        <div>
+                        <div className="col-md-6">
                             <InputLabel htmlFor="username" value="Notendanafn" />
                             <TextInput
                                 id="username"
-                                className="mt-1 block w-full"
+                                className="mt-1"
                                 value={data.username}
                                 onChange={(e) => setData('username', e.target.value)}
                             />
                         </div>
-                        <div>
+                        <div className="col-md-6">
                             <InputLabel htmlFor="role" value="Hlutverk" />
                             <select
                                 id="role"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                className="form-select mt-1"
                                 value={data.role}
                                 onChange={(e) => setData('role', e.target.value)}
                             >
@@ -98,38 +98,38 @@ export default function Edit({ user, roles }: EditProps) {
                         </div>
                     </div>
 
-                    <div className="grid gap-3 md:grid-cols-3">
-                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                    <div className="row g-3 mt-2">
+                        <label className="col-md-4 form-check d-flex align-items-center gap-2">
                             <Checkbox
                                 checked={data.is_active}
                                 onChange={(e) =>
                                     setData('is_active', e.target.checked)
                                 }
                             />
-                            Virkur aðgangur
+                            <span className="text-muted">Virkur aðgangur</span>
                         </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                        <label className="col-md-4 form-check d-flex align-items-center gap-2">
                             <Checkbox
                                 checked={data.show_name}
                                 onChange={(e) =>
                                     setData('show_name', e.target.checked)
                                 }
                             />
-                            Sýna nafn
+                            <span className="text-muted">Sýna nafn</span>
                         </label>
-                        <label className="flex items-center gap-2 text-sm text-slate-600">
+                        <label className="col-md-4 form-check d-flex align-items-center gap-2">
                             <Checkbox
                                 checked={data.show_phone}
                                 onChange={(e) =>
                                     setData('show_phone', e.target.checked)
                                 }
                             />
-                            Sýna síma
+                            <span className="text-muted">Sýna síma</span>
                         </label>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <p className="text-xs text-slate-400">
+                    <div className="d-flex align-items-center justify-content-between mt-4">
+                        <p className="small text-muted mb-0">
                             Stofnað: {user.created_at ?? '—'}
                         </p>
                         <PrimaryButton

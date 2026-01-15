@@ -39,10 +39,10 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
         <AdminLayout
             header={
                 <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                    <p className="text-uppercase small text-muted fw-semibold mb-1">
                         Flokkar
                     </p>
-                    <h1 className="text-2xl font-semibold text-slate-900">
+                    <h1 className="h3 fw-semibold mb-0">
                         Stjórna flokkum
                     </h1>
                 </div>
@@ -50,97 +50,98 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
         >
             <Head title="Flokkar" />
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                    <form onSubmit={submit} className="flex flex-wrap gap-2">
-                        <select
-                            value={section}
-                            onChange={(event) => setSection(event.target.value)}
-                            className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            <section className="card shadow-sm">
+                <div className="card-body">
+                    <div className="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between">
+                        <form onSubmit={submit} className="d-flex flex-wrap gap-2">
+                            <select
+                                value={section}
+                                onChange={(event) =>
+                                    setSection(event.target.value)
+                                }
+                                className="form-select"
+                            >
+                                <option value="">Allar deildir</option>
+                                {sections.map((item) => (
+                                    <option key={item} value={item}>
+                                        {item}
+                                    </option>
+                                ))}
+                            </select>
+                            <button type="submit" className="btn btn-dark">
+                                Sía
+                            </button>
+                        </form>
+                        <Link
+                            href={route('admin.categories.create')}
+                            className="btn btn-outline-dark"
                         >
-                            <option value="">Allar deildir</option>
-                            {sections.map((item) => (
-                                <option key={item} value={item}>
-                                    {item}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            type="submit"
-                            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-                        >
-                            Sía
-                        </button>
-                    </form>
-                    <Link
-                        href={route('admin.categories.create')}
-                        className="rounded-lg border border-slate-900 px-4 py-2 text-sm font-semibold text-slate-900"
-                    >
-                        Nýr flokkur
-                    </Link>
-                </div>
+                            Nýr flokkur
+                        </Link>
+                    </div>
 
-                <div className="mt-6 overflow-x-auto">
-                    <table className="min-w-full text-left text-sm">
-                        <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-                            <tr>
-                                <th className="px-3 py-3">Nafn</th>
-                                <th className="px-3 py-3">Slug</th>
-                                <th className="px-3 py-3">Deild</th>
-                                <th className="px-3 py-3">Foreldri</th>
-                                <th className="px-3 py-3">Röðun</th>
-                                <th className="px-3 py-3">Staða</th>
-                                <th className="px-3 py-3 text-right">Aðgerðir</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {categories.data.map((category) => (
-                                <tr key={category.id} className="hover:bg-slate-50">
-                                    <td className="px-3 py-3 font-medium text-slate-900">
-                                        {category.name}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {category.slug}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {category.section}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {category.parent?.name ?? '—'}
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600">
-                                        {category.sort_order}
-                                    </td>
-                                    <td className="px-3 py-3">
-                                        <span
-                                            className={`rounded-full px-2 py-1 text-xs font-semibold ${
-                                                category.is_active
-                                                    ? 'bg-emerald-100 text-emerald-700'
-                                                    : 'bg-rose-100 text-rose-700'
-                                            }`}
-                                        >
-                                            {category.is_active
-                                                ? 'Virkur'
-                                                : 'Óvirkur'}
-                                        </span>
-                                    </td>
-                                    <td className="px-3 py-3 text-right">
-                                        <Link
-                                            href={route(
-                                                'admin.categories.edit',
-                                                category.id,
-                                            )}
-                                            className="text-sm font-semibold text-slate-900 hover:text-slate-600"
-                                        >
-                                            Breyta
-                                        </Link>
-                                    </td>
+                    <div className="table-responsive mt-4">
+                        <table className="table table-hover align-middle mb-0">
+                            <thead className="table-light">
+                                <tr>
+                                    <th>Nafn</th>
+                                    <th>Slug</th>
+                                    <th>Deild</th>
+                                    <th>Foreldri</th>
+                                    <th>Röðun</th>
+                                    <th>Staða</th>
+                                    <th className="text-end">Aðgerðir</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {categories.data.map((category) => (
+                                    <tr key={category.id}>
+                                        <td className="fw-semibold">
+                                            {category.name}
+                                        </td>
+                                        <td className="text-muted">
+                                            {category.slug}
+                                        </td>
+                                        <td className="text-muted">
+                                            {category.section}
+                                        </td>
+                                        <td className="text-muted">
+                                            {category.parent?.name ?? '—'}
+                                        </td>
+                                        <td className="text-muted">
+                                            {category.sort_order}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`badge ${
+                                                    category.is_active
+                                                        ? 'bg-success'
+                                                        : 'bg-danger'
+                                                }`}
+                                            >
+                                                {category.is_active
+                                                    ? 'Virkur'
+                                                    : 'Óvirkur'}
+                                            </span>
+                                        </td>
+                                        <td className="text-end">
+                                            <Link
+                                                href={route(
+                                                    'admin.categories.edit',
+                                                    category.id,
+                                                )}
+                                                className="btn btn-sm btn-outline-secondary"
+                                            >
+                                                Breyta
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <Pagination links={categories.links} />
                 </div>
-                <Pagination links={categories.links} />
             </section>
         </AdminLayout>
     );
