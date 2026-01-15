@@ -6,7 +6,7 @@ import {
     TransitionChild,
 } from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { PropsWithChildren, RefObject, useRef, useState } from 'react';
+import { PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react';
 
 type AdRow = {
     id: number;
@@ -136,6 +136,7 @@ export default function Index() {
     const { filters, counts, extendOptions, ads } = props;
     const [soldAd, setSoldAd] = useState<AdRow | null>(null);
     const buyerIdentifierRef = useRef<HTMLInputElement>(null);
+    const cancelSoldRef = useRef<HTMLButtonElement>(null);
     const {
         data: soldData,
         setData: setSoldData,
@@ -173,6 +174,19 @@ export default function Index() {
         resetSold();
         clearSoldErrors();
     };
+
+    useEffect(() => {
+        if (!soldAd) return;
+
+        requestAnimationFrame(() => {
+            if (soldData.sold_outside) {
+                cancelSoldRef.current?.focus();
+                return;
+            }
+
+            buyerIdentifierRef.current?.focus();
+        });
+    }, [soldAd, soldData.sold_outside]);
 
     const confirmSold = () => {
         if (!soldAd) return;
@@ -433,7 +447,11 @@ export default function Index() {
                     </nav>
                 ) : null}
 
-                <Modal show={Boolean(soldAd)} onClose={closeSoldModal} initialFocus={buyerIdentifierRef}>
+                <Modal
+                    show={Boolean(soldAd)}
+                    onClose={closeSoldModal}
+                    initialFocus={soldData.sold_outside ? cancelSoldRef : buyerIdentifierRef}
+                >
                     <div className="p-4">
                         <h2 className="h5 mb-3">Merkja auglýsingu selda</h2>
                         <p className="text-muted small mb-3">
@@ -470,7 +488,12 @@ export default function Index() {
                             </label>
                         </div>
                         <div className="d-flex justify-content-end gap-2">
-                            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={closeSoldModal}>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary btn-sm"
+                                onClick={closeSoldModal}
+                                ref={cancelSoldRef}
+                            >
                                 Hætta við
                             </button>
                             <button
