@@ -31,11 +31,9 @@ class AccountDealsController extends Controller
 
         $deals = $deals->through(function (Deal $deal) use ($user) {
             $isSeller = (int) $deal->seller_id === (int) $user->id;
-            $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
             $canCancel = $isSeller
-                && $deal->status === 'completed'
-                && $windowEndsAt
-                && now()->lessThanOrEqualTo($windowEndsAt);
+                && $deal->status === 'active'
+                && (bool) $deal->buyer_id;
 
             return [
                 'id' => $deal->id,
