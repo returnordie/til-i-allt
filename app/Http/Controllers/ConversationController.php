@@ -167,6 +167,7 @@ class ConversationController extends Controller
                 'buyer_id' => $dealModel?->buyer_id,
                 'price_final' => $dealModel?->price_final,
                 'currency' => $dealModel?->currency ?? 'ISK',
+                'confirmed_at' => $dealModel?->confirmed_at?->toDateTimeString(),
 
                 // UI rules
                 'can_mark_buyer' => $isSeller && (bool) $other, // seller + other user exists

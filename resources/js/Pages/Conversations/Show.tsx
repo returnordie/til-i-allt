@@ -18,6 +18,7 @@ type DealProps = null | {
     buyer_id: number | null;
     price_final: number | null;
     currency: string;
+    confirmed_at: string | null;
     can_mark_buyer: boolean;
     links: {
         upsert: string;
@@ -51,19 +52,6 @@ function fmtTime(s: string | null) {
     return new Date(s).toLocaleString('is-IS');
 }
 
-function dealStatusLabel(status?: DealProps['status']) {
-    switch (status) {
-        case 'active':
-            return 'Virk';
-        case 'inactive':
-            return 'Óvirk';
-        case 'completed':
-            return 'Frágengin';
-        default:
-            return status ?? 'Virk';
-    }
-}
-
 export default function Show() {
     const { props } = usePage<PageProps>();
     const { conversation, messages, authUserId, deal } = props;
@@ -95,8 +83,8 @@ export default function Show() {
 
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
 
-    const send = (e: React.FormEvent) => {
-        e.preventDefault();
+    const send = (e?: React.FormEvent) => {
+        e?.preventDefault();
         justSentRef.current = true;
 
         post(conversation.links.send, {
@@ -111,6 +99,13 @@ export default function Show() {
     // --- deal actions (mark buyer) ---
     const canShowDealBox = Boolean(deal) && conversation.context === 'ad';
     const canMarkBuyer = Boolean(deal?.can_mark_buyer) && Boolean(conversation.other?.id);
+    const isSeller = Boolean(deal?.can_mark_buyer);
+    const buyerMarked = deal?.buyer_id === authUserId;
+    const soldToOther = deal?.status === 'completed' && deal?.buyer_id !== authUserId;
+    const showBuyerStatus = !isSeller && canShowDealBox && (buyerMarked || soldToOther);
+
+    const buyerMarkedAt = deal?.confirmed_at ? new Date(deal.confirmed_at).getTime() : null;
+    const buyerMarkExpired = buyerMarkedAt ? Date.now() - buyerMarkedAt > 24 * 60 * 60 * 1000 : false;
 
     const markBuyer = () => {
         if (!deal?.links.upsert || !conversation.other?.id) return;
@@ -164,7 +159,7 @@ export default function Show() {
                                     className="btn btn-outline-secondary btn-sm"
                                     onClick={() => router.patch(conversation.links.archive, {}, { preserveScroll: true })}
                                 >
-                                    {conversation.is_archived ? 'Taka úr geymslu' : 'Geyma'}
+                                    {conversation.is_archived ? 'Hætta að fela' : 'Fela'}
                                 </button>
 
                                 <button
@@ -175,58 +170,46 @@ export default function Show() {
                                     Loka
                                 </button>
 
-                                <button
-                                    className="btn btn-outline-danger btn-sm"
-                                    onClick={() => router.patch(conversation.links.block, { status: 'blocked' }, { preserveScroll: true })}
-                                    disabled={conversation.status === 'blocked'}
-                                >
-                                    Blokka
-                                </button>
                             </div>
                         </div>
 
                         {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
                         {props.flash?.error ? <div className="alert alert-danger">{props.flash.error}</div> : null}
 
+                        {showBuyerStatus ? (
+                            <div className={`alert ${buyerMarked ? 'alert-success' : 'alert-warning'}`}>
+                                {buyerMarked ? 'Þú hefur verið merkt/ur sem kaupandi.' : 'Varan hefur verið seld.'}
+                            </div>
+                        ) : null}
+
                         {/* DEAL box (merkja kaupanda) */}
-                        {canShowDealBox ? (
+                        {canShowDealBox && canMarkBuyer ? (
                             <div className="card mb-3">
                                 <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-2">
                                     <div>
                                         <div className="fw-semibold">Viðskipti</div>
-                                        <div className="small text-muted">
-                                            Staða: <span className="fw-semibold">{dealStatusLabel(deal?.status)}</span>
-                                            {deal?.buyer_id ? (
-                                                <>
-                                                    {' '}· Kaupandi ID: <span className="fw-semibold">{deal.buyer_id}</span>
-                                                </>
-                                            ) : (
-                                                <> · <span className="text-muted">Enginn kaupandi valinn</span></>
-                                            )}
-                                        </div>
+                                        <div className="small text-muted">Merkja eða afmerkja kaupanda.</div>
                                     </div>
 
-                                    {canMarkBuyer ? (
-                                        <div className="d-flex gap-2">
-                                            <button
-                                                type="button"
-                                                className="btn btn-dark btn-sm"
-                                                onClick={markBuyer}
-                                                disabled={deal?.buyer_id === conversation.other!.id}
-                                            >
-                                                Merkja {conversation.other?.name ?? 'kaupanda'}
-                                            </button>
+                                    <div className="d-flex gap-2">
+                                        <button
+                                            type="button"
+                                            className="btn btn-dark btn-sm"
+                                            onClick={markBuyer}
+                                            disabled={buyerMarkExpired || deal?.buyer_id === conversation.other!.id}
+                                        >
+                                            Merkja sem kaupanda
+                                        </button>
 
-                                            <button
-                                                type="button"
-                                                className="btn btn-outline-secondary btn-sm"
-                                                onClick={clearBuyer}
-                                                disabled={!deal?.buyer_id}
-                                            >
-                                                Taka af kaupanda
-                                            </button>
-                                        </div>
-                                    ) : null}
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary btn-sm"
+                                            onClick={clearBuyer}
+                                            disabled={buyerMarkExpired || !deal?.buyer_id}
+                                        >
+                                            Hætta við viðskipti
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ) : null}
@@ -274,12 +257,18 @@ export default function Show() {
                             <form onSubmit={send}>
                                 <div className="card">
                                     <div className="card-body">
-                                        <label className="form-label">Senda skilaboð</label>
                                         <textarea
                                             className={`form-control ${errors.body ? 'is-invalid' : ''}`}
                                             rows={3}
                                             value={data.body}
                                             onChange={(e) => setData('body', e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key !== 'Enter' || e.shiftKey) return;
+                                                e.preventDefault();
+                                                if (!processing) {
+                                                    send();
+                                                }
+                                            }}
                                             placeholder="Skrifaðu skilaboð..."
                                         />
                                         {errors.body ? <div className="invalid-feedback">{errors.body}</div> : null}

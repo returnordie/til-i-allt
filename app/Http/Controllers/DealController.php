@@ -38,9 +38,17 @@ class DealController extends Controller
             ]);
         }
 
-        $deal->buyer_id = $data['buyer_id'] ?? $deal->buyer_id;
+        $buyerProvided = array_key_exists('buyer_id', $data);
+        $newBuyerId = $buyerProvided ? $data['buyer_id'] : $deal->buyer_id;
+        $buyerChanged = $buyerProvided && $deal->buyer_id !== $newBuyerId;
+
+        $deal->buyer_id = $newBuyerId;
         $deal->price_final = $data['price_final'] ?? $deal->price_final;
         $deal->currency = $data['currency'] ?? $deal->currency;
+
+        if ($buyerChanged) {
+            $deal->confirmed_at = $newBuyerId ? now() : null;
+        }
         $deal->save();
 
         return back()->with('success', 'Viðskipti stofnuð.');
@@ -59,7 +67,13 @@ class DealController extends Controller
             'buyer_id' => ['nullable', 'integer', 'exists:users,id', 'different:'.$user->id],
         ]);
 
+        $buyerChanged = $deal->buyer_id !== $data['buyer_id'];
+
         $deal->buyer_id = $data['buyer_id'];
+
+        if ($buyerChanged) {
+            $deal->confirmed_at = $data['buyer_id'] ? now() : null;
+        }
         $deal->save();
 
         return back()->with('success', 'Kaupandi uppfærður.');
