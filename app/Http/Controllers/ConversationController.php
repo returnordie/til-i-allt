@@ -163,7 +163,7 @@ class ConversationController extends Controller
 
             $deal = [
                 'id' => $dealModel?->id,
-                'status' => $dealModel?->status ?? 'proposed',
+                'status' => $dealModel?->status ?? 'active',
                 'buyer_id' => $dealModel?->buyer_id,
                 'price_final' => $dealModel?->price_final,
                 'currency' => $dealModel?->currency ?? 'ISK',

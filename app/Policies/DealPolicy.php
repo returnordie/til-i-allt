@@ -26,6 +26,14 @@ class DealPolicy
             return false;
         }
 
-        return ($deal->status === 'completed');
+        if ($deal->status !== 'completed') {
+            return false;
+        }
+
+        if (! $deal->buyer_id) {
+            return false;
+        }
+
+        return $deal->reviewsAreOpen();
     }
 }

@@ -14,7 +14,7 @@ type Msg = {
 
 type DealProps = null | {
     id: number | null;
-    status: 'proposed' | 'confirmed' | 'completed' | 'canceled' | 'disputed' | string;
+    status: 'active' | 'inactive' | 'completed' | string;
     buyer_id: number | null;
     price_final: number | null;
     currency: string;
@@ -49,6 +49,19 @@ type PageProps = {
 function fmtTime(s: string | null) {
     if (!s) return '';
     return new Date(s).toLocaleString('is-IS');
+}
+
+function dealStatusLabel(status?: DealProps['status']) {
+    switch (status) {
+        case 'active':
+            return 'Virk';
+        case 'inactive':
+            return 'Óvirk';
+        case 'completed':
+            return 'Frágengin';
+        default:
+            return status ?? 'Virk';
+    }
 }
 
 export default function Show() {
@@ -182,7 +195,7 @@ export default function Show() {
                                     <div>
                                         <div className="fw-semibold">Viðskipti</div>
                                         <div className="small text-muted">
-                                            Staða: <span className="fw-semibold">{deal?.status ?? 'proposed'}</span>
+                                            Staða: <span className="fw-semibold">{dealStatusLabel(deal?.status)}</span>
                                             {deal?.buyer_id ? (
                                                 <>
                                                     {' '}· Kaupandi ID: <span className="fw-semibold">{deal.buyer_id}</span>

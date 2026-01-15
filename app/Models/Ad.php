@@ -65,6 +65,11 @@ class Ad extends Model
         return $this->hasMany(AdPromotion::class);
     }
 
+    public function latestDeal()
+    {
+        return $this->hasOne(Deal::class)->latestOfMany();
+    }
+
     public function uniqueViews()
     {
         return $this->hasMany(AdViewUnique::class);

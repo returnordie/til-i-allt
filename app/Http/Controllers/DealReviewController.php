@@ -14,6 +14,7 @@ class DealReviewController extends Controller
 
         abort_if($deal->status !== 'completed', 422, 'Aðeins er hægt að gefa umsögn þegar viðskiptum er lokið.');
         abort_if(!$deal->buyer_id, 422, 'Kaupandi vantar á viðskiptin.');
+        abort_if(!$deal->reviewsAreOpen(), 422, 'Hægt er að gefa umsögn eftir 24 klst.');
 
         $isSeller = (int) $deal->seller_id === (int) $user->id;
         $isBuyer  = (int) $deal->buyer_id === (int) $user->id;

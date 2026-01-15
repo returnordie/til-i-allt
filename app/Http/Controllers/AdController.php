@@ -390,6 +390,7 @@ class AdController extends Controller
     public function edit(Request $request, Ad $ad)
     {
         // $this->authorize('update', $ad);
+        abort_if($ad->status === 'sold', 403, 'Seld auglýsing er ekki hægt að breyta.');
 
         $ad->load([
             'category:id,parent_id,name,slug',
@@ -439,6 +440,7 @@ class AdController extends Controller
     public function update(UpdateAdRequest $request, Ad $ad)
     {
         // $this->authorize('update', $ad);
+        abort_if($ad->status === 'sold', 403, 'Seld auglýsing er ekki hægt að breyta.');
 
         $base = $request->validated();
 

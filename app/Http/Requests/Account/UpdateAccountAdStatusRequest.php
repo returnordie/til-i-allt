@@ -15,7 +15,7 @@ class UpdateAccountAdStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', Rule::in(['draft', 'active', 'paused', 'sold', 'archived'])],
+            'status' => ['required', 'string', Rule::in(['active', 'inactive', 'sold'])],
         ];
     }
 }
