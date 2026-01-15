@@ -4,18 +4,20 @@ import {
     Transition,
     TransitionChild,
 } from '@headlessui/react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, RefObject } from 'react';
 
 export default function Modal({
     children,
     show = false,
     maxWidth = '2xl',
     closeable = true,
+    initialFocus,
     onClose = () => {},
 }: PropsWithChildren<{
     show: boolean;
     maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
     closeable?: boolean;
+    initialFocus?: RefObject<HTMLElement>;
     onClose: CallableFunction;
 }>) {
     const close = () => {
@@ -40,6 +42,7 @@ export default function Modal({
                 open={show}
                 className="fixed inset-0 z-50 flex transform items-center overflow-y-auto px-4 py-6 transition-all sm:px-0"
                 onClose={close}
+                initialFocus={initialFocus}
             >
                 <TransitionChild
                     enter="ease-out duration-300"

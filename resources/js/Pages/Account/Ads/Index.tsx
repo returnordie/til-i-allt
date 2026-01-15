@@ -1,7 +1,7 @@
 import Modal from '@/Components/Modal';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type AdRow = {
     id: number;
@@ -62,6 +62,7 @@ export default function Index() {
     const { props } = usePage<PageProps>();
     const { filters, counts, extendOptions, ads } = props;
     const [soldAd, setSoldAd] = useState<AdRow | null>(null);
+    const buyerIdentifierRef = useRef<HTMLInputElement>(null);
     const {
         data: soldData,
         setData: setSoldData,
@@ -359,7 +360,7 @@ export default function Index() {
                     </nav>
                 ) : null}
 
-                <Modal show={Boolean(soldAd)} onClose={closeSoldModal}>
+                <Modal show={Boolean(soldAd)} onClose={closeSoldModal} initialFocus={buyerIdentifierRef}>
                     <div className="p-4">
                         <h2 className="h5 mb-3">Merkja auglýsingu selda</h2>
                         <p className="text-muted small mb-3">
@@ -377,6 +378,7 @@ export default function Index() {
                                 value={soldData.buyer_identifier}
                                 onChange={(event) => setSoldData('buyer_identifier', event.target.value)}
                                 disabled={soldData.sold_outside}
+                                ref={buyerIdentifierRef}
                             />
                             {soldErrors.buyer_identifier ? (
                                 <div className="text-danger small mt-2">{soldErrors.buyer_identifier}</div>
