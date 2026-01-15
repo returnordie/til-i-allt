@@ -11,8 +11,11 @@ type DealRow = {
     price_final: number | null;
     currency: string;
     seller: { id: number; name: string } | null;
+    buyer: { id: number; name: string } | null;
+    is_seller: boolean;
     ad: { title: string; link: string } | null;
     can_respond: boolean;
+    can_cancel: boolean;
     links: {
         set_status: string;
     };
@@ -31,7 +34,7 @@ function statusMeta(status: DealRow['status']) {
         case 'active':
             return { label: 'Bíður staðfestingar', badge: 'text-bg-warning' };
         case 'completed':
-            return { label: 'Samþykkt', badge: 'text-bg-success' };
+            return { label: 'Lokið', badge: 'text-bg-success' };
         case 'inactive':
             return { label: 'Hætt við', badge: 'text-bg-secondary' };
         default:
@@ -53,6 +56,10 @@ export default function Index() {
     };
 
     const decline = (deal: DealRow) => {
+        router.patch(deal.links.set_status, { status: 'inactive' }, { preserveScroll: true });
+    };
+
+    const cancel = (deal: DealRow) => {
         router.patch(deal.links.set_status, { status: 'inactive' }, { preserveScroll: true });
     };
 
@@ -80,7 +87,7 @@ export default function Index() {
                                     <thead>
                                         <tr>
                                             <th>Auglýsing</th>
-                                            <th>Seljandi</th>
+                                            <th>Aðili</th>
                                             <th>Staða</th>
                                             <th>Dagsetning</th>
                                             <th className="text-end">Aðgerðir</th>
@@ -110,12 +117,12 @@ export default function Index() {
                                                                 Verð: {deal.price_final !== null ? `${deal.price_final.toLocaleString()} ${deal.currency}` : '—'}
                                                             </div>
                                                         </td>
-                                                        <td>{deal.seller?.name ?? '—'}</td>
+                                                        <td>{deal.is_seller ? deal.buyer?.name ?? '—' : deal.seller?.name ?? '—'}</td>
                                                         <td>
                                                             <span className={`badge ${sm.badge}`}>{sm.label}</span>
                                                         </td>
                                                         <td className="text-muted small">
-                                                            {deal.completed_at ? `Samþykkt: ${fmtDate(deal.completed_at)}` : null}
+                                                            {deal.completed_at ? `Lokið: ${fmtDate(deal.completed_at)}` : null}
                                                             {!deal.completed_at && deal.canceled_at ? `Hætt við: ${fmtDate(deal.canceled_at)}` : null}
                                                             {!deal.completed_at && !deal.canceled_at ? `Merkt: ${fmtDate(deal.confirmed_at)}` : null}
                                                         </td>
@@ -129,6 +136,10 @@ export default function Index() {
                                                                         Hafna
                                                                     </button>
                                                                 </div>
+                                                            ) : deal.can_cancel ? (
+                                                                <button type="button" className="btn btn-danger btn-sm" onClick={() => cancel(deal)}>
+                                                                    Hætta við
+                                                                </button>
                                                             ) : (
                                                                 <span className="text-muted small">—</span>
                                                             )}

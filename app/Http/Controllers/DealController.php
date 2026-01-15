@@ -109,7 +109,7 @@ class DealController extends Controller
 
         if ($to === 'inactive') {
             if ($deal->status === 'completed') {
-                abort_unless($isBuyer, 403);
+                abort_unless($isBuyer || $isSeller, 403);
 
                 $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
                 abort_if(!$windowEndsAt || now()->greaterThan($windowEndsAt), 422, 'Það er ekki hægt að hætta við eftir 24 klst.');

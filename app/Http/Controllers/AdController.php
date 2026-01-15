@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ad;
+use App\Models\Deal;
 use App\Models\AdPromotion;
 use App\Models\Category;
 use App\Models\AdAttributeValue;
@@ -317,8 +318,18 @@ class AdController extends Controller
 
         $user = $request->user();
         $isOwnerOrAdmin = $user && ($user->id === $ad->user_id || (method_exists($user, 'isAdmin') && $user->isAdmin()));
+        $buyerHasAccess = false;
 
-        if (($ad->status ?? 'active') !== 'active' && ! $isOwnerOrAdmin) {
+        if ($user && ($ad->status ?? 'active') !== 'active') {
+            $buyerHasAccess = Deal::query()
+                ->where('ad_id', $ad->id)
+                ->where('buyer_id', $user->id)
+                ->whereNotNull('confirmed_at')
+                ->where('confirmed_at', '>=', now()->subDays(30))
+                ->exists();
+        }
+
+        if (($ad->status ?? 'active') !== 'active' && ! $isOwnerOrAdmin && ! $buyerHasAccess) {
             abort(404);
         }
 
