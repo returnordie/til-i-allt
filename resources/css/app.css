@@ -241,6 +241,16 @@ body{
     padding: .9rem 1rem;
     border-bottom: 1px solid rgba(20,21,26,.06);
 }
+
+/* Account navigation (míns svæði) */
+.account-nav .list-group-item.active{
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: var(--tt-ink);
+}
+.account-nav .list-group-item.active .text-muted{
+    color: #6c757d !important;
+}
 .tt-dropitem:hover{ background: rgba(20,21,26,.04); color: var(--tt-ink); }
 .tt-dropitem.unread{ font-weight: 900; }
 .tt-dropitem-row{ display:flex; justify-content: space-between; gap: .75rem; }

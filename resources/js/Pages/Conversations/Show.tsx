@@ -103,6 +103,7 @@ export default function Show() {
     const buyerMarked = deal?.buyer_id === authUserId;
     const soldToOther = deal?.status === 'completed' && deal?.buyer_id !== authUserId;
     const showBuyerStatus = !isSeller && canShowDealBox && (buyerMarked || soldToOther);
+    const canManageDeal = canShowDealBox && canMarkBuyer && deal?.status !== 'completed';
 
     const buyerMarkedAt = deal?.confirmed_at ? new Date(deal.confirmed_at).getTime() : null;
     const buyerMarkExpired = buyerMarkedAt ? Date.now() - buyerMarkedAt > 24 * 60 * 60 * 1000 : false;
@@ -156,18 +157,18 @@ export default function Show() {
 
                             <div className="d-flex gap-2">
                                 <button
-                                    className="btn btn-outline-secondary btn-sm"
+                                    className="btn btn-warning btn-sm"
                                     onClick={() => router.patch(conversation.links.archive, {}, { preserveScroll: true })}
                                 >
                                     {conversation.is_archived ? 'Hætta að fela' : 'Fela'}
                                 </button>
 
                                 <button
-                                    className="btn btn-outline-dark btn-sm"
+                                    className="btn btn-warning btn-sm"
                                     onClick={() => router.patch(conversation.links.close, { status: 'closed' }, { preserveScroll: true })}
                                     disabled={conversation.status !== 'open'}
                                 >
-                                    Loka
+                                    Til baka
                                 </button>
 
                             </div>
@@ -183,7 +184,7 @@ export default function Show() {
                         ) : null}
 
                         {/* DEAL box (merkja kaupanda) */}
-                        {canShowDealBox && canMarkBuyer ? (
+                        {canManageDeal ? (
                             <div className="card mb-3">
                                 <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-2">
                                     <div>
@@ -194,7 +195,7 @@ export default function Show() {
                                     <div className="d-flex gap-2">
                                         <button
                                             type="button"
-                                            className="btn btn-dark btn-sm"
+                                            className="btn btn-success btn-sm"
                                             onClick={markBuyer}
                                             disabled={buyerMarkExpired || deal?.buyer_id === conversation.other!.id}
                                         >
@@ -203,7 +204,7 @@ export default function Show() {
 
                                         <button
                                             type="button"
-                                            className="btn btn-outline-secondary btn-sm"
+                                            className="btn btn-danger btn-sm"
                                             onClick={clearBuyer}
                                             disabled={buyerMarkExpired || !deal?.buyer_id}
                                         >
@@ -274,7 +275,7 @@ export default function Show() {
                                         {errors.body ? <div className="invalid-feedback">{errors.body}</div> : null}
 
                                         <div className="d-flex justify-content-end mt-2">
-                                            <button className="btn btn-dark" type="submit" disabled={processing}>
+                                            <button className="btn btn-warning" type="submit" disabled={processing}>
                                                 {processing ? 'Sendi...' : 'Senda'}
                                             </button>
                                         </div>

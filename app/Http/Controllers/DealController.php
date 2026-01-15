@@ -91,42 +91,41 @@ class DealController extends Controller
 
         // aðgangsstýring (einföld og practical)
         // - seljandi: má stjórna stöðu
-        // - kaupandi: má hætta við innan 24 klst eftir frágang
+        // - kaupandi: má samþykkja/hafna þegar hann er merktur
         $isSeller = (int) $deal->seller_id === (int) $user->id;
         $isBuyer  = $deal->buyer_id && (int) $deal->buyer_id === (int) $user->id;
 
         abort_unless($isSeller || $isBuyer, 403);
 
-        if ($deal->status === 'completed') {
-            if ($to !== 'inactive') {
-                abort(422, 'Viðskiptum er lokið.');
-            }
-
+        if ($to === 'completed') {
             abort_unless($isBuyer, 403);
+            abort_if(!$deal->buyer_id, 422, 'Það þarf að vera valinn kaupandi.');
+            abort_if(!$deal->confirmed_at, 422, 'Seljandi þarf fyrst að merkja kaupanda.');
+            abort_if($deal->status !== 'active', 422, 'Viðskipti eru ekki virk.');
 
-            $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
-            abort_if(!$windowEndsAt || now()->greaterThan($windowEndsAt), 422, 'Það er ekki hægt að hætta við eftir 24 klst.');
+            $deal->status = 'completed';
+            $deal->completed_at = $deal->completed_at ?? now();
+        }
 
-            $deal->status = 'inactive';
-            $deal->canceled_at = $deal->canceled_at ?? now();
-        } else {
-            if ($to === 'completed') {
-                abort_unless($isSeller, 403);
-                abort_if(!$deal->buyer_id, 422, 'Það þarf að vera valinn kaupandi.');
-                $deal->status = 'completed';
-                $deal->completed_at = $deal->completed_at ?? now();
-            }
+        if ($to === 'inactive') {
+            if ($deal->status === 'completed') {
+                abort_unless($isBuyer, 403);
 
-            if ($to === 'inactive') {
-                abort_unless($isSeller, 403);
+                $windowEndsAt = $deal->completed_at?->copy()->addHours(24);
+                abort_if(!$windowEndsAt || now()->greaterThan($windowEndsAt), 422, 'Það er ekki hægt að hætta við eftir 24 klst.');
+
+                $deal->status = 'inactive';
+                $deal->canceled_at = $deal->canceled_at ?? now();
+            } else {
+                abort_unless($isSeller || $isBuyer, 403);
                 $deal->status = 'inactive';
                 $deal->canceled_at = $deal->canceled_at ?? now();
             }
+        }
 
-            if ($to === 'active') {
-                abort_unless($isSeller, 403);
-                $deal->status = 'active';
-            }
+        if ($to === 'active') {
+            abort_unless($isSeller, 403);
+            $deal->status = 'active';
         }
 
         $deal->save();
