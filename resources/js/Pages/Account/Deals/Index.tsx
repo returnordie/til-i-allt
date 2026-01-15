@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 
 type DealRow = {
     id: number;
@@ -18,6 +18,12 @@ type DealRow = {
     can_cancel: boolean;
     links: {
         set_status: string;
+    };
+    review: {
+        can_review: boolean;
+        has_review: boolean;
+        is_open: boolean;
+        link: string;
     };
 };
 
@@ -140,6 +146,14 @@ export default function Index() {
                                                                 <button type="button" className="btn btn-danger btn-sm" onClick={() => cancel(deal)}>
                                                                     Hætta við
                                                                 </button>
+                                                            ) : deal.review?.can_review ? (
+                                                                <Link href={deal.review.link} className="btn btn-outline-warning btn-sm">
+                                                                    Gefa umsögn
+                                                                </Link>
+                                                            ) : deal.review?.has_review ? (
+                                                                <Link href={deal.review.link} className="btn btn-outline-secondary btn-sm">
+                                                                    Skoða umsögn
+                                                                </Link>
                                                             ) : (
                                                                 <span className="text-muted small">—</span>
                                                             )}

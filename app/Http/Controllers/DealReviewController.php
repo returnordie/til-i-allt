@@ -4,10 +4,76 @@ namespace App\Http\Controllers;
 
 use App\Models\Deal;
 use App\Models\DealReview;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DealReviewController extends Controller
 {
+    public function create(Request $request, Deal $deal)
+    {
+        $user = $request->user();
+
+        abort_unless($deal->isParticipant($user->id), 403);
+
+        $deal->load([
+            'ad:id,title,section,slug,category_id',
+            'ad.category:id,slug',
+            'seller:id,name',
+            'buyer:id,name',
+        ]);
+
+        $isSeller = (int) $deal->seller_id === (int) $user->id;
+        $ratee = $isSeller ? $deal->buyer : $deal->seller;
+
+        $existingReview = DealReview::query()
+            ->where('deal_id', $deal->id)
+            ->where('rater_id', $user->id)
+            ->latest('id')
+            ->first();
+
+        $canReview = Gate::allows('createReview', $deal) && !$existingReview;
+
+        $reviewWindowEndsAt = $deal->completed_at
+            ? $deal->completed_at->copy()->addDays(14)
+            : null;
+
+        return Inertia::render('Account/Deals/Review', [
+            'deal' => [
+                'id' => $deal->id,
+                'status' => $deal->status,
+                'completed_at' => $deal->completed_at?->toDateTimeString(),
+                'review_opens_at' => $deal->reviewsOpenAt()?->toDateTimeString(),
+                'review_closes_at' => $reviewWindowEndsAt?->toDateTimeString(),
+                'ad' => $deal->ad ? [
+                    'title' => $deal->ad->title,
+                    'link' => route('ads.show', [
+                        'section' => $deal->ad->section,
+                        'categorySlug' => $deal->ad->category?->slug,
+                        'ad' => $deal->ad->id,
+                        'slug' => $deal->ad->slug,
+                    ]),
+                ] : null,
+            ],
+            'ratee' => $ratee ? [
+                'id' => $ratee->id,
+                'name' => $ratee->name,
+                'profile_url' => $ratee->username ? route('users.show', $ratee->username) : null,
+            ] : null,
+            'existingReview' => $existingReview ? [
+                'rating' => $existingReview->rating,
+                'comment' => $existingReview->comment,
+                'created_at' => $existingReview->created_at?->toDateTimeString(),
+            ] : null,
+            'canReview' => $canReview,
+            'storeUrl' => route('dealReviews.store', $deal),
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+        ]);
+    }
+
     public function store(Request $request, Deal $deal)
     {
         $user = $request->user();
@@ -24,7 +90,7 @@ class DealReviewController extends Controller
         $rateeId = $isSeller ? (int) $deal->buyer_id : (int) $deal->seller_id;
 
         $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'rating' => ['required', 'integer', 'min:0', 'max:5'],
             'comment' => ['nullable', 'string', 'max:5000'],
             'meta' => ['nullable', 'array'],
         ]);

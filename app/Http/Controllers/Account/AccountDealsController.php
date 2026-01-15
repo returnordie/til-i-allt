@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
+use App\Models\DealReview;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,11 +30,21 @@ class AccountDealsController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $deals = $deals->through(function (Deal $deal) use ($user) {
+        $reviewedDealIds = DealReview::query()
+            ->where('rater_id', $user->id)
+            ->whereIn('deal_id', $deals->getCollection()->pluck('id'))
+            ->pluck('deal_id')
+            ->all();
+
+        $reviewedLookup = array_flip($reviewedDealIds);
+
+        $deals = $deals->through(function (Deal $deal) use ($user, $reviewedLookup) {
             $isSeller = (int) $deal->seller_id === (int) $user->id;
             $canCancel = $isSeller
                 && $deal->status === 'active'
                 && (bool) $deal->buyer_id;
+            $hasReview = isset($reviewedLookup[$deal->id]);
+            $reviewOpen = $deal->reviewsAreOpen();
 
             return [
                 'id' => $deal->id,
@@ -63,6 +74,15 @@ class AccountDealsController extends Controller
                 ] : null,
                 'can_respond' => !$isSeller && $deal->status === 'active' && (bool) $deal->confirmed_at,
                 'can_cancel' => $canCancel,
+                'review' => [
+                    'can_review' => $deal->status === 'completed'
+                        && (bool) $deal->buyer_id
+                        && $reviewOpen
+                        && !$hasReview,
+                    'has_review' => $hasReview,
+                    'is_open' => $reviewOpen,
+                    'link' => route('account.deals.review', $deal),
+                ],
                 'links' => [
                     'set_status' => route('deals.setStatus', $deal),
                 ],
