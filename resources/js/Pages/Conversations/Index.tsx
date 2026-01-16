@@ -10,7 +10,7 @@ type ConvRow = {
     last_message_at: string | null;
     unread: boolean;
     snippet: string | null;
-    other: { name: string; username: string | null } | null;
+    other: { name: string; username: string | null; show_name: boolean } | null;
     ad: { title: string; link: string | null } | null;
     links: { show: string };
 };
@@ -27,6 +27,11 @@ type PageProps = {
 function fmtTime(s: string | null) {
     if (!s) return '';
     return new Date(s).toLocaleString();
+}
+
+function displayName(user: ConvRow['other']) {
+    if (!user) return '—';
+    return user.show_name ? user.name : (user.username ?? user.name);
 }
 
 export default function Index() {
@@ -82,14 +87,16 @@ export default function Index() {
                                             <div className="text-truncate">
                                                 <div className="d-flex align-items-center gap-2">
                                                     {c.unread ? <span className="badge text-bg-danger">Nýtt</span> : null}
-                                                    <span>{c.other?.name ?? '—'}</span>
-                                                    <span className="text-muted small">{c.context === 'support' ? 'Support' : 'Auglýsing'}</span>
+                                                    <span>{displayName(c.other)}</span>
                                                 </div>
 
-                                                <div className="text-muted small text-truncate">
-                                                    {c.ad?.title ? `„${c.ad.title}“ · ` : ''}
-                                                    {c.snippet ?? ''}
-                                                </div>
+                                                {c.ad?.title ? (
+                                                    <div className="text-muted small text-truncate">Vegna auglýsingar: {c.ad.title}</div>
+                                                ) : (
+                                                    <div className="text-muted small">{c.context === 'support' ? 'Support' : 'Þráður'}</div>
+                                                )}
+
+                                                {c.snippet ? <div className="text-muted small text-truncate">{c.snippet}</div> : null}
                                             </div>
 
                                             <div className="text-muted small text-nowrap">

@@ -324,7 +324,7 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
                                     {/* Messages */}
                                     <Link
-                                        href={route('conversations.index')}
+                                        href={route('conversations.latest')}
                                         className="tt-iconlink position-relative"
                                         aria-label="Skilaboð"
                                         title="Skilaboð"

@@ -7,6 +7,7 @@ use App\Models\Ad;
 use App\Models\Conversation;
 use App\Models\User;
 use App\Models\Deal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -27,30 +28,14 @@ class ConversationController extends Controller
             ->with([
                 'ad:id,title,slug,section,category_id,status,expires_at',
                 'ad.category:id,slug,name',
-                'owner:id,name,username',
-                'member:id,name,username',
+                'owner:id,name,username,show_name',
+                'member:id,name,username,show_name',
                 'latestMessage.sender:id,name',
             ])
             ->orderByDesc('last_message_at')
             ->orderByDesc('updated_at');
 
-        if ($filter === 'inbox') {
-            $query->where(function ($qq) use ($user) {
-                $qq->where(function ($q) use ($user) {
-                    $q->where('owner_id', $user->id)->whereNull('owner_archived_at');
-                })->orWhere(function ($q) use ($user) {
-                    $q->where('member_id', $user->id)->whereNull('member_archived_at');
-                });
-            });
-        } elseif ($filter === 'archived') {
-            $query->where(function ($qq) use ($user) {
-                $qq->where(function ($q) use ($user) {
-                    $q->where('owner_id', $user->id)->whereNotNull('owner_archived_at');
-                })->orWhere(function ($q) use ($user) {
-                    $q->where('member_id', $user->id)->whereNotNull('member_archived_at');
-                });
-            });
-        }
+        $this->applyConversationFilter($query, $user, $filter);
 
         if ($q !== '') {
             $query->where(function ($qq) use ($q) {
@@ -72,6 +57,7 @@ class ConversationController extends Controller
     public function show(Request $request, Conversation $conversation): Response
     {
         $this->authorize('view', $conversation);
+        $filter = (string) $request->string('filter', 'inbox');
 
         // Mark read when opening
         $this->markReadInternal($request->user(), $conversation);
@@ -79,8 +65,8 @@ class ConversationController extends Controller
         $conversation->load([
             'ad:id,title,slug,section,category_id,status,expires_at',
             'ad.category:id,slug,name',
-            'owner:id,name,username',
-            'member:id,name,username',
+            'owner:id,name,username,show_name',
+            'member:id,name,username,show_name',
         ]);
 
         $user = $request->user();
@@ -159,6 +145,7 @@ class ConversationController extends Controller
                     'id' => $other->id,
                     'name' => $other->name,
                     'username' => $other->username,
+                    'show_name' => (bool) $other->show_name,
                 ] : null,
 
                 'ad' => $conversation->ad ? [
@@ -185,8 +172,32 @@ class ConversationController extends Controller
 
             // NEW
             'deal' => $deal,
-            'conversationList' => $this->conversationListFor($user),
+            'conversationList' => $this->conversationListFor($user, $filter),
+            'filters' => ['filter' => $filter],
         ]);
+    }
+
+    public function latest(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $filter = (string) $request->string('filter', 'inbox');
+
+        $query = Conversation::query()
+            ->where(function ($qq) use ($user) {
+                $qq->where('owner_id', $user->id)->orWhere('member_id', $user->id);
+            })
+            ->orderByDesc('last_message_at')
+            ->orderByDesc('updated_at');
+
+        $this->applyConversationFilter($query, $user, $filter);
+
+        $conversation = $query->first();
+
+        if (!$conversation) {
+            return redirect()->route('conversations.index', ['filter' => $filter]);
+        }
+
+        return redirect()->route('conversations.show', [$conversation, 'filter' => $filter]);
     }
 
 
@@ -314,21 +325,25 @@ class ConversationController extends Controller
         $conversation->save();
     }
 
-    private function conversationListFor(User $user)
+    private function conversationListFor(User $user, string $filter)
     {
-        return Conversation::query()
+        $query = Conversation::query()
             ->where(function ($qq) use ($user) {
                 $qq->where('owner_id', $user->id)->orWhere('member_id', $user->id);
             })
             ->with([
                 'ad:id,title,slug,section,category_id,status,expires_at',
                 'ad.category:id,slug,name',
-                'owner:id,name,username',
-                'member:id,name,username',
+                'owner:id,name,username,show_name',
+                'member:id,name,username,show_name',
                 'latestMessage.sender:id,name',
             ])
             ->orderByDesc('last_message_at')
-            ->orderByDesc('updated_at')
+            ->orderByDesc('updated_at');
+
+        $this->applyConversationFilter($query, $user, $filter);
+
+        return $query
             ->limit(20)
             ->get()
             ->map(fn (Conversation $c) => $this->formatConversationRow($c, $user))
@@ -365,6 +380,7 @@ class ConversationController extends Controller
                 'id' => $other->id,
                 'name' => $other->name,
                 'username' => $other->username,
+                'show_name' => (bool) $other->show_name,
             ] : null,
 
             'ad' => $conversation->ad ? [
@@ -378,5 +394,26 @@ class ConversationController extends Controller
                 'show' => route('conversations.show', $conversation),
             ],
         ];
+    }
+
+    private function applyConversationFilter(Builder $query, User $user, string $filter): void
+    {
+        if ($filter === 'inbox') {
+            $query->where(function ($qq) use ($user) {
+                $qq->where(function ($q) use ($user) {
+                    $q->where('owner_id', $user->id)->whereNull('owner_archived_at');
+                })->orWhere(function ($q) use ($user) {
+                    $q->where('member_id', $user->id)->whereNull('member_archived_at');
+                });
+            });
+        } elseif ($filter === 'archived') {
+            $query->where(function ($qq) use ($user) {
+                $qq->where(function ($q) use ($user) {
+                    $q->where('owner_id', $user->id)->whereNotNull('owner_archived_at');
+                })->orWhere(function ($q) use ($user) {
+                    $q->where('member_id', $user->id)->whereNotNull('member_archived_at');
+                });
+            });
+        }
     }
 }
