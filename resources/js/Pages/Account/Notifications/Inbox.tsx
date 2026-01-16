@@ -64,7 +64,7 @@ export default function Inbox() {
                                             <div className="d-flex justify-content-between gap-3">
                                                 <div className="text-truncate">
                                                     <div className="d-flex align-items-center gap-2">
-                                                        {unread ? <span className="badge text-bg-danger">Nýtt</span> : null}
+                                                        {unread ? <span className="badge tt-badge-green">Nýtt</span> : null}
                                                         <span>{n.data.title}</span>
                                                     </div>
                                                     {n.data.body ? (
