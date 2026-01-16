@@ -78,17 +78,32 @@ class UserProfileController extends Controller
             ];
         });
 
-        $ratingSummary = DealReview::query()
-            ->where('ratee_id', $user->id)
+        $publicDelayDays = max(0, (int) config('tia.deal_review_public_delay_days', 7));
+        $publicDelayCutoff = now()->subDays($publicDelayDays);
+        $publishedDealIds = DealReview::query()
+            ->select('deal_id')
             ->whereNull('deleted_at')
+            ->groupBy('deal_id')
+            ->havingRaw('COUNT(*) >= 2');
+
+        $publishedReviews = DealReview::query()
+            ->where('ratee_id', $user->id)
+            ->whereNull('deal_reviews.deleted_at')
+            ->where(function ($query) use ($publicDelayCutoff, $publishedDealIds) {
+                $query->whereIn('deal_id', $publishedDealIds)
+                    ->orWhereHas('deal', function ($dealQuery) use ($publicDelayCutoff) {
+                        $dealQuery->whereNotNull('completed_at')
+                            ->where('completed_at', '<=', $publicDelayCutoff);
+                    });
+            });
+
+        $ratingSummary = (clone $publishedReviews)
             ->selectRaw('AVG(rating) as avg, COUNT(*) as count')
             ->first();
 
         $ratingAvg = $ratingSummary?->avg ? (float) $ratingSummary->avg : 0.0;
         $ratingCount = (int) ($ratingSummary?->count ?? 0);
-        $recentReviews = DealReview::query()
-            ->where('ratee_id', $user->id)
-            ->whereNull('deleted_at')
+        $recentReviews = (clone $publishedReviews)
             ->with('rater:id,name,username')
             ->orderByDesc('created_at')
             ->limit(5)

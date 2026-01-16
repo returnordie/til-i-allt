@@ -7,5 +7,6 @@ return [
     'ad_extend_max_days_ahead' => 180,
     'notifications_prune_days' => 10,
     'deal_review_delay_hours' => 0,
+    'deal_review_public_delay_days' => 7,
 
 ];

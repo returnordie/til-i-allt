@@ -136,121 +136,139 @@ export default function Show() {
             <Head title={`${profile.display_name} (@${profile.username})`} />
 
             <div className="container py-4">
-                {/* Header */}
-                <div className="card mb-3">
-                    <div className="card-body">
-                        <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
-                            <div>
-                                <div className="h4 mb-1">{profile.display_name}</div>
-                            </div>
+                <div className="row g-3">
+                    <div className="col-12 col-lg-8 order-2 order-lg-1">
+                        {/* Ads grid */}
+                        <div className="row g-3">
+                            {ads.data.map((ad) => (
+                                <div key={ad.id} className="col-12 col-sm-6 col-xl-4">
+                                    <div className="card h-100">
+                                        <div className="bg-white border-bottom" style={{ aspectRatio: '16 / 10' }}>
+                                            {ad.main_image_url ? (
+                                                <img
+                                                    src={ad.main_image_url}
+                                                    alt=""
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                            ) : (
+                                                <div className="d-flex align-items-center justify-content-center h-100 text-muted">
+                                                    Engin mynd
+                                                </div>
+                                            )}
+                                        </div>
 
-                            <div className="text-end">
-                                <button
-                                    type="button"
-                                    className="btn btn-link p-0 text-decoration-none"
-                                    onClick={() => setShowReviews(true)}
-                                    aria-label="Skoða umsagnir"
-                                >
-                                    <div className="d-flex align-items-center justify-content-end gap-2">
-                                        <StarRatingDisplay rating={displayRating} />
-                                        <div className="text-muted">
-                                            <div className="fw-semibold">{formatRatingValue(displayRating)}</div>
-                                            <div className="small">({profile.rating.count})</div>
+                                        <div className="card-body d-flex flex-column">
+                                            <div className="d-flex justify-content-between gap-2">
+                                                <div className="fw-semibold text-truncate">{ad.title}</div>
+                                                <span className="badge text-bg-light">{ad.section}</span>
+                                            </div>
+
+                                            <div className="text-muted small mt-1">
+                                                {ad.category?.name ?? ''}{ad.location_text ? ` · ${ad.location_text}` : ''}
+                                            </div>
+
+                                            <div className="mt-2 fw-semibold">
+                                                {fmtPrice(ad.price, ad.currency)}
+                                            </div>
+
+                                            <div className="text-muted small mt-1">
+                                                Birt: {fmtDate(ad.published_at)}
+                                            </div>
+
+                                            <div className="mt-auto pt-3">
+                                                <TTButton
+                                                    as="link"
+                                                    href={ad.links.show}
+                                                    look="outline"
+                                                    variant="dark"
+                                                    className="w-100"
+                                                >
+                                                    Skoða auglýsingu
+                                                </TTButton>
+                                            </div>
                                         </div>
                                     </div>
-                                </button>
+                                </div>
+                            ))}
+
+                            {ads.data.length === 0 ? (
+                                <div className="col-12">
+                                    <div className="card">
+                                        <div className="card-body text-center text-muted py-5">
+                                            Engar virkar auglýsingar.
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
+
+                        {/* Pagination */}
+                        {ads.links?.length ? (
+                            <nav className="mt-4">
+                                <ul className="pagination pagination-sm mb-0 flex-wrap tt-pagination-slate">
+                                    {ads.links.map((l, idx) => (
+                                        <li
+                                            key={idx}
+                                            className={`page-item ${l.active ? 'active' : ''} ${!l.url ? 'disabled' : ''}`}
+                                        >
+                                            {l.url ? (
+                                                <Link className="page-link" href={l.url} preserveScroll>
+                                                    <span dangerouslySetInnerHTML={{ __html: l.label }} />
+                                                </Link>
+                                            ) : (
+                                                <span className="page-link">
+                                                    <span dangerouslySetInnerHTML={{ __html: l.label }} />
+                                                </span>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+                        ) : null}
+                    </div>
+
+                    <div className="col-12 col-lg-4 order-1 order-lg-2">
+                        {/* Header */}
+                        <div className="card">
+                            <div className="card-body">
+                                <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
+                                    <div>
+                                        <div className="h4 mb-1">{profile.display_name}</div>
+                                        <div className="text-muted small">@{profile.username}</div>
+                                    </div>
+
+                                    <div className="text-end">
+                                        <button
+                                            type="button"
+                                            className="btn btn-link p-0 text-decoration-none"
+                                            onClick={() => setShowReviews(true)}
+                                            aria-label="Skoða umsagnir"
+                                        >
+                                            <div className="d-flex align-items-center justify-content-end gap-2">
+                                                <StarRatingDisplay rating={displayRating} />
+                                                <div className="text-muted">
+                                                    <div className="fw-semibold">{formatRatingValue(displayRating)}</div>
+                                                    <div className="small">({profile.rating.count})</div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="mt-3 border-top pt-3">
+                                    <div className="d-flex flex-column gap-2 text-muted small">
+                                        <div>
+                                            Skráður: <span className="text-dark">{fmtDate(profile.member_since)}</span>
+                                        </div>
+                                        <div>
+                                            Virkar auglýsingar: <span className="text-dark">{profile.active_ads_count}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Ads grid */}
-                <div className="row g-3">
-                    {ads.data.map((ad) => (
-                        <div key={ad.id} className="col-12 col-sm-6 col-lg-4">
-                            <div className="card h-100">
-                                <div className="bg-white border-bottom" style={{ aspectRatio: '16 / 10' }}>
-                                    {ad.main_image_url ? (
-                                        <img
-                                            src={ad.main_image_url}
-                                            alt=""
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    ) : (
-                                        <div className="d-flex align-items-center justify-content-center h-100 text-muted">
-                                            Engin mynd
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="card-body d-flex flex-column">
-                                    <div className="d-flex justify-content-between gap-2">
-                                        <div className="fw-semibold text-truncate">{ad.title}</div>
-                                        <span className="badge text-bg-light">{ad.section}</span>
-                                    </div>
-
-                                    <div className="text-muted small mt-1">
-                                        {ad.category?.name ?? ''}{ad.location_text ? ` · ${ad.location_text}` : ''}
-                                    </div>
-
-                                    <div className="mt-2 fw-semibold">
-                                        {fmtPrice(ad.price, ad.currency)}
-                                    </div>
-
-                                    <div className="text-muted small mt-1">
-                                        Birt: {fmtDate(ad.published_at)}
-                                    </div>
-
-                                    <div className="mt-auto pt-3">
-                                        <TTButton
-                                            as="link"
-                                            href={ad.links.show}
-                                            look="outline"
-                                            variant="dark"
-                                            className="w-100"
-                                        >
-                                            Skoða auglýsingu
-                                        </TTButton>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-
-                    {ads.data.length === 0 ? (
-                        <div className="col-12">
-                            <div className="card">
-                                <div className="card-body text-center text-muted py-5">
-                                    Engar virkar auglýsingar.
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
-                </div>
-
-                {/* Pagination */}
-                {ads.links?.length ? (
-                    <nav className="mt-4">
-                        <ul className="pagination pagination-sm mb-0 flex-wrap tt-pagination-slate">
-                            {ads.links.map((l, idx) => (
-                                <li
-                                    key={idx}
-                                    className={`page-item ${l.active ? 'active' : ''} ${!l.url ? 'disabled' : ''}`}
-                                >
-                                    {l.url ? (
-                                        <Link className="page-link" href={l.url} preserveScroll>
-                                            <span dangerouslySetInnerHTML={{ __html: l.label }} />
-                                        </Link>
-                                    ) : (
-                                        <span className="page-link">
-                                            <span dangerouslySetInnerHTML={{ __html: l.label }} />
-                                        </span>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                ) : null}
             </div>
             <ReviewModal show={showReviews} onClose={() => setShowReviews(false)} reviews={profile.recent_reviews} />
         </AppLayout>
