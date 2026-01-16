@@ -68,6 +68,7 @@ function fmtTime(s: string | null) {
 export default function Show() {
     const { props } = usePage<PageProps>();
     const { conversation, messages, authUserId, deal, conversationList } = props;
+    const [isListOpen, setIsListOpen] = useState(false);
 
     // --- scroll to bottom behavior (no live chat) ---
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -162,14 +163,24 @@ export default function Show() {
             <Head title="Skilaboð" />
 
             <div className="container py-4">
-                <div className="row justify-content-center">
-                    <div className="col-12 col-lg-4 col-xl-3 mb-3 mb-lg-0">
-                        <div className="card h-100">
-                            <div className="card-body border-bottom">
-                                <div className="fw-semibold">Skilaboð</div>
-                                <div className="text-muted small">Þræðir raðaðir eftir nýjustu skilaboðum.</div>
-                            </div>
-                            <div className="list-group list-group-flush">
+                <div className="row justify-content-center" style={{ minHeight: 'calc(100vh - 180px)' }}>
+                    <div className="col-12 col-lg-4 col-xl-3 mb-3 mb-lg-0 d-lg-flex" style={{ minHeight: 'calc(100vh - 180px)' }}>
+                        <div
+                            className={`card h-100 flex-column ${isListOpen ? 'd-flex' : 'd-none'} d-lg-flex`}
+                        >
+                            {isListOpen ? (
+                                <div className="d-flex align-items-center justify-content-end gap-2 border-bottom p-2 d-lg-none">
+                                    <TTButton
+                                        size="sm"
+                                        variant="slate"
+                                        look="ghost"
+                                        onClick={() => setIsListOpen(false)}
+                                    >
+                                        Loka lista
+                                    </TTButton>
+                                </div>
+                            ) : null}
+                            <div className="list-group list-group-flush flex-grow-1 overflow-auto">
                                 {conversationList.map((c) => (
                                     <Link
                                         key={c.id}
@@ -200,7 +211,7 @@ export default function Show() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-8 col-xl-9">
+                    <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column" style={{ minHeight: 'calc(100vh - 180px)' }}>
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                             <div>
                                 <div className="h5 mb-0">{conversation.other?.name ?? 'Skilaboð'}</div>
@@ -216,6 +227,15 @@ export default function Show() {
                             </div>
 
                             <div className="d-flex gap-2">
+                                <TTButton
+                                    size="sm"
+                                    variant="slate"
+                                    look="ghost"
+                                    className="d-lg-none"
+                                    onClick={() => setIsListOpen((prev) => !prev)}
+                                >
+                                    Skilaboðalisti
+                                </TTButton>
                                 <TTButton
                                     size="sm"
                                     variant="amber"
@@ -277,8 +297,12 @@ export default function Show() {
                             </div>
                         ) : null}
 
-                        <div className="card mb-3">
-                            <div ref={scrollerRef} className="card-body" style={{ maxHeight: 520, overflow: 'auto' }}>
+                        <div className="card flex-grow-1 mb-3 d-flex flex-column">
+                            <div
+                                ref={scrollerRef}
+                                className="card-body flex-grow-1 overflow-auto"
+                                style={{ minHeight: 200 }}
+                            >
                                 {messages.data.map((m) => {
                                     const mine = m.sender_id === authUserId;
                                     const isSystem = m.message_type !== 'user';

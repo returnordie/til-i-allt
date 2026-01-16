@@ -50,7 +50,7 @@ export default function Index() {
                         <div className="card mb-3">
                             <div className="card-body">
                                 <div className="d-flex flex-wrap gap-2">
-                                    {['inbox', 'archived', 'all'].map((k) => {
+                                    {['inbox', 'archived'].map((k) => {
                                         const active = filters.filter === k;
                                         return (
                                             <TTButton
@@ -62,7 +62,7 @@ export default function Index() {
                                                     router.get(route('conversations.index'), { filter: k, q: filters.q }, { preserveState: true, preserveScroll: true })
                                                 }
                                             >
-                                                {k === 'inbox' ? 'Innhólf' : k === 'archived' ? 'Lokuð skilaboð' : 'Allt'}
+                                                {k === 'inbox' ? 'Innhólf' : 'Lokuð skilaboð'}
                                             </TTButton>
                                         );
                                     })}
