@@ -58,49 +58,10 @@ class ConversationController extends Controller
             });
         }
 
-        $conversations = $query->paginate(20)->withQueryString()->through(function (Conversation $c) use ($user) {
-            $other = $c->otherUserFor($user->id);
-
-            $lastRead = $c->lastReadAtFor($user->id);
-            $unread = $c->last_message_at && (!$lastRead || $c->last_message_at->gt($lastRead));
-
-            $lastBody = $c->latestMessage?->body;
-            $snippet = $lastBody ? mb_strimwidth($lastBody, 0, 90, '…') : null;
-
-            $adTitle = $c->ad?->title;
-            $adLink = $c->ad ? route('ads.show', [
-                'section' => $c->ad->section,
-                'categorySlug' => $c->ad->category?->slug,
-                'ad' => $c->ad->id,
-                'slug' => $c->ad->slug,
-            ]) : null;
-
-            return [
-                'id' => $c->id,
-                'status' => $c->status,
-                'context' => $c->context,
-                'subject' => $c->subject,
-                'last_message_at' => $c->last_message_at?->toDateTimeString(),
-                'unread' => $unread,
-
-                'other' => $other ? [
-                    'id' => $other->id,
-                    'name' => $other->name,
-                    'username' => $other->username,
-                ] : null,
-
-                'ad' => $c->ad ? [
-                    'title' => $adTitle,
-                    'link' => $adLink,
-                ] : null,
-
-                'snippet' => $snippet,
-
-                'links' => [
-                    'show' => route('conversations.show', $c),
-                ],
-            ];
-        });
+        $conversations = $query
+            ->paginate(20)
+            ->withQueryString()
+            ->through(fn (Conversation $c) => $this->formatConversationRow($c, $user));
 
         return Inertia::render('Conversations/Index', [
             'filters' => ['filter' => $filter, 'q' => $q],
@@ -224,6 +185,7 @@ class ConversationController extends Controller
 
             // NEW
             'deal' => $deal,
+            'conversationList' => $this->conversationListFor($user),
         ]);
     }
 
@@ -350,5 +312,71 @@ class ConversationController extends Controller
         }
 
         $conversation->save();
+    }
+
+    private function conversationListFor(User $user)
+    {
+        return Conversation::query()
+            ->where(function ($qq) use ($user) {
+                $qq->where('owner_id', $user->id)->orWhere('member_id', $user->id);
+            })
+            ->with([
+                'ad:id,title,slug,section,category_id,status,expires_at',
+                'ad.category:id,slug,name',
+                'owner:id,name,username',
+                'member:id,name,username',
+                'latestMessage.sender:id,name',
+            ])
+            ->orderByDesc('last_message_at')
+            ->orderByDesc('updated_at')
+            ->limit(20)
+            ->get()
+            ->map(fn (Conversation $c) => $this->formatConversationRow($c, $user))
+            ->values();
+    }
+
+    private function formatConversationRow(Conversation $conversation, User $user): array
+    {
+        $other = $conversation->otherUserFor($user->id);
+
+        $lastRead = $conversation->lastReadAtFor($user->id);
+        $unread = $conversation->last_message_at && (!$lastRead || $conversation->last_message_at->gt($lastRead));
+
+        $lastBody = $conversation->latestMessage?->body;
+        $snippet = $lastBody ? mb_strimwidth($lastBody, 0, 90, '…') : null;
+
+        $adTitle = $conversation->ad?->title;
+        $adLink = $conversation->ad ? route('ads.show', [
+            'section' => $conversation->ad->section,
+            'categorySlug' => $conversation->ad->category?->slug,
+            'ad' => $conversation->ad->id,
+            'slug' => $conversation->ad->slug,
+        ]) : null;
+
+        return [
+            'id' => $conversation->id,
+            'status' => $conversation->status,
+            'context' => $conversation->context,
+            'subject' => $conversation->subject,
+            'last_message_at' => $conversation->last_message_at?->toDateTimeString(),
+            'unread' => $unread,
+
+            'other' => $other ? [
+                'id' => $other->id,
+                'name' => $other->name,
+                'username' => $other->username,
+            ] : null,
+
+            'ad' => $conversation->ad ? [
+                'title' => $adTitle,
+                'link' => $adLink,
+            ] : null,
+
+            'snippet' => $snippet,
+
+            'links' => [
+                'show' => route('conversations.show', $conversation),
+            ],
+        ];
     }
 }

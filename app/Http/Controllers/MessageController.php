@@ -20,6 +20,14 @@ class MessageController extends Controller
         }
 
         $user = $request->user();
+        $archivedForUser = $conversation->archivedAtFor($user->id);
+        $archivedForOther = $conversation->owner_id === $user->id
+            ? $conversation->member_archived_at
+            : $conversation->owner_archived_at;
+
+        if ($archivedForUser || $archivedForOther) {
+            return back()->with('error', 'Samtal fyrir þessa auglýsingu hefur verið lokað.');
+        }
 
         $msg = Message::create([
             'conversation_id' => $conversation->id,
