@@ -90,7 +90,7 @@ class UserProfileController extends Controller
         return Inertia::render('Users/Show', [
             'profile' => [
                 'username' => $user->username,
-                'display_name' => $user->show_name ? $user->name : 'Notandi',
+                'display_name' => $user->show_name ? $user->name : ($user->username ?? $user->name),
                 'member_since' => $user->created_at?->toDateString(),
                 'active_ads_count' => (clone $adsQuery)->count(),
 

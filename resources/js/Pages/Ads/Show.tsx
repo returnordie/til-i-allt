@@ -31,20 +31,20 @@ type AdShowProps = {
         section: SectionKey;
         slug: string;
         listing_type?: 'sell' | 'want' | null;
-        location_text?: string | null;
         views_count?: number;
         category: { name: string | null; slug: string | null };
-        postcode?: {
-            id: number;
-            code: string;
-            name: string | null;
-            region?: { id: number; name: string } | null;
-        } | null;
         images: AdImage[];
         seller: {
             id: number;
             display: string;
             phone: string | null;
+            address?: string | null;
+            postcode?: {
+                id: number;
+                code: string;
+                name: string | null;
+                region?: { id: number; name: string } | null;
+            } | null;
             rating?: { avg: number; count: number };
             links?: { profile: string };
         };
@@ -128,8 +128,8 @@ export default function Show({ ad }: AdShowProps) {
     const backHref = ad.category?.slug ? route('ads.index', { section: ad.section, categorySlug: ad.category.slug }) : '/';
     const showTitle = ad.title?.trim() || 'Auglýsing';
     const locationParts = [
-        ad.postcode ? `${ad.postcode.code}${ad.postcode.name ? ` ${ad.postcode.name}` : ''}` : null,
-        ad.location_text || null,
+        ad.seller.postcode ? `${ad.seller.postcode.code}${ad.seller.postcode.name ? ` ${ad.seller.postcode.name}` : ''}` : null,
+        ad.seller.address || null,
     ].filter(Boolean);
     const locationLabel = locationParts.join(' · ');
 

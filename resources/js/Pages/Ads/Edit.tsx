@@ -13,8 +13,6 @@ type Props = {
         title: string;
         price: number | null;
         description: string;
-        location_text?: string | null;
-        postcode_id?: number | null;
         attributes?: Record<string, any>;
 
         images: ExistingAdImage[];
@@ -31,8 +29,6 @@ export default function Edit({ ad, fieldDefs = [] }: Props) {
         title: ad.title,
         price: ad.price,
         description: ad.description,
-        location_text: ad.location_text ?? '',
-        postcode_id: ad.postcode_id ?? null,
         attributes: ad.attributes ?? {},
     };
 

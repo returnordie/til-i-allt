@@ -14,8 +14,6 @@ type SharedProps = {
         categories: Record<SectionKey, NavParent[]>;
         heroArtUrl?: string;
     };
-    regions?: Array<{ id: number; name: string }>;
-    postcodes?: Array<{ id: number; code: string; name: string; region_id: number }>;
 };
 
 export type FieldDef = {
@@ -40,8 +38,6 @@ export type AdFormInitial = {
     title?: string;
     price?: number | null;
     description?: string;
-    location_text?: string | null;
-    postcode_id?: number | null;
     attributes?: Record<string, any>;
 };
 
@@ -60,8 +56,6 @@ type FormData = {
     title: string;
     price: string;
     description: string;
-    location_text: string;
-    postcode_id: number | '';
     attributes: Record<string, any>;
 
     images: File[];
@@ -223,8 +217,6 @@ export default function AdForm({
         title: initial?.title ?? '',
         price: initial?.price ? String(initial.price) : '',
         description: initial?.description ?? '',
-        location_text: initial?.location_text ?? '',
-        postcode_id: initial?.postcode_id ?? '',
         attributes: initial?.attributes ?? {},
 
         images: [],
@@ -239,45 +231,6 @@ export default function AdForm({
 
     const isLeafSection = data.section === 'bilatorg' || data.section === 'fasteignir';
     const isVehicleSection = data.section === 'bilatorg';
-
-    const regions = props.regions ?? [];
-    const postcodes = props.postcodes ?? [];
-    const [regionId, setRegionId] = useState<string>(() => {
-        if (initial?.postcode_id) {
-            const match = postcodes.find((pc) => pc.id === initial.postcode_id);
-            return match ? String(match.region_id) : '';
-        }
-        return '';
-    });
-
-    useEffect(() => {
-        if (!data.postcode_id) return;
-        const match = postcodes.find((pc) => pc.id === Number(data.postcode_id));
-        if (match && String(match.region_id) !== regionId) {
-            setRegionId(String(match.region_id));
-        }
-    }, [data.postcode_id, postcodes, regionId]);
-
-    const filteredPostcodes = useMemo(() => {
-        if (!regionId) return postcodes;
-        return postcodes.filter((pc) => pc.region_id === Number(regionId));
-    }, [postcodes, regionId]);
-
-    const selectedPostcode = useMemo(() => {
-        if (!data.postcode_id) return null;
-        return postcodes.find((pc) => pc.id === Number(data.postcode_id)) ?? null;
-    }, [postcodes, data.postcode_id]);
-
-    const locationSummary = useMemo(() => {
-        const parts = [];
-        if (selectedPostcode) {
-            parts.push(`${selectedPostcode.code}${selectedPostcode.name ? ` ${selectedPostcode.name}` : ''}`);
-        }
-        if (data.location_text) {
-            parts.push(data.location_text);
-        }
-        return parts.filter(Boolean).join(' · ');
-    }, [selectedPostcode, data.location_text]);
 
     // UI guard: Bílatorg má ekki vera "Óskast"
     useEffect(() => {
@@ -895,67 +848,6 @@ export default function AdForm({
                             {err('price') && <div className="invalid-feedback">{err('price')}</div>}
                         </div>
 
-                        <div className="row g-3 mb-3">
-                            <div className="col-12 col-md-6">
-                                <label htmlFor="region_id" className="form-label">
-                                    Svæði
-                                </label>
-                                <select
-                                    id="region_id"
-                                    className="form-select tt-input"
-                                    value={regionId}
-                                    onChange={(e) => {
-                                        setRegionId(e.target.value);
-                                        setData('postcode_id', '');
-                                    }}
-                                >
-                                    <option value="">Veldu svæði…</option>
-                                    {regions.map((region) => (
-                                        <option key={region.id} value={region.id}>
-                                            {region.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="col-12 col-md-6">
-                                <label htmlFor="postcode_id" className="form-label">
-                                    Póstnúmer
-                                </label>
-                                <select
-                                    id="postcode_id"
-                                    className={`form-select tt-input ${err('postcode_id') ? 'is-invalid' : ''}`}
-                                    value={data.postcode_id}
-                                    onChange={(e) =>
-                                        setData('postcode_id', e.target.value ? Number(e.target.value) : '')
-                                    }
-                                    disabled={!filteredPostcodes.length}
-                                >
-                                    <option value="">Veldu póstnúmer…</option>
-                                    {filteredPostcodes.map((pc) => (
-                                        <option key={pc.id} value={pc.id}>
-                                            {pc.code} {pc.name ? `· ${pc.name}` : ''}
-                                        </option>
-                                    ))}
-                                </select>
-                                {err('postcode_id') && <div className="invalid-feedback">{err('postcode_id')}</div>}
-                            </div>
-                        </div>
-
-                        <div className="mb-4">
-                            <label htmlFor="location_text" className="form-label">
-                                Staðsetning (frjálst)
-                            </label>
-                            <input
-                                id="location_text"
-                                className={`form-control tt-input ${err('location_text') ? 'is-invalid' : ''}`}
-                                value={data.location_text}
-                                onChange={(e) => setData('location_text', e.target.value)}
-                                placeholder="t.d. Reykjavík, Akranes eða 'Sendi'"
-                            />
-                            {err('location_text') && <div className="invalid-feedback">{err('location_text')}</div>}
-                        </div>
-
                         <div className="mb-4">
                             <label htmlFor="description" className="form-label">
                                 Lýsing
@@ -1462,10 +1354,6 @@ export default function AdForm({
                                     <div>
                                         <div className="tt-af-k">Verð</div>
                                         <div>{formatISK(data.price)}</div>
-                                    </div>
-                                    <div>
-                                        <div className="tt-af-k">Staðsetning</div>
-                                        <div>{locationSummary || '—'}</div>
                                     </div>
                                     <div>
                                         <div className="tt-af-k">Flokkur</div>

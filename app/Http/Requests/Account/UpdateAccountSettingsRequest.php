@@ -58,6 +58,10 @@ class UpdateAccountSettingsRequest extends FormRequest
                 Rule::unique('users', 'phone_e164')->ignore($userId),
             ],
 
+            'postcode_id' => ['nullable', 'integer', 'exists:postcodes,id'],
+            'address' => ['nullable', 'string', 'max:160'],
+            'show_address' => ['required', 'boolean'],
+
             // defaults for new ads
             'show_name' => ['required', 'boolean'],
             'show_phone' => ['required', 'boolean'],
