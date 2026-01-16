@@ -23,6 +23,7 @@ class AccountDealsController extends Controller
             ->with([
                 'ad:id,title,section,slug,category_id',
                 'ad.category:id,slug',
+                'ad.images:id,ad_id,public_id,sort_order',
                 'seller:id,name',
                 'buyer:id,name',
             ])
@@ -39,21 +40,22 @@ class AccountDealsController extends Controller
             ->all();
 
         $reviewedLookup = array_flip($reviewedDealIds);
-        $reviewStats = DealReview::query()
+        $receivedReviews = DealReview::query()
             ->whereIn('deal_id', $dealIds)
-            ->selectRaw('deal_id, count(*) as review_count, avg(rating) as average_rating')
-            ->groupBy('deal_id')
+            ->where('ratee_id', $user->id)
             ->get()
             ->keyBy('deal_id');
 
-        $deals = $deals->through(function (Deal $deal) use ($user, $reviewedLookup, $reviewStats) {
+        $deals = $deals->through(function (Deal $deal) use ($user, $reviewedLookup, $receivedReviews) {
             $isSeller = (int) $deal->seller_id === (int) $user->id;
             $canCancel = $isSeller
                 && $deal->status === 'active'
                 && (bool) $deal->buyer_id;
             $hasReview = isset($reviewedLookup[$deal->id]);
             $reviewOpen = $deal->reviewsAreOpen();
-            $summary = $reviewStats->get($deal->id);
+            $receivedReview = $receivedReviews->get($deal->id);
+            $mainImage = $deal->ad?->images?->first();
+            $mainImageUrl = $mainImage ? route('ad-images.show', $mainImage->public_id) : null;
 
             return [
                 'id' => $deal->id,
@@ -74,6 +76,7 @@ class AccountDealsController extends Controller
                 'is_seller' => $isSeller,
                 'ad' => $deal->ad ? [
                     'title' => $deal->ad->title,
+                    'main_image_url' => $mainImageUrl,
                     'link' => route('ads.show', [
                         'section' => $deal->ad->section,
                         'categorySlug' => $deal->ad->category?->slug,
@@ -90,10 +93,7 @@ class AccountDealsController extends Controller
                         && !$hasReview,
                     'has_review' => $hasReview,
                     'is_open' => $reviewOpen,
-                    'summary' => $summary ? [
-                        'count' => (int) $summary->review_count,
-                        'average_rating' => (float) $summary->average_rating,
-                    ] : null,
+                    'received_rating' => $receivedReview ? (int) $receivedReview->rating : null,
                     'link' => route('account.deals.review', $deal),
                 ],
                 'links' => [

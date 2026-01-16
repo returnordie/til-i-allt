@@ -1,5 +1,4 @@
 import AppLayout from '@/Layouts/AppLayout';
-import AccountNav from '@/Components/Account/AccountNav';
 import TTButton from '@/Components/UI/TTButton';
 import { Head, router, usePage } from '@inertiajs/react';
 
@@ -14,7 +13,7 @@ type DealRow = {
     seller: { id: number; name: string } | null;
     buyer: { id: number; name: string } | null;
     is_seller: boolean;
-    ad: { title: string; link: string } | null;
+    ad: { title: string; link: string; main_image_url: string | null } | null;
     can_respond: boolean;
     can_cancel: boolean;
     links: {
@@ -24,7 +23,7 @@ type DealRow = {
         can_review: boolean;
         has_review: boolean;
         is_open: boolean;
-        summary: { count: number; average_rating: number } | null;
+        received_rating: number | null;
         link: string;
     };
 };
@@ -56,25 +55,13 @@ function fmtDate(s: string | null) {
 }
 
 function renderStarRating(rating: number) {
-    const rounded = Math.round(rating * 2) / 2;
+    const rounded = Math.max(0, Math.min(5, Math.round(rating)));
 
     return (
-        <span className="d-inline-flex align-items-center gap-1" aria-label={`Einkunn ${rounded.toFixed(1)} af 5`}>
+        <span className="d-inline-flex align-items-center gap-1" aria-label={`Einkunn ${rounded} af 5`}>
             {Array.from({ length: 5 }, (_, index) => {
                 const starValue = index + 1;
                 const isFull = rounded >= starValue;
-                const isHalf = !isFull && rounded + 0.5 >= starValue;
-
-                if (isHalf) {
-                    return (
-                        <span key={starValue} className="position-relative d-inline-block" style={{ width: '1em' }}>
-                            <span className="text-muted">★</span>
-                            <span className="position-absolute top-0 start-0 overflow-hidden text-warning" style={{ width: '50%' }}>
-                                ★
-                            </span>
-                        </span>
-                    );
-                }
 
                 return (
                     <span key={starValue} className={isFull ? 'text-warning' : 'text-muted'}>
@@ -82,7 +69,6 @@ function renderStarRating(rating: number) {
                     </span>
                 );
             })}
-            <span className="text-muted small ms-1">{rounded.toFixed(1)}</span>
         </span>
     );
 }
@@ -108,45 +94,50 @@ export default function Index() {
             <Head title="Mín viðskipti" />
 
             <div className="container py-4">
-                <div className="row g-4">
-                    <div className="col-12 col-lg-3">
-                        <AccountNav />
-                    </div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                    <h1 className="h4 mb-0">Mín viðskipti</h1>
+                </div>
 
-                    <div className="col-12 col-lg-9">
-                        <div className="d-flex align-items-center justify-content-between mb-3">
-                            <h1 className="h4 mb-0">Mín viðskipti</h1>
-                        </div>
+                {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
+                {props.flash?.error ? <div className="alert alert-danger">{props.flash.error}</div> : null}
 
-                        {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
-                        {props.flash?.error ? <div className="alert alert-danger">{props.flash.error}</div> : null}
-
-                        <div className="card">
-                            <div className="table-responsive">
-                                <table className="table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Auglýsing</th>
-                                            <th>Aðili</th>
-                                            <th>Staða</th>
-                                            <th>Dagsetning</th>
-                                            <th>Stjörnur</th>
-                                            <th className="text-end">Aðgerðir</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {deals.data.length === 0 ? (
-                                            <tr>
-                                                <td colSpan={6} className="text-center text-muted py-4">
-                                                    Engin viðskipti fundust.
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            deals.data.map((deal) => {
-                                                const sm = statusMeta(deal.status);
-                                                return (
-                                                    <tr key={deal.id}>
-                                                        <td>
+                <div className="card">
+                    <div className="table-responsive">
+                        <table className="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Auglýsing</th>
+                                    <th>Aðili</th>
+                                    <th>Staða</th>
+                                    <th>Dagsetning</th>
+                                    <th>Stjörnur</th>
+                                    <th className="text-end">Aðgerðir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {deals.data.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="text-center text-muted py-4">
+                                            Engin viðskipti fundust.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    deals.data.map((deal) => {
+                                        const sm = statusMeta(deal.status);
+                                        return (
+                                            <tr key={deal.id}>
+                                                <td>
+                                                    <div className="d-flex gap-3">
+                                                        <div style={{ width: 52, height: 52 }} className="border bg-white overflow-hidden">
+                                                            {deal.ad?.main_image_url ? (
+                                                                <img
+                                                                    src={deal.ad.main_image_url}
+                                                                    alt=""
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                />
+                                                            ) : null}
+                                                        </div>
+                                                        <div>
                                                             {deal.ad ? (
                                                                 <a href={deal.ad.link} className="fw-semibold">
                                                                     {deal.ad.title}
@@ -157,87 +148,87 @@ export default function Index() {
                                                             <div className="text-muted small">
                                                                 Verð: {deal.price_final !== null ? `${deal.price_final.toLocaleString()} ${deal.currency}` : '—'}
                                                             </div>
-                                                        </td>
-                                                        <td>{deal.is_seller ? deal.buyer?.name ?? '—' : deal.seller?.name ?? '—'}</td>
-                                                        <td>
-                                                            <span className={`badge ${sm.badge}`}>{sm.label}</span>
-                                                        </td>
-                                                        <td className="text-muted small">
-                                                            {deal.completed_at ? `Lokið: ${fmtDate(deal.completed_at)}` : null}
-                                                            {!deal.completed_at && deal.canceled_at ? `Hætt við: ${fmtDate(deal.canceled_at)}` : null}
-                                                            {!deal.completed_at && !deal.canceled_at ? `Merkt: ${fmtDate(deal.confirmed_at)}` : null}
-                                                        </td>
-                                                        <td className="text-muted small">
-                                                            {deal.review.summary && deal.review.summary.count >= 2 ? (
-                                                                renderStarRating(deal.review.summary.average_rating)
-                                                            ) : (
-                                                                <span className="text-muted">—</span>
-                                                            )}
-                                                        </td>
-                                                        <td className="text-end">
-                                                            {deal.can_respond ? (
-                                                                <div className="d-inline-flex gap-2" role="group">
-                                                                    <TTButton
-                                                                        type="button"
-                                                                        size="sm"
-                                                                        variant="green"
-                                                                        look="solid"
-                                                                        onClick={() => accept(deal)}
-                                                                    >
-                                                                        Samþykkja
-                                                                    </TTButton>
-                                                                    <TTButton
-                                                                        type="button"
-                                                                        size="sm"
-                                                                        variant="red"
-                                                                        look="solid"
-                                                                        onClick={() => decline(deal)}
-                                                                    >
-                                                                        Hafna
-                                                                    </TTButton>
-                                                                </div>
-                                                            ) : deal.can_cancel ? (
-                                                                <TTButton
-                                                                    type="button"
-                                                                    size="sm"
-                                                                    variant="red"
-                                                                    look="solid"
-                                                                    onClick={() => cancel(deal)}
-                                                                >
-                                                                    Hætta við
-                                                                </TTButton>
-                                                            ) : deal.review?.can_review ? (
-                                                                <TTButton
-                                                                    as="link"
-                                                                    href={deal.review.link}
-                                                                    size="sm"
-                                                                    variant="amber"
-                                                                    look="solid"
-                                                                >
-                                                                    Gefa umsögn
-                                                                </TTButton>
-                                                            ) : deal.review?.has_review ? (
-                                                                <TTButton
-                                                                    as="link"
-                                                                    href={deal.review.link}
-                                                                    size="sm"
-                                                                    variant="amber"
-                                                                    look="solid"
-                                                                >
-                                                                    Umsögn
-                                                                </TTButton>
-                                                            ) : (
-                                                                <span className="text-muted small">—</span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{deal.is_seller ? deal.buyer?.name ?? '—' : deal.seller?.name ?? '—'}</td>
+                                                <td>
+                                                    <span className={`badge ${sm.badge}`}>{sm.label}</span>
+                                                </td>
+                                                <td className="text-muted small">
+                                                    {deal.completed_at ? `Lokið: ${fmtDate(deal.completed_at)}` : null}
+                                                    {!deal.completed_at && deal.canceled_at ? `Hætt við: ${fmtDate(deal.canceled_at)}` : null}
+                                                    {!deal.completed_at && !deal.canceled_at ? `Merkt: ${fmtDate(deal.confirmed_at)}` : null}
+                                                </td>
+                                                <td className="text-muted small">
+                                                    {deal.review.received_rating ? (
+                                                        renderStarRating(deal.review.received_rating)
+                                                    ) : (
+                                                        <span className="text-muted">—</span>
+                                                    )}
+                                                </td>
+                                                <td className="text-end">
+                                                    {deal.can_respond ? (
+                                                        <div className="d-inline-flex gap-2" role="group">
+                                                            <TTButton
+                                                                type="button"
+                                                                size="sm"
+                                                                variant="green"
+                                                                look="solid"
+                                                                onClick={() => accept(deal)}
+                                                            >
+                                                                Samþykkja
+                                                            </TTButton>
+                                                            <TTButton
+                                                                type="button"
+                                                                size="sm"
+                                                                variant="red"
+                                                                look="solid"
+                                                                onClick={() => decline(deal)}
+                                                            >
+                                                                Hafna
+                                                            </TTButton>
+                                                        </div>
+                                                    ) : deal.can_cancel ? (
+                                                        <TTButton
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="red"
+                                                            look="solid"
+                                                            onClick={() => cancel(deal)}
+                                                        >
+                                                            Hætta við
+                                                        </TTButton>
+                                                    ) : deal.review?.can_review ? (
+                                                        <TTButton
+                                                            as="link"
+                                                            href={deal.review.link}
+                                                            size="sm"
+                                                            variant="amber"
+                                                            look="solid"
+                                                        >
+                                                            Gefa umsögn
+                                                        </TTButton>
+                                                    ) : deal.review?.has_review ? (
+                                                        <TTButton
+                                                            as="link"
+                                                            href={deal.review.link}
+                                                            size="sm"
+                                                            variant="amber"
+                                                            look="solid"
+                                                        >
+                                                            Umsögn
+                                                        </TTButton>
+                                                    ) : (
+                                                        <span className="text-muted small">—</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

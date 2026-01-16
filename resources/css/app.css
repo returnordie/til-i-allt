@@ -32,6 +32,10 @@ body{
     color: var(--tt-ink);
 }
 
+.btn{
+    border-radius: 0;
+}
+
 a{
     color: inherit;
     text-decoration: none;
@@ -136,7 +140,7 @@ a:focus{
     place-items:center;
     width: 42px;
     height: 42px;
-    border-radius: 999px;
+    border-radius: 0;
     color: rgba(20,21,26,.72);
     text-decoration:none;
     background: transparent;
@@ -165,7 +169,7 @@ a:focus{
 
 /* User button */
 .tt-userbtn{
-    border-radius: var(--tt-r-md);
+    border-radius: 0;
     border: 1px solid var(--tt-border);
     background: rgba(255,255,255,.92);
     font-weight: 750;
@@ -249,6 +253,14 @@ a:focus{
     background: rgba(251,251,252,.70);
 }
 .tt-cnav{ padding: .85rem 0 1.0rem; }
+.tt-cnav--dock{
+    display:flex;
+    justify-content:center;
+}
+.tt-cnav--dock .tt-grid{
+    width: fit-content;
+    margin: 0 auto;
+}
 
 /* Compact grid */
 .tt-grid{
@@ -306,6 +318,32 @@ a:focus{
 .tt-catscanvas{
     width: min(420px, 92vw);
     border-right: 1px solid var(--tt-border);
+}
+
+.tt-pagination-slate .page-link{
+    color: #0f172a;
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+    border-radius: 0;
+}
+
+.tt-pagination-slate .page-link:hover,
+.tt-pagination-slate .page-link:focus{
+    color: #0f172a;
+    background: #cbd5e1;
+    border-color: #cbd5e1;
+}
+
+.tt-pagination-slate .page-item.active .page-link{
+    color: #fff;
+    background: #64748b;
+    border-color: #64748b;
+}
+
+.tt-pagination-slate .page-item.disabled .page-link{
+    color: #94a3b8;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
 }
 
 /* Generic card/input */

@@ -1,6 +1,6 @@
 :root {
     /* Shape + type */
-    --tt-radius: 0.45rem; /* boxy, not pill */
+    --tt-radius: 0;
     --tt-fw: 600;
 
     /* Palette (custom, NOT bootstrap variants) */
@@ -125,7 +125,7 @@
     --bs-btn-padding-x: 0.7rem;
     --bs-btn-padding-y: 0.4rem;
     --bs-btn-font-size: 0.875rem;
-    --bs-btn-border-radius: 0.4rem;
+    --bs-btn-border-radius: 0;
 }
 
 .btn.tt-btn.tt-md {
@@ -136,7 +136,7 @@
     --bs-btn-padding-x: 1.1rem;
     --bs-btn-padding-y: 0.65rem;
     --bs-btn-font-size: 1rem;
-    --bs-btn-border-radius: 0.5rem;
+    --bs-btn-border-radius: 0;
 }
 
 /* Color modifiers (custom palette) */
@@ -144,6 +144,18 @@
     --tt-accent: var(--tt-slate);
     --tt-accent-hover: #cbd5e1;
     --tt-focus-rgb: 100, 116, 139; /* slate-500-ish */
+}
+
+.btn.tt-btn.tt-solid.tt-c-slate {
+    --bs-btn-color: var(--tt-slate-ink);
+    --bs-btn-hover-color: var(--tt-slate-ink);
+}
+
+.btn.tt-btn.tt-outline.tt-c-slate,
+.btn.tt-btn.tt-soft.tt-c-slate,
+.btn.tt-btn.tt-ghost.tt-c-slate {
+    --bs-btn-color: var(--tt-slate-ink);
+    --bs-btn-hover-color: var(--tt-slate-ink);
 }
 
 .tt-c-blue {
