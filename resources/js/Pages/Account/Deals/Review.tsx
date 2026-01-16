@@ -110,7 +110,7 @@ export default function Review() {
                                                 <div className="border rounded p-3 h-100 tt-review-surface">
                                                     <div className="fw-semibold">Þín umsögn</div>
                                                     <div className="mt-2">
-                                                        <span className="me-2">Stjörnur:</span>
+                                                        <span className="me-2">Stjörnugjöf:</span>
                                                         <span className="fw-semibold">
                                                             {existingReview ? formatRating(existingReview.rating) : '—'}
                                                         </span>
@@ -118,7 +118,6 @@ export default function Review() {
                                                     </div>
                                                     {existingReview?.comment ? (
                                                         <div className="mt-2">
-                                                            <div className="text-muted small">Athugasemd</div>
                                                             <div>{existingReview.comment}</div>
                                                         </div>
                                                     ) : null}
@@ -130,7 +129,7 @@ export default function Review() {
                                                         Umsögn frá {otherReview?.rater_name ?? 'viðskiptaaðila'}
                                                     </div>
                                                     <div className="mt-2">
-                                                        <span className="me-2">Stjörnur:</span>
+                                                        <span className="me-2">Stjörnugjöf:</span>
                                                         <span className="fw-semibold">
                                                             {otherReview ? formatRating(otherReview.rating) : '—'}
                                                         </span>
@@ -138,7 +137,6 @@ export default function Review() {
                                                     </div>
                                                     {otherReview?.comment ? (
                                                         <div className="mt-2">
-                                                            <div className="text-muted small">Athugasemd</div>
                                                             <div>{otherReview.comment}</div>
                                                         </div>
                                                     ) : null}
@@ -150,13 +148,12 @@ export default function Review() {
                                     <div className="border rounded p-3 tt-review-surface">
                                         <div className="fw-semibold">Umsögn skráð</div>
                                         <div className="mt-2">
-                                            <span className="me-2">Stjörnur:</span>
+                                            <span className="me-2">Stjörnugjöf:</span>
                                             <span className="fw-semibold">{formatRating(existingReview.rating)}</span>
                                             <StarRatingDisplay rating={existingReview.rating} className="ms-2" />
                                         </div>
                                         {existingReview.comment ? (
                                             <div className="mt-2">
-                                                <div className="text-muted small">Athugasemd</div>
                                                 <div>{existingReview.comment}</div>
                                             </div>
                                         ) : null}
@@ -166,7 +163,7 @@ export default function Review() {
                                 {canReview ? (
                                     <form onSubmit={submit} className="mt-4">
                                         <div className="mb-3">
-                                            <label className="form-label fw-semibold">Stjörnur</label>
+                                            <label className="form-label fw-semibold">Stjörnugjöf</label>
                                             <StarRatingInput value={Number(data.rating)} onChange={(value) => setData('rating', value)} />
                                             {errors.rating ? <div className="text-danger small mt-2">{errors.rating}</div> : null}
                                         </div>
@@ -186,9 +183,11 @@ export default function Review() {
                                             {errors.comment ? <div className="text-danger small mt-2">{errors.comment}</div> : null}
                                         </div>
 
-                                        <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
-                                            Vista umsögn
-                                        </TTButton>
+                                        <div className="d-flex justify-content-end">
+                                            <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
+                                                Vista umsögn
+                                            </TTButton>
+                                        </div>
                                     </form>
                                 ) : existingReview ? null : (
                                     <div className="alert alert-warning mb-0">

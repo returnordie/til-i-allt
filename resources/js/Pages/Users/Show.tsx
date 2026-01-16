@@ -89,7 +89,7 @@ export default function Show() {
                                     </div>
                                 </div>
                                 <div className="text-muted small mt-1">
-                                    Stjörnur tengjast viðskiptum (deal reviews).
+                                    Stjörnugjöf tengist viðskiptum (deal reviews).
                                 </div>
                             </div>
                         </div>
