@@ -1,7 +1,8 @@
 // resources/js/Components/AdForm.tsx
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import Hero from '@/Components/Hero';
+import TTButton from '@/Components/UI/TTButton';
 
 type SectionKey = 'solutorg' | 'bilatorg' | 'fasteignir';
 
@@ -749,9 +750,9 @@ export default function AdForm({
 
                             {/* ✅ Til baka (var vantað í leaf) */}
                             <div className="d-flex justify-content-between align-items-center mt-3">
-                                <button type="button" className="btn tt-btn-ghost" onClick={() => setStep(0)}>
+                                <TTButton type="button" look="ghost" variant="slate" onClick={() => setStep(0)}>
                                     ← Til baka
-                                </button>
+                                </TTButton>
                             </div>
                         </>
                     ) : (
@@ -799,18 +800,19 @@ export default function AdForm({
                                 )}
 
                                 <div className="d-flex justify-content-between align-items-center mt-3">
-                                    <button type="button" className="btn tt-btn-ghost" onClick={() => setStep(0)}>
+                                    <TTButton type="button" look="ghost" variant="slate" onClick={() => setStep(0)}>
                                         ← Til baka
-                                    </button>
+                                    </TTButton>
 
-                                    <button
+                                    <TTButton
                                         type="button"
-                                        className="btn tt-btn-cta"
+                                        variant="amber"
+                                        look="solid"
                                         onClick={() => setStep(2)}
                                         disabled={!data.category_slug || processing}
                                     >
                                         Halda áfram →
-                                    </button>
+                                    </TTButton>
                                 </div>
                             </div>
                         </>
@@ -1188,27 +1190,28 @@ export default function AdForm({
                         <div className="d-flex justify-content-between align-items-center">
                             <div className="d-flex gap-2">
                                 {mode !== 'edit' && mode !== 'create' ? (
-                                    <button type="button" className="btn tt-btn-ghost" onClick={() => setStep(1)}>
+                                    <TTButton type="button" look="ghost" variant="slate" onClick={() => setStep(1)}>
                                         ← Til baka
-                                    </button>
+                                    </TTButton>
                                 ) : null }
 
                                 {mode === 'create' ? (
-                                    <Link type="button" className="btn tt-btn-ghost" onClick={() => setStep(1)}>
+                                    <TTButton type="button" look="ghost" variant="slate" onClick={() => setStep(1)}>
                                         ← Byrja uppá nýtt
-                                    </Link>
+                                    </TTButton>
                                 ) : null }
                             </div>
 
 
-                            <button
+                            <TTButton
                                 type="button"
-                                className="btn tt-btn-cta"
+                                variant="amber"
+                                look="solid"
                                 onClick={goNextFromDetails}
                                 disabled={processing}
                             >
                                 Næsta: Myndir →
-                            </button>
+                            </TTButton>
                         </div>
                     </form>
                 </div>
@@ -1259,7 +1262,16 @@ export default function AdForm({
                                 </div>
                             </div>
                             <div className="ms-auto d-none d-md-block">
-                                <span className="btn tt-btn-ghost btn-sm">Velja myndir</span>
+                                <TTButton
+                                    type="button"
+                                    size="sm"
+                                    look="ghost"
+                                    variant="slate"
+                                    className="pointer-events-none"
+                                    tabIndex={-1}
+                                >
+                                    Velja myndir
+                                </TTButton>
                             </div>
                         </div>
 
@@ -1286,23 +1298,27 @@ export default function AdForm({
                                     />
 
                                     <div className="d-flex gap-2 mt-2">
-                                        <button
+                                        <TTButton
                                             type="button"
-                                            className="btn btn-sm btn-success"
+                                            size="sm"
+                                            variant="green"
+                                            look="solid"
                                             onClick={setSelectedAsMain}
                                             disabled={totalCount === 0}
                                         >
                                             Setja sem aðalmynd
-                                        </button>
+                                        </TTButton>
 
-                                        <button
+                                        <TTButton
                                             type="button"
-                                            className="btn btn-sm btn-danger"
+                                            size="sm"
+                                            variant="red"
+                                            look="solid"
                                             onClick={removeSelected}
                                             disabled={!selectedKey}
                                         >
                                             Fjarlægja
-                                        </button>
+                                        </TTButton>
                                     </div>
                                 </div>
                             ) : (
@@ -1407,13 +1423,13 @@ export default function AdForm({
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center mt-4">
-                        <button type="button" className="btn tt-btn-ghost" onClick={goBackFromImages}>
+                        <TTButton type="button" look="ghost" variant="slate" onClick={goBackFromImages}>
                             ← Til baka
-                        </button>
+                        </TTButton>
 
-                        <button type="button" className="btn tt-btn-cta" onClick={goNextFromImages} disabled={processing}>
+                        <TTButton type="button" variant="amber" look="solid" onClick={goNextFromImages} disabled={processing}>
                             Næsta: Forskoðun →
-                        </button>
+                        </TTButton>
                     </div>
                 </div>
             )}
@@ -1534,13 +1550,13 @@ export default function AdForm({
                     </div>
 
                     <div className="d-flex justify-content-between align-items-center mt-4">
-                        <button type="button" className="btn tt-btn-ghost" onClick={goBackFromReview}>
+                        <TTButton type="button" look="ghost" variant="slate" onClick={goBackFromReview}>
                             ← Til baka
-                        </button>
+                        </TTButton>
 
-                        <button type="button" className="btn tt-btn-cta" onClick={submitFinal} disabled={processing}>
+                        <TTButton type="button" variant="amber" look="solid" onClick={submitFinal} disabled={processing}>
                             {processing ? 'Vista…' : mode === 'edit' ? 'Vista breytingar' : 'Birta auglýsingu'}
-                        </button>
+                        </TTButton>
                     </div>
                 </div>
             )}

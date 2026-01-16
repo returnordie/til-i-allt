@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -88,9 +89,15 @@ export default function Review() {
                                     )}
                                 </div>
                             </div>
-                            <Link href={route('account.deals.index')} className="btn btn-warning btn-sm">
+                            <TTButton
+                                as="link"
+                                href={route('account.deals.index')}
+                                size="sm"
+                                variant="amber"
+                                look="solid"
+                            >
                                 Til baka
-                            </Link>
+                            </TTButton>
                         </div>
 
                         {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
@@ -174,7 +181,7 @@ export default function Review() {
                                                     <button
                                                         key={value}
                                                         type="button"
-                                                        className="btn p-0 border-0 bg-transparent"
+                                                        className="p-0 border-0 bg-transparent"
                                                         onClick={() => setData('rating', value)}
                                                         onMouseEnter={() => setHoverRating(value)}
                                                         onFocus={() => setHoverRating(value)}
@@ -220,9 +227,9 @@ export default function Review() {
                                             {errors.comment ? <div className="text-danger small mt-2">{errors.comment}</div> : null}
                                         </div>
 
-                                        <button type="submit" className="btn btn-warning" disabled={processing}>
+                                        <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
                                             Vista umsögn
-                                        </button>
+                                        </TTButton>
                                     </form>
                                 ) : existingReview ? null : (
                                     <div className="alert alert-warning mb-0">

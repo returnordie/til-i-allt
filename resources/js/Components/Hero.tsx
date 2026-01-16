@@ -1,6 +1,6 @@
 // resources/js/Components/Hero.tsx
 import React, { useMemo, useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
 
 type AdsMeta = { total?: number; from?: number; to?: number };
 type HeroContext = 'home' | 'section' | 'category';
@@ -172,9 +172,14 @@ export default function Hero(props: HeroProps) {
 
                 {showCta ? (
                     <div className="d-flex gap-2">
-                        <Link href={ctaHref as string} className="btn tt-btn-cta">
+                        <TTButton
+                            as="link"
+                            href={ctaHref as string}
+                            variant="amber"
+                            look="solid"
+                        >
                             {ctaLabel}
-                        </Link>
+                        </TTButton>
                     </div>
                 ) : null}
             </div>

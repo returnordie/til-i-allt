@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react';
 
@@ -222,9 +223,15 @@ export default function Index() {
             <div className="container py-4">
                 <div className="d-flex align-items-center justify-content-between mb-3">
                     <h1 className="h4 mb-0">Mínar auglýsingar</h1>
-                    <Link href={route('ads.create')} className="btn btn-warning btn-sm">
+                    <TTButton
+                        as="link"
+                        href={route('ads.create')}
+                        size="sm"
+                        variant="amber"
+                        look="solid"
+                    >
                         Ný auglýsing
-                    </Link>
+                    </TTButton>
                 </div>
 
                 {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
@@ -236,17 +243,19 @@ export default function Index() {
                             {filterButtons.map((b) => {
                                 const active = filters.status === b.key || (filters.status === 'all' && b.key === 'all');
                                 return (
-                                    <button
+                                    <TTButton
                                         key={b.key}
                                         type="button"
-                                        className={`btn btn-sm ${active ? 'btn-dark' : 'btn-outline-dark'}`}
+                                        size="sm"
+                                        variant="dark"
+                                        look={active ? 'solid' : 'outline'}
                                         onClick={() => setFilter(b.key)}
                                     >
                                         {b.label}{' '}
                                         <span className={`ms-1 badge ${active ? 'text-bg-light' : 'text-bg-secondary'}`}>
                                             {counts[b.key] ?? 0}
                                         </span>
-                                    </button>
+                                    </TTButton>
                                 );
                             })}
                         </div>
@@ -287,42 +296,68 @@ export default function Index() {
 
                                     <div className="d-flex flex-wrap gap-2 mt-3">
                                         {ad.status !== 'sold' ? (
-                                            <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
+                                            <TTButton
+                                                as="link"
+                                                href={ad.links.edit}
+                                                size="sm"
+                                                variant="slate"
+                                                look="outline"
+                                            >
                                                 Breyta
-                                            </a>
+                                            </TTButton>
                                         ) : null}
 
                                         {ad.status === 'active' ? (
-                                            <button type="button" className="btn btn-outline-warning btn-sm" onClick={() => patchStatus(ad, 'inactive')}>
+                                            <TTButton
+                                                type="button"
+                                                size="sm"
+                                                variant="amber"
+                                                look="outline"
+                                                onClick={() => patchStatus(ad, 'inactive')}
+                                            >
                                                 Gera óvirkt
-                                            </button>
+                                            </TTButton>
                                         ) : null}
 
                                         {ad.status === 'inactive' ? (
-                                            <button type="button" className="btn btn-warning btn-sm" onClick={() => patchStatus(ad, 'active')}>
+                                            <TTButton
+                                                type="button"
+                                                size="sm"
+                                                variant="amber"
+                                                look="solid"
+                                                onClick={() => patchStatus(ad, 'active')}
+                                            >
                                                 Gera virkt
-                                            </button>
+                                            </TTButton>
                                         ) : null}
 
                                         {ad.can_extend ? (
                                             <>
                                                 {extendOptions.map((d) => (
-                                                    <button
+                                                    <TTButton
                                                         key={d}
                                                         type="button"
-                                                        className="btn btn-outline-warning btn-sm"
+                                                        size="sm"
+                                                        variant="amber"
+                                                        look="outline"
                                                         onClick={() => extend(ad, d)}
                                                     >
                                                         +{d} dagar
-                                                    </button>
+                                                    </TTButton>
                                                 ))}
                                             </>
                                         ) : null}
 
                                         {ad.status !== 'sold' ? (
-                                            <button type="button" className="btn btn-warning btn-sm" onClick={() => openSoldModal(ad)}>
+                                            <TTButton
+                                                type="button"
+                                                size="sm"
+                                                variant="amber"
+                                                look="solid"
+                                                onClick={() => openSoldModal(ad)}
+                                            >
                                                 Merkja selt
-                                            </button>
+                                            </TTButton>
                                         ) : null}
                                     </div>
                                 </div>
@@ -380,44 +415,66 @@ export default function Index() {
                                             <td className="text-end">
                                                 <div className="d-inline-flex flex-wrap gap-2 justify-content-end">
                                                     {ad.status !== 'sold' ? (
-                                                        <a className="btn btn-outline-secondary btn-sm" href={ad.links.edit}>
+                                                        <TTButton
+                                                            as="link"
+                                                            href={ad.links.edit}
+                                                            size="sm"
+                                                            variant="slate"
+                                                            look="outline"
+                                                        >
                                                             Breyta
-                                                        </a>
+                                                        </TTButton>
                                                     ) : null}
 
                                                     {ad.status === 'active' ? (
-                                                        <button
+                                                        <TTButton
                                                             type="button"
-                                                            className="btn btn-outline-warning btn-sm"
+                                                            size="sm"
+                                                            variant="amber"
+                                                            look="outline"
                                                             onClick={() => patchStatus(ad, 'inactive')}
                                                         >
                                                             Gera óvirkt
-                                                        </button>
+                                                        </TTButton>
                                                     ) : null}
 
                                                     {ad.status === 'inactive' ? (
-                                                        <button type="button" className="btn btn-warning btn-sm" onClick={() => patchStatus(ad, 'active')}>
+                                                        <TTButton
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="amber"
+                                                            look="solid"
+                                                            onClick={() => patchStatus(ad, 'active')}
+                                                        >
                                                             Gera virkt
-                                                        </button>
+                                                        </TTButton>
                                                     ) : null}
 
                                                     {ad.can_extend ? (
                                                         extendOptions.map((d) => (
-                                                            <button
+                                                            <TTButton
                                                                 key={d}
                                                                 type="button"
-                                                                className="btn btn-outline-warning btn-sm"
+                                                                size="sm"
+                                                                variant="amber"
+                                                                look="outline"
                                                                 onClick={() => extend(ad, d)}
                                                             >
                                                                 +{d} dagar
-                                                            </button>
+                                                            </TTButton>
                                                         ))
                                                     ) : null}
 
                                                     {ad.status !== 'sold' ? (
-                                                        <button type="button" className="btn btn-warning btn-sm" onClick={() => openSoldModal(ad)}>
+                                                        <TTButton
+                                                            type="button"
+                                                            size="sm"
+                                                            variant="amber"
+                                                            look="solid"
+                                                            onClick={() => openSoldModal(ad)}
+                                                        >
                                                             Merkja selt
-                                                        </button>
+                                                        </TTButton>
                                                     ) : null}
                                                 </div>
                                             </td>
@@ -497,22 +554,26 @@ export default function Index() {
                             </label>
                         </div>
                         <div className="d-flex justify-content-end gap-2">
-                            <button
+                            <TTButton
                                 type="button"
-                                className="btn btn-danger btn-sm"
+                                size="sm"
+                                variant="red"
+                                look="solid"
                                 onClick={closeSoldModal}
                                 ref={cancelSoldRef}
                             >
                                 Hætta við
-                            </button>
-                            <button
+                            </TTButton>
+                            <TTButton
                                 type="button"
-                                className="btn btn-warning btn-sm"
+                                size="sm"
+                                variant="amber"
+                                look="solid"
                                 onClick={confirmSold}
                                 disabled={soldProcessing}
                             >
                                 Staðfesta söluna
-                            </button>
+                            </TTButton>
                         </div>
                     </div>
                 </Modal>

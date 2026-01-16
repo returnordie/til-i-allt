@@ -1,6 +1,7 @@
 import Pagination, { PaginatorLink } from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { Head, router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 
 interface CategoryListItem {
@@ -75,16 +76,18 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
                                     </option>
                                 ))}
                             </select>
-                            <button type="submit" className="btn btn-dark">
+                            <TTButton type="submit" variant="dark" look="solid">
                                 Sía
-                            </button>
+                            </TTButton>
                         </form>
-                        <Link
+                        <TTButton
+                            as="link"
                             href={route('admin.categories.create')}
-                            className="btn btn-outline-dark"
+                            look="outline"
+                            variant="dark"
                         >
                             Nýr flokkur
-                        </Link>
+                        </TTButton>
                     </div>
 
                     <div className="table-responsive mt-4">
@@ -132,15 +135,18 @@ export default function Index({ filters, sections, categories }: CategoriesPageP
                                             </span>
                                         </td>
                                         <td className="text-end">
-                                            <Link
+                                            <TTButton
+                                                as="link"
                                                 href={route(
                                                     'admin.categories.edit',
                                                     category.id,
                                                 )}
-                                                className="btn btn-sm btn-outline-secondary"
+                                                size="sm"
+                                                look="outline"
+                                                variant="slate"
                                             >
                                                 Breyta
-                                            </Link>
+                                            </TTButton>
                                         </td>
                                     </tr>
                                 ))}

@@ -1,6 +1,7 @@
 import Pagination, { PaginatorLink } from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { Head } from '@inertiajs/react';
 
 interface RegionListItem {
     id: number;
@@ -46,12 +47,14 @@ export default function Index({ regions }: RegionsPageProps) {
                         <p className="small text-muted mb-0">
                             {safeRegions.meta.total} svæði
                         </p>
-                        <Link
+                        <TTButton
+                            as="link"
                             href={route('admin.regions.create')}
-                            className="btn btn-outline-dark"
+                            look="outline"
+                            variant="dark"
                         >
                             Nýtt svæði
-                        </Link>
+                        </TTButton>
                     </div>
 
                     <div className="table-responsive mt-4">
@@ -91,15 +94,18 @@ export default function Index({ regions }: RegionsPageProps) {
                                             </span>
                                         </td>
                                         <td className="text-end">
-                                            <Link
+                                            <TTButton
+                                                as="link"
                                                 href={route(
                                                     'admin.regions.edit',
                                                     region.id,
                                                 )}
-                                                className="btn btn-sm btn-outline-secondary"
+                                                size="sm"
+                                                look="outline"
+                                                variant="slate"
                                             >
                                                 Breyta
-                                            </Link>
+                                            </TTButton>
                                         </td>
                                     </tr>
                                 ))}

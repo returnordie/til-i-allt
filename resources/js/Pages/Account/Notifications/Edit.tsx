@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 type Prefs = {
@@ -134,9 +135,9 @@ export default function Edit() {
                             </div>
 
                             <div className="d-flex justify-content-end mt-3">
-                                <button type="submit" className="btn btn-primary" disabled={processing}>
+                                <TTButton type="submit" variant="blue" look="solid" disabled={processing}>
                                     {processing ? 'Vista...' : 'Vista'}
-                                </button>
+                                </TTButton>
                             </div>
                         </form>
                     </div>

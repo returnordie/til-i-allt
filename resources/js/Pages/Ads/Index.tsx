@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import Hero from '@/Components/Hero';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, router } from '@inertiajs/react';
 
 type SectionKey = 'solutorg' | 'bilatorg' | 'fasteignir';
@@ -195,12 +196,12 @@ export default function Index({ section, category, ads, filters }: Props) {
                     </div>
 
                     <div className="col-12 d-flex gap-2 mt-2">
-                        <button type="submit" className="btn tt-btn-cta">
+                        <TTButton type="submit" variant="amber" look="solid">
                             Sía
-                        </button>
-                        <button type="button" className="btn tt-btn-ghost" onClick={clearFilters}>
+                        </TTButton>
+                        <TTButton type="button" variant="slate" look="ghost" onClick={clearFilters}>
                             Hreinsa
-                        </button>
+                        </TTButton>
                     </div>
                 </div>
             </form>
@@ -209,9 +210,9 @@ export default function Index({ section, category, ads, filters }: Props) {
                 <div className="tt-card p-5 text-center">
                     <div className="display-6 mb-2">Engar auglýsingar ennþá</div>
                     <div className="text-muted mb-4">Prófaðu að breyta síum eða settu inn fyrstu auglýsinguna.</div>
-                    <Link href="/ads/create" className="btn tt-btn-cta">
+                    <TTButton as="link" href="/ads/create" variant="amber" look="solid">
                         Setja inn auglýsingu
-                    </Link>
+                    </TTButton>
                 </div>
             ) : (
                 <>

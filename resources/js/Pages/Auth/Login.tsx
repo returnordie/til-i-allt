@@ -2,6 +2,7 @@
 
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, useForm } from '@inertiajs/react';
 
 type LoginForm = {
@@ -99,9 +100,9 @@ export default function Login({
                         Ekki með aðgang?
                     </Link>
 
-                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                    <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
                         {processing ? 'Skrái inn…' : 'Innskrá'}
-                    </button>
+                    </TTButton>
                 </div>
             </form>
         </>
