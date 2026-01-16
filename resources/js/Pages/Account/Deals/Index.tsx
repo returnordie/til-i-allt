@@ -139,7 +139,7 @@ export default function Index() {
                                     <th>Aðili</th>
                                     <th>Staða</th>
                                     <th>Dagsetning</th>
-                                    <th>Stjörnur</th>
+                                    <th>Stjörnugjöf</th>
                                     <th className="text-end">Aðgerðir</th>
                                 </tr>
                             </thead>

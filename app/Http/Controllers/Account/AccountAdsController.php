@@ -231,7 +231,15 @@ class AccountAdsController extends Controller
 
         $ad->save();
 
-        return back()->with('success', 'Staða uppfærð.');
+        $title = $ad->title ?: 'ónefnd auglýsing';
+        $message = match ($status) {
+            'active' => "Auglýsingin „{$title}“ hefur verið gerð virk.",
+            'inactive' => "Auglýsingin „{$title}“ hefur verið gerð óvirk.",
+            'sold' => "Auglýsingin „{$title}“ hefur verið merkt frágengin.",
+            default => "Staða auglýsingarinnar „{$title}“ hefur verið uppfærð.",
+        };
+
+        return back()->with('success', $message);
     }
 
     public function extend(ExtendAccountAdRequest $request, Ad $ad): RedirectResponse
@@ -242,19 +250,23 @@ class AccountAdsController extends Controller
             return back()->with('error', 'Ekki hægt að framlengja seldar/geymdar auglýsingar.');
         }
 
+        $title = $ad->title ?: 'ónefnd auglýsing';
         $days = (int) $request->validated()['days'];
 
         $base = ($ad->expires_at && $ad->expires_at->isFuture())
             ? $ad->expires_at->copy()
             : now();
 
-        $newExpires = $base->addDays($days);
-
         $capDays = (int) config('tia.ad_extend_max_days_ahead', 180);
         $cap = now()->addDays($capDays);
 
+        $newExpires = $base->copy()->addDays($days);
+
         if ($newExpires->greaterThan($cap)) {
-            $newExpires = $cap;
+            return back()->with(
+                'error',
+                "Ekki er hægt að framlengja birtingatíma auglýsingarinnar „{$title}“ lengur en {$capDays} daga. Hægt er að framlengja aftur seinna.",
+            );
         }
 
         $ad->expires_at = $newExpires;
@@ -271,6 +283,6 @@ class AccountAdsController extends Controller
 
         $ad->save();
 
-        return back()->with('success', "Framlengt um {$days} daga.");
+        return back()->with('success', "Birtingatími á auglýsingu „{$title}“ hefur verið framlengdur um {$days} daga.");
     }
 }

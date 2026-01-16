@@ -46,12 +46,14 @@ function Modal({
     maxWidth = '2xl',
     closeable = true,
     initialFocus,
+    dialogClassName,
     onClose = () => {},
 }: PropsWithChildren<{
     show: boolean;
     maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
     closeable?: boolean;
     initialFocus?: RefObject<HTMLElement>;
+    dialogClassName?: string;
     onClose: CallableFunction;
 }>) {
     const close = () => {
@@ -116,7 +118,7 @@ function Modal({
                     }
                 }}
             >
-                <div className={`modal-dialog modal-dialog-centered ${modalSizeClass}`}>
+                <div className={`modal-dialog modal-dialog-centered ${modalSizeClass} ${dialogClassName ?? ''}`.trim()}>
                     <div className="modal-content">{children}</div>
                 </div>
             </div>
@@ -247,8 +249,9 @@ export default function Index() {
                                         key={b.key}
                                         type="button"
                                         size="sm"
-                                        variant="slate"
+                                        variant="amber"
                                         look={active ? 'solid' : 'outline'}
+                                        className={active ? undefined : 'text-dark'}
                                         onClick={() => setFilter(b.key)}
                                     >
                                         {b.label}{' '}
@@ -270,11 +273,19 @@ export default function Index() {
                             <div className="card mb-3" key={ad.id}>
                                 <div className="card-body">
                                     <div className="d-flex gap-3">
-                                        <div style={{ width: 84, height: 84 }} className="border rounded bg-white overflow-hidden">
+                                        <a
+                                            href={ad.links.show}
+                                            className="border rounded bg-white overflow-hidden d-inline-block"
+                                            style={{ width: 84, height: 84 }}
+                                        >
                                             {ad.main_image_url ? (
-                                                <img src={ad.main_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img
+                                                    src={ad.main_image_url}
+                                                    alt=""
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             ) : null}
-                                        </div>
+                                        </a>
 
                                         <div className="flex-grow-1">
                                             <div className="d-flex justify-content-between gap-2">
@@ -285,7 +296,7 @@ export default function Index() {
                                             </div>
 
                                             <div className="text-muted small">
-                                                {ad.price !== null ? `${ad.price.toLocaleString()} ${ad.currency}` : '—'} · Skoðanir: {ad.views_count}
+                                                {ad.price !== null ? `${ad.price.toLocaleString()} ${ad.currency}` : '—'} · Innlit: {ad.views_count}
                                             </div>
 
                                             <div className="text-muted small">
@@ -296,37 +307,19 @@ export default function Index() {
 
                                     <div className="d-flex flex-wrap gap-2 mt-3">
                                         {ad.status !== 'sold' ? (
-                                            <TTButton
-                                                as="link"
-                                                href={ad.links.edit}
-                                                size="sm"
-                                                variant="slate"
-                                                look="outline"
-                                            >
+                                            <TTButton as="link" href={ad.links.edit} size="sm" variant="amber" look="solid">
                                                 Breyta
                                             </TTButton>
                                         ) : null}
 
                                         {ad.status === 'active' ? (
-                                            <TTButton
-                                                type="button"
-                                                size="sm"
-                                                variant="amber"
-                                                look="outline"
-                                                onClick={() => patchStatus(ad, 'inactive')}
-                                            >
+                                            <TTButton type="button" size="sm" variant="amber" look="solid" onClick={() => patchStatus(ad, 'inactive')}>
                                                 Gera óvirkt
                                             </TTButton>
                                         ) : null}
 
                                         {ad.status === 'inactive' ? (
-                                            <TTButton
-                                                type="button"
-                                                size="sm"
-                                                variant="amber"
-                                                look="solid"
-                                                onClick={() => patchStatus(ad, 'active')}
-                                            >
+                                            <TTButton type="button" size="sm" variant="amber" look="solid" onClick={() => patchStatus(ad, 'active')}>
                                                 Gera virkt
                                             </TTButton>
                                         ) : null}
@@ -339,7 +332,7 @@ export default function Index() {
                                                         type="button"
                                                         size="sm"
                                                         variant="amber"
-                                                        look="outline"
+                                                        look="solid"
                                                         onClick={() => extend(ad, d)}
                                                     >
                                                         +{d} dagar
@@ -374,7 +367,7 @@ export default function Index() {
                                 <tr>
                                     <th>Auglýsing</th>
                                     <th>Staða</th>
-                                    <th>Skoðanir</th>
+                                    <th>Innlit</th>
                                     <th>Rennur út</th>
                                     <th className="text-end">Aðgerðir</th>
                                 </tr>
@@ -387,11 +380,19 @@ export default function Index() {
                                         <tr key={ad.id}>
                                             <td>
                                                 <div className="d-flex gap-3">
-                                                    <div style={{ width: 52, height: 52 }} className="border rounded bg-white overflow-hidden">
+                                                    <a
+                                                        href={ad.links.show}
+                                                        className="border rounded bg-white overflow-hidden d-inline-block"
+                                                        style={{ width: 52, height: 52 }}
+                                                    >
                                                         {ad.main_image_url ? (
-                                                            <img src={ad.main_image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            <img
+                                                                src={ad.main_image_url}
+                                                                alt=""
+                                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                            />
                                                         ) : null}
-                                                    </div>
+                                                    </a>
                                                     <div>
                                                         <a className="fw-semibold text-decoration-none" href={ad.links.show}>
                                                             {ad.title}
@@ -415,37 +416,19 @@ export default function Index() {
                                             <td className="text-end">
                                                 <div className="d-inline-flex flex-wrap gap-2 justify-content-end">
                                                     {ad.status !== 'sold' ? (
-                                                        <TTButton
-                                                            as="link"
-                                                            href={ad.links.edit}
-                                                            size="sm"
-                                                            variant="slate"
-                                                            look="outline"
-                                                        >
+                                                        <TTButton as="link" href={ad.links.edit} size="sm" variant="amber" look="solid">
                                                             Breyta
                                                         </TTButton>
                                                     ) : null}
 
                                                     {ad.status === 'active' ? (
-                                                        <TTButton
-                                                            type="button"
-                                                            size="sm"
-                                                            variant="amber"
-                                                            look="outline"
-                                                            onClick={() => patchStatus(ad, 'inactive')}
-                                                        >
+                                                        <TTButton type="button" size="sm" variant="amber" look="solid" onClick={() => patchStatus(ad, 'inactive')}>
                                                             Gera óvirkt
                                                         </TTButton>
                                                     ) : null}
 
                                                     {ad.status === 'inactive' ? (
-                                                        <TTButton
-                                                            type="button"
-                                                            size="sm"
-                                                            variant="amber"
-                                                            look="solid"
-                                                            onClick={() => patchStatus(ad, 'active')}
-                                                        >
+                                                        <TTButton type="button" size="sm" variant="amber" look="solid" onClick={() => patchStatus(ad, 'active')}>
                                                             Gera virkt
                                                         </TTButton>
                                                     ) : null}
@@ -457,7 +440,7 @@ export default function Index() {
                                                                 type="button"
                                                                 size="sm"
                                                                 variant="amber"
-                                                                look="outline"
+                                                                look="solid"
                                                                 onClick={() => extend(ad, d)}
                                                             >
                                                                 +{d} dagar
@@ -518,6 +501,8 @@ export default function Index() {
                 <Modal
                     show={Boolean(soldAd)}
                     onClose={closeSoldModal}
+                    maxWidth="md"
+                    dialogClassName="tt-review-modal"
                     initialFocus={soldData.sold_outside ? cancelSoldRef : buyerIdentifierRef}
                 >
                     <div className="p-4">
@@ -557,12 +542,12 @@ export default function Index() {
                             <TTButton
                                 type="button"
                                 size="sm"
-                                variant="red"
+                                variant="amber"
                                 look="solid"
                                 onClick={closeSoldModal}
                                 ref={cancelSoldRef}
                             >
-                                Hætta við
+                                Loka
                             </TTButton>
                             <TTButton
                                 type="button"
@@ -572,7 +557,7 @@ export default function Index() {
                                 onClick={confirmSold}
                                 disabled={soldProcessing}
                             >
-                                Staðfesta söluna
+                                Staðfesta
                             </TTButton>
                         </div>
                     </div>

@@ -235,7 +235,7 @@ export default function Show({ ad }: AdShowProps) {
                             <div className="tt-ad-price fs-4">{formatISK(ad.price)}</div>
                             <div className="text-muted small">#{ad.id} · {ad.slug}</div>
                             {ad.views_count !== undefined ? (
-                                <div className="text-muted small">Skoðanir: {ad.views_count}</div>
+                                <div className="text-muted small">Innlit: {ad.views_count}</div>
                             ) : null}
                         </div>
                         {locationLabel ? (

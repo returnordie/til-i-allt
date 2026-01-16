@@ -181,7 +181,7 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                                         <div className="border rounded p-3 h-100 tt-review-surface">
                                             <div className="fw-semibold">Þín umsögn</div>
                                             <div className="mt-2 d-flex align-items-center gap-2">
-                                                <span className="me-1">Stjörnur:</span>
+                                                <span className="me-1">Stjörnugjöf:</span>
                                                 <span className="fw-semibold">
                                                     {payload.existingReview ? formatRating(payload.existingReview.rating) : '—'}
                                                 </span>
@@ -189,7 +189,6 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                                             </div>
                                             {payload.existingReview?.comment ? (
                                                 <div className="mt-2">
-                                                    <div className="text-muted small">Athugasemd</div>
                                                     <div>{payload.existingReview.comment}</div>
                                                 </div>
                                             ) : null}
@@ -201,7 +200,7 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                                                 Umsögn frá {payload.otherReview?.rater_name ?? 'viðskiptaaðila'}
                                             </div>
                                             <div className="mt-2 d-flex align-items-center gap-2">
-                                                <span className="me-1">Stjörnur:</span>
+                                                <span className="me-1">Stjörnugjöf:</span>
                                                 <span className="fw-semibold">
                                                     {payload.otherReview ? formatRating(payload.otherReview.rating) : '—'}
                                                 </span>
@@ -209,7 +208,6 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                                             </div>
                                             {payload.otherReview?.comment ? (
                                                 <div className="mt-2">
-                                                    <div className="text-muted small">Athugasemd</div>
                                                     <div>{payload.otherReview.comment}</div>
                                                 </div>
                                             ) : null}
@@ -221,13 +219,12 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                             <div className="border rounded p-3 tt-review-surface mb-4">
                                 <div className="fw-semibold">Umsögn skráð</div>
                                 <div className="mt-2 d-flex align-items-center gap-2">
-                                    <span className="me-1">Stjörnur:</span>
+                                    <span className="me-1">Stjörnugjöf:</span>
                                     <span className="fw-semibold">{formatRating(payload.existingReview.rating)}</span>
                                     <StarRatingDisplay rating={payload.existingReview.rating} />
                                 </div>
                                 {payload.existingReview.comment ? (
                                     <div className="mt-2">
-                                        <div className="text-muted small">Athugasemd</div>
                                         <div>{payload.existingReview.comment}</div>
                                     </div>
                                 ) : null}
@@ -237,7 +234,7 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                         {payload.canReview ? (
                             <form onSubmit={submit}>
                                 <div className="mb-3">
-                                    <label className="form-label fw-semibold">Stjörnur</label>
+                                    <label className="form-label fw-semibold">Stjörnugjöf</label>
                                     <StarRatingInput
                                         value={Number(data.rating)}
                                         onChange={(value) => setData('rating', value)}
@@ -260,9 +257,11 @@ export default function ReviewModal({ show, payload, loading, error, onClose, on
                                     {errors.comment ? <div className="text-danger small mt-2">{errors.comment}</div> : null}
                                 </div>
 
-                                <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
-                                    Vista umsögn
-                                </TTButton>
+                                <div className="d-flex justify-content-end">
+                                    <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
+                                        Vista umsögn
+                                    </TTButton>
+                                </div>
 
                                 <p className="text-muted small mt-3 mb-0">
                                     Umsögnin þín birtist ekki fyrr en hinn aðilinn hefur einnig skilað inn umsögn. Hafi engin
