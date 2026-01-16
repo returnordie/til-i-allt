@@ -20,6 +20,7 @@ class DealReview extends Model
 
     protected $casts = [
         'meta' => 'array',
+        'rating' => 'float',
     ];
 
     public function deal()

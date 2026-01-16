@@ -1,6 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { StarRatingDisplay } from '@/Components/Reviews/StarRating';
 import TTButton from '@/Components/UI/TTButton';
+import ReviewModal, { ReviewPayload } from '@/Pages/Account/Deals/ReviewModal';
 import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 type DealRow = {
     id: number;
@@ -55,27 +58,16 @@ function fmtDate(s: string | null) {
 }
 
 function renderStarRating(rating: number) {
-    const rounded = Math.max(0, Math.min(5, Math.round(rating)));
-
-    return (
-        <span className="d-inline-flex align-items-center gap-1" aria-label={`Einkunn ${rounded} af 5`}>
-            {Array.from({ length: 5 }, (_, index) => {
-                const starValue = index + 1;
-                const isFull = rounded >= starValue;
-
-                return (
-                    <span key={starValue} className={isFull ? 'text-warning' : 'text-muted'}>
-                        ★
-                    </span>
-                );
-            })}
-        </span>
-    );
+    return <StarRatingDisplay rating={rating} sizeClass="fs-6" />;
 }
 
 export default function Index() {
     const { props } = usePage<PageProps>();
     const { deals } = props;
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [reviewModalLoading, setReviewModalLoading] = useState(false);
+    const [reviewModalError, setReviewModalError] = useState<string | null>(null);
+    const [reviewPayload, setReviewPayload] = useState<ReviewPayload | null>(null);
 
     const accept = (deal: DealRow) => {
         router.patch(deal.links.set_status, { status: 'completed' }, { preserveScroll: true });
@@ -87,6 +79,43 @@ export default function Index() {
 
     const cancel = (deal: DealRow) => {
         router.patch(deal.links.set_status, { status: 'inactive' }, { preserveScroll: true });
+    };
+
+    const openReviewModal = async (deal: DealRow) => {
+        setReviewModalOpen(true);
+        setReviewModalLoading(true);
+        setReviewModalError(null);
+        setReviewPayload(null);
+
+        try {
+            const response = await fetch(deal.review.link, {
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Tókst ekki að sækja umsögn.');
+            }
+
+            const payload = (await response.json()) as ReviewPayload;
+            setReviewPayload(payload);
+        } catch (error) {
+            setReviewModalError(error instanceof Error ? error.message : 'Tókst ekki að sækja umsögn.');
+        } finally {
+            setReviewModalLoading(false);
+        }
+    };
+
+    const closeReviewModal = () => {
+        setReviewModalOpen(false);
+        setReviewModalError(null);
+        setReviewPayload(null);
+    };
+
+    const handleReviewSubmitted = () => {
+        closeReviewModal();
+        router.reload({ preserveScroll: true });
     };
 
     return (
@@ -161,7 +190,7 @@ export default function Index() {
                                                     {!deal.completed_at && !deal.canceled_at ? `Merkt: ${fmtDate(deal.confirmed_at)}` : null}
                                                 </td>
                                                 <td className="text-muted small">
-                                                    {deal.review.received_rating ? (
+                                                    {deal.review.received_rating !== null ? (
                                                         renderStarRating(deal.review.received_rating)
                                                     ) : (
                                                         <span className="text-muted">—</span>
@@ -201,21 +230,21 @@ export default function Index() {
                                                         </TTButton>
                                                     ) : deal.review?.can_review ? (
                                                         <TTButton
-                                                            as="link"
-                                                            href={deal.review.link}
+                                                            type="button"
                                                             size="sm"
                                                             variant="amber"
                                                             look="solid"
+                                                            onClick={() => openReviewModal(deal)}
                                                         >
                                                             Gefa umsögn
                                                         </TTButton>
                                                     ) : deal.review?.has_review ? (
                                                         <TTButton
-                                                            as="link"
-                                                            href={deal.review.link}
+                                                            type="button"
                                                             size="sm"
                                                             variant="amber"
                                                             look="solid"
+                                                            onClick={() => openReviewModal(deal)}
                                                         >
                                                             Umsögn
                                                         </TTButton>
@@ -232,6 +261,15 @@ export default function Index() {
                     </div>
                 </div>
             </div>
+
+            <ReviewModal
+                show={reviewModalOpen}
+                payload={reviewPayload}
+                loading={reviewModalLoading}
+                error={reviewModalError}
+                onClose={closeReviewModal}
+                onSubmitted={handleReviewSubmitted}
+            />
         </AppLayout>
     );
 }

@@ -93,7 +93,7 @@ class AccountDealsController extends Controller
                         && !$hasReview,
                     'has_review' => $hasReview,
                     'is_open' => $reviewOpen,
-                    'received_rating' => $receivedReview ? (int) $receivedReview->rating : null,
+                    'received_rating' => $receivedReview ? (float) $receivedReview->rating : null,
                     'link' => route('account.deals.review', $deal),
                 ],
                 'links' => [

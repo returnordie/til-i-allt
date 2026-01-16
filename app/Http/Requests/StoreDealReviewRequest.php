@@ -23,7 +23,7 @@ class StoreDealReviewRequest extends FormRequest
     {
         return [
             'ratee_id' => ['required', 'exists:users,id'],
-            'rating' => ['required', 'integer', 'min:0', 'max:5'],
+            'rating' => ['required', 'numeric', 'min:0', 'max:5', 'multiple_of:0.5'],
             'comment' => ['nullable', 'string', 'max:2000'],
             'meta' => ['nullable', 'array'],
         ];
