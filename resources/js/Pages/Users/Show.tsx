@@ -1,6 +1,8 @@
 import AppLayout from '@/Layouts/AppLayout';
+import { StarRatingDisplay } from '@/Components/Reviews/StarRating';
 import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 type Profile = {
     username: string;
@@ -11,6 +13,13 @@ type Profile = {
         avg: number;   // 0-5
         count: number; // fjöldi reviews
     };
+    recent_reviews: Array<{
+        id: number;
+        rating: number;
+        comment: string | null;
+        created_at: string | null;
+        rater_name: string | null;
+    }>;
 };
 
 type AdCard = {
@@ -35,10 +44,75 @@ type PageProps = {
     };
 };
 
-function Stars({ avg }: { avg: number }) {
-    const full = Math.max(0, Math.min(5, Math.floor(avg)));
-    const stars = Array.from({ length: 5 }, (_, i) => (i < full ? '★' : '☆')).join('');
-    return <span className="fs-5" aria-label={`Einkunn ${avg} af 5`}>{stars}</span>;
+function formatRatingValue(rating: number) {
+    const rounded = Math.round(rating * 2) / 2;
+    return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+}
+
+function ReviewModal({ show, onClose, reviews }: { show: boolean; onClose: () => void; reviews: Profile['recent_reviews'] }) {
+    useEffect(() => {
+        if (!show) return;
+
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        };
+    }, [show]);
+
+    if (!show) return null;
+
+    return (
+        <>
+            <div
+                className="modal fade show d-block"
+                role="dialog"
+                aria-modal="true"
+                onClick={(event) => {
+                    if (event.target === event.currentTarget) {
+                        onClose();
+                    }
+                }}
+            >
+                <div className="modal-dialog modal-dialog-centered">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2 className="h5 mb-0">Síðustu umsagnir</h2>
+                            <button type="button" className="btn-close" aria-label="Loka" onClick={onClose} />
+                        </div>
+                        <div className="modal-body">
+                            {reviews.length === 0 ? (
+                                <div className="text-muted text-center py-4">Engar umsagnir ennþá.</div>
+                            ) : (
+                                <div className="d-flex flex-column gap-3">
+                                    {reviews.map((review) => (
+                                        <div key={review.id} className="border rounded p-3 tt-review-surface">
+                                            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                                <div className="fw-semibold">{review.rater_name ?? 'Óþekktur'}</div>
+                                                <div className="text-muted small">
+                                                    {review.created_at ? new Date(review.created_at).toLocaleDateString('is-IS') : ''}
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 d-flex align-items-center gap-2">
+                                                <span className="fw-semibold">{formatRatingValue(review.rating)}</span>
+                                                <StarRatingDisplay rating={review.rating} />
+                                            </div>
+                                            {review.comment ? (
+                                                <div className="mt-2">{review.comment}</div>
+                                            ) : null}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="modal-backdrop fade show" />
+        </>
+    );
 }
 
 function fmtPrice(p: number | null, cur: string) {
@@ -54,6 +128,8 @@ function fmtDate(s: string | null) {
 export default function Show() {
     const { props } = usePage<PageProps>();
     const { profile, ads } = props;
+    const [showReviews, setShowReviews] = useState(false);
+    const displayRating = profile.rating.count > 0 ? profile.rating.avg : 5;
 
     return (
         <AppLayout headerProps={{ hideCatbar: true }} mainClassName="bg-light">
@@ -66,31 +142,23 @@ export default function Show() {
                         <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
                             <div>
                                 <div className="h4 mb-1">{profile.display_name}</div>
-                                <div className="text-muted">@{profile.username}</div>
-
-                                <div className="d-flex flex-wrap gap-3 mt-2 text-muted small">
-                                    <div>
-                                        <span className="fw-semibold text-body">Auglýsingar:</span>{' '}
-                                        {profile.active_ads_count}
-                                    </div>
-                                    <div>
-                                        <span className="fw-semibold text-body">Skráður:</span>{' '}
-                                        {profile.member_since ?? '—'}
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="text-end">
-                                <div className="d-flex align-items-center justify-content-end gap-2">
-                                    <Stars avg={profile.rating.avg} />
-                                    <div className="text-muted">
-                                        <div className="fw-semibold">{profile.rating.avg.toFixed(1)}</div>
-                                        <div className="small">({profile.rating.count})</div>
+                                <button
+                                    type="button"
+                                    className="btn btn-link p-0 text-decoration-none"
+                                    onClick={() => setShowReviews(true)}
+                                    aria-label="Skoða umsagnir"
+                                >
+                                    <div className="d-flex align-items-center justify-content-end gap-2">
+                                        <StarRatingDisplay rating={displayRating} />
+                                        <div className="text-muted">
+                                            <div className="fw-semibold">{formatRatingValue(displayRating)}</div>
+                                            <div className="small">({profile.rating.count})</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="text-muted small mt-1">
-                                    Stjörnugjöf tengist viðskiptum (deal reviews).
-                                </div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -184,6 +252,7 @@ export default function Show() {
                     </nav>
                 ) : null}
             </div>
+            <ReviewModal show={showReviews} onClose={() => setShowReviews(false)} reviews={profile.recent_reviews} />
         </AppLayout>
     );
 }

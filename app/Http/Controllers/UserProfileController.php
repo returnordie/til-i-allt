@@ -86,6 +86,20 @@ class UserProfileController extends Controller
 
         $ratingAvg = $ratingSummary?->avg ? (float) $ratingSummary->avg : 0.0;
         $ratingCount = (int) ($ratingSummary?->count ?? 0);
+        $recentReviews = DealReview::query()
+            ->where('ratee_id', $user->id)
+            ->whereNull('deleted_at')
+            ->with('rater:id,name,username')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn (DealReview $review) => [
+                'id' => $review->id,
+                'rating' => (float) $review->rating,
+                'comment' => $review->comment,
+                'created_at' => $review->created_at?->toDateTimeString(),
+                'rater_name' => $review->rater?->name ?? $review->rater?->username,
+            ]);
 
         return Inertia::render('Users/Show', [
             'profile' => [
@@ -98,6 +112,7 @@ class UserProfileController extends Controller
                     'avg' => $ratingAvg,
                     'count' => $ratingCount,
                 ],
+                'recent_reviews' => $recentReviews,
             ],
             'ads' => $ads,
         ]);
