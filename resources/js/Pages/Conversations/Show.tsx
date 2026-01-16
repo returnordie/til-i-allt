@@ -76,6 +76,7 @@ export default function Show() {
     const { conversation, messages, authUserId, deal, conversationList, filters } = props;
     const [isListOpen, setIsListOpen] = useState(false);
     const otherDisplayName = conversation.other ? displayName(conversation.other) : '';
+    const messageMaxWidth = 'min(100%, 960px)';
 
     // --- scroll to bottom behavior (no live chat) ---
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -330,7 +331,7 @@ export default function Show() {
                             </div>
                         ) : null}
 
-                        <div className="card flex-grow-1 mb-3 d-flex flex-column">
+                        <div className="card mb-3 d-flex flex-column" style={{ maxHeight: 'calc(100vh - 360px)' }}>
                             <div
                                 ref={scrollerRef}
                                 className="card-body flex-grow-1 overflow-auto"
@@ -343,7 +344,7 @@ export default function Show() {
                                     if (isSystem) {
                                         return (
                                             <div key={m.id} className="d-flex justify-content-center mb-3">
-                                                <div className="text-muted small border rounded px-3 py-2 bg-white" style={{ maxWidth: 680 }}>
+                                                <div className="text-muted small border rounded px-3 py-2 bg-white" style={{ maxWidth: messageMaxWidth }}>
                                                     <div className="mb-1" style={{ whiteSpace: 'pre-wrap' }}>{m.body}</div>
                                                     {m.created_at ? <div className="text-center">{fmtTime(m.created_at)}</div> : null}
                                                 </div>
@@ -353,7 +354,7 @@ export default function Show() {
 
                                     return (
                                         <div key={m.id} className={`d-flex mb-3 ${mine ? 'justify-content-end' : 'justify-content-start'}`}>
-                                            <div style={{ maxWidth: 680 }} className={`p-2 rounded border ${mine ? 'bg-white' : 'bg-light'}`}>
+                                            <div style={{ maxWidth: messageMaxWidth }} className={`p-2 rounded border ${mine ? 'bg-white' : 'bg-light'}`}>
                                                 <div className="small text-muted mb-1">
                                                     {mine ? 'Þú' : (otherDisplayName || m.sender_name || 'Notandi')} · {fmtTime(m.created_at)}
                                                 </div>
