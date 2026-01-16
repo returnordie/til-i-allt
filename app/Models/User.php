@@ -30,6 +30,9 @@ class User extends Authenticatable
 
         'show_phone',
         'show_name',
+        'postcode_id',
+        'address',
+        'show_address',
 
         'preferred_contact_method',
         'best_call_time',
@@ -66,6 +69,7 @@ class User extends Authenticatable
 
             'show_phone' => 'boolean',
             'show_name' => 'boolean',
+            'show_address' => 'boolean',
             'is_system' => 'boolean',
             'is_active' => 'boolean',
 
@@ -90,6 +94,11 @@ class User extends Authenticatable
         return $this->morphMany(Notification::class, 'notifiable')
             ->whereNull('deleted_at')
             ->orderByDesc('created_at');
+    }
+
+    public function postcode()
+    {
+        return $this->belongsTo(Postcode::class);
     }
 
     public function readNotifications(): MorphMany

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\UpdateAccountSettingsRequest;
+use App\Models\Postcode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,6 +15,10 @@ class AccountSettingsController extends Controller
     public function edit(): Response
     {
         $user = Auth::user();
+        $postcodes = Postcode::query()
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get(['id', 'code', 'name']);
 
         return Inertia::render('Account/Settings/Edit', [
             'user' => [
@@ -21,6 +26,9 @@ class AccountSettingsController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'phone_e164' => $user->phone_e164,
+                'postcode_id' => $user->postcode_id,
+                'address' => $user->address,
+                'show_address' => (bool) $user->show_address,
 
                 // defaults (not for public profile; used as defaults in AdForm)
                 'show_name' => (bool) $user->show_name,
@@ -33,6 +41,7 @@ class AccountSettingsController extends Controller
                 'email_on_ad_expiring' => (bool) $user->email_on_ad_expiring,
                 'email_on_ad_expired' => (bool) $user->email_on_ad_expired,
             ],
+            'postcodes' => $postcodes,
         ]);
     }
 
@@ -42,7 +51,7 @@ class AccountSettingsController extends Controller
         $validated = $request->validated();
 
         // normalize empties to null
-        foreach (['username', 'phone_e164'] as $k) {
+        foreach (['username', 'phone_e164', 'address'] as $k) {
             if (array_key_exists($k, $validated) && $validated[$k] === '') {
                 $validated[$k] = null;
             }

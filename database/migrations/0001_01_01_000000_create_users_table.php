@@ -19,6 +19,9 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->boolean('show_phone')->default(false)->index();
             $table->boolean('show_name')->default(true)->index();
+            $table->unsignedBigInteger('postcode_id')->nullable()->index();
+            $table->string('address', 160)->nullable();
+            $table->boolean('show_address')->default(false)->index();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

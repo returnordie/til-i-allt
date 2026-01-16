@@ -9,8 +9,6 @@ use App\Models\Category;
 use App\Models\AdAttributeValue;
 use App\Models\AdViewUnique;
 use App\Models\DealReview;
-use App\Models\Postcode;
-use App\Models\Region;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Http\Request;
@@ -75,25 +73,6 @@ class AdController extends Controller
     private function baseIndexQuery()
     {
         return Ad::query()->from('ads');
-    }
-
-    private function adLocationOptions(): array
-    {
-        $regions = Region::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
-        $postcodes = Postcode::query()
-            ->where('is_active', true)
-            ->orderBy('code')
-            ->get(['id', 'code', 'name', 'region_id']);
-
-        return [
-            'regions' => $regions,
-            'postcodes' => $postcodes,
-        ];
     }
 
     private function userRatingSummary(int $userId): array
@@ -310,9 +289,9 @@ class AdController extends Controller
         $ad->load([
             'category:id,section,parent_id,name,slug,hero_art',
             'images:id,ad_id,public_id,is_main,sort_order',
-            'user:id,name,username,show_name,show_phone,phone_e164',
-            'postcode:id,code,name,region_id',
-            'postcode.region:id,name',
+            'user:id,name,username,show_name,show_phone,phone_e164,postcode_id,address,show_address',
+            'user.postcode:id,code,name,region_id',
+            'user.postcode.region:id,name',
             'attributeValues.definition:id,key,label,type,unit,group,options',
         ]);
 
@@ -395,31 +374,31 @@ class AdController extends Controller
                 'section' => $ad->section,
                 'slug' => $ad->slug,
                 'listing_type' => $ad->listing_type ?? null,
-                'location_text' => $ad->location_text,
                 'views_count' => (int) $ad->views_count,
 
                 'category' => [
                     'name' => $ad->category?->name,
                     'slug' => $ad->category?->slug,
                 ],
-                'postcode' => $ad->postcode ? [
-                    'id' => $ad->postcode->id,
-                    'code' => $ad->postcode->code,
-                    'name' => $ad->postcode->name,
-                    'region' => $ad->postcode->region ? [
-                        'id' => $ad->postcode->region->id,
-                        'name' => $ad->postcode->region->name,
-                    ] : null,
-                ] : null,
 
                 'images' => $images,
 
                 'seller' => [
                     'id' => $ad->user->id,
-                    'display' => $ad->user->show_name === 'name'
+                    'display' => $ad->user->show_name
                         ? $ad->user->name
                         : ($ad->user->username ?? $ad->user->name),
                     'phone' => $ad->user->show_phone ? $ad->user->phone_e164 : null,
+                    'address' => $ad->user->show_address ? $ad->user->address : null,
+                    'postcode' => $ad->user->postcode ? [
+                        'id' => $ad->user->postcode->id,
+                        'code' => $ad->user->postcode->code,
+                        'name' => $ad->user->postcode->name,
+                        'region' => $ad->user->postcode->region ? [
+                            'id' => $ad->user->postcode->region->id,
+                            'name' => $ad->user->postcode->region->name,
+                        ] : null,
+                    ] : null,
                     'rating' => $rating,
                     'links' => [
                         'profile' => route('users.show', $ad->user),
@@ -445,7 +424,6 @@ class AdController extends Controller
 
         return Inertia::render('Ads/Create', [
             'fieldDefs' => $fieldDefs,
-            ...$this->adLocationOptions(),
         ]);
     }
 
@@ -542,13 +520,10 @@ class AdController extends Controller
                 'title' => $ad->title,
                 'price' => $ad->price,
                 'description' => $ad->description,
-                'location_text' => $ad->location_text,
-                'postcode_id' => $ad->postcode_id,
                 'attributes' => $attrs,
                 'images' => $images,
             ],
             'fieldDefs' => $this->fieldDefsForCategory($ad->category), // ef þú ert með, annars []
-            ...$this->adLocationOptions(),
         ]);
     }
 

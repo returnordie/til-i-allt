@@ -10,6 +10,9 @@ type UserSettings = {
     phone_e164: string | null;
     date_of_birth: string | null;
     tia_balance: number;
+    postcode_id: number | null;
+    address: string | null;
+    show_address: boolean;
 
     show_name: boolean;
     show_phone: boolean;
@@ -25,6 +28,7 @@ type UserSettings = {
 
 type PageProps = {
     user: UserSettings;
+    postcodes: Array<{ id: number; code: string; name: string | null }>;
     flash?: { success?: string };
 };
 
@@ -37,6 +41,9 @@ export default function Edit() {
         username: u.username ?? '',
         phone_e164: u.phone_e164 ?? '',
         date_of_birth: u.date_of_birth ?? '',
+        postcode_id: u.postcode_id ?? '',
+        address: u.address ?? '',
+        show_address: !!u.show_address,
 
         show_name: !!u.show_name,
         show_phone: !!u.show_phone,
@@ -140,6 +147,40 @@ export default function Edit() {
                                         </div>
 
                                         <div className="col-md-6">
+                                            <label className="form-label">Póstnúmer</label>
+                                            <select
+                                                className={`form-select ${errors.postcode_id ? 'is-invalid' : ''}`}
+                                                value={data.postcode_id}
+                                                onChange={(e) =>
+                                                    setData('postcode_id', e.target.value ? Number(e.target.value) : '')
+                                                }
+                                            >
+                                                <option value="">Veldu póstnúmer…</option>
+                                                {props.postcodes.map((pc) => (
+                                                    <option key={pc.id} value={pc.id}>
+                                                        {pc.code} {pc.name ? `· ${pc.name}` : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors.postcode_id ? (
+                                                <div className="invalid-feedback">{errors.postcode_id}</div>
+                                            ) : null}
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label">Heimilisfang</label>
+                                            <input
+                                                className={`form-control ${errors.address ? 'is-invalid' : ''}`}
+                                                value={data.address}
+                                                onChange={(e) => setData('address', e.target.value)}
+                                                placeholder="t.d. Hringbraut 12"
+                                            />
+                                            {errors.address ? (
+                                                <div className="invalid-feedback">{errors.address}</div>
+                                            ) : null}
+                                        </div>
+
+                                        <div className="col-md-6">
                                             <label className="form-label">TIA stig</label>
                                             <input className="form-control" value={u.tia_balance} disabled />
                                             <div className="form-text">Stig fyrir virkni (read-only hér).</div>
@@ -176,6 +217,19 @@ export default function Edit() {
                                         />
                                         <label className="form-check-label" htmlFor="show_phone">
                                             Sýna síma í auglýsingum (sjálfgefið)
+                                        </label>
+                                    </div>
+
+                                    <div className="form-check form-switch mt-2">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            checked={data.show_address}
+                                            onChange={(e) => setData('show_address', e.target.checked)}
+                                            id="show_address"
+                                        />
+                                        <label className="form-check-label" htmlFor="show_address">
+                                            Sýna heimilisfang í auglýsingum (sjálfgefið)
                                         </label>
                                     </div>
                                 </div>
