@@ -1,5 +1,4 @@
 import AppLayout from '@/Layouts/AppLayout';
-import AccountNav from '@/Components/Account/AccountNav';
 import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
@@ -39,12 +38,8 @@ export default function Index() {
             <Head title="Skilaboð" />
 
             <div className="container py-4">
-                <div className="row g-4">
-                    <div className="col-12 col-lg-3">
-                        <AccountNav />
-                    </div>
-
-                    <div className="col-12 col-lg-9">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-lg-8">
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h1 className="h4 mb-0">Skilaboð</h1>
                         </div>
@@ -54,7 +49,7 @@ export default function Index() {
 
                         <div className="card mb-3">
                             <div className="card-body">
-                                <div className="d-flex flex-wrap gap-2 mb-3">
+                                <div className="d-flex flex-wrap gap-2">
                                     {['inbox', 'archived', 'all'].map((k) => {
                                         const active = filters.filter === k;
                                         return (
@@ -71,18 +66,6 @@ export default function Index() {
                                             </TTButton>
                                         );
                                     })}
-                                </div>
-
-                                <div className="input-group">
-                                    <span className="input-group-text">Leit</span>
-                                    <input
-                                        className="form-control"
-                                        value={filters.q}
-                                        onChange={(e) =>
-                                            router.get(route('conversations.index'), { filter: filters.filter, q: e.target.value }, { preserveState: true, preserveScroll: true })
-                                        }
-                                        placeholder="Leita í subject..."
-                                    />
                                 </div>
                             </div>
                         </div>

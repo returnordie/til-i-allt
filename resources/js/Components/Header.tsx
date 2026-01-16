@@ -290,10 +290,6 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                         </button>
 
                                         <div className="dropdown-menu dropdown-menu-end tt-drop">
-                                            <div className="tt-drophead">
-                                                <div className="tt-drophead-title">Tilkynningar</div>
-                                            </div>
-
                                             <div className="tt-droplist">
                                                 {recent.length === 0 ? (
                                                     <div className="tt-empt">Engar tilkynningar ennþá.</div>

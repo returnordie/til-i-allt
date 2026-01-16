@@ -1,5 +1,4 @@
 import AppLayout from '@/Layouts/AppLayout';
-import AccountNav from '@/Components/Account/AccountNav';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 type N = {
@@ -40,12 +39,8 @@ export default function Inbox() {
             <Head title="Tilkynningar" />
 
             <div className="container py-4">
-                <div className="row g-4">
-                    <div className="col-12 col-lg-3">
-                        <AccountNav />
-                    </div>
-
-                    <div className="col-12 col-lg-9">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-lg-8">
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <div>
                                 <h1 className="h4 mb-0">Tilkynningar</h1>
