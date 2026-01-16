@@ -183,6 +183,10 @@ class ConversationController extends Controller
             ];
         }
 
+        $archivedByOther = (bool) ($conversation->owner_id === $user->id
+            ? $conversation->member_archived_at
+            : $conversation->owner_archived_at);
+
         return Inertia::render('Conversations/Show', [
             'conversation' => [
                 'id' => $conversation->id,
@@ -207,6 +211,7 @@ class ConversationController extends Controller
                 ] : null,
 
                 'is_archived' => (bool) $conversation->archivedAtFor($user->id),
+                'is_archived_by_other' => $archivedByOther,
                 'links' => [
                     'archive' => route('conversations.archive', $conversation),
                     'close' => route('conversations.close', $conversation),
