@@ -35,6 +35,7 @@ type PageProps = {
 export default function Edit() {
     const { props } = usePage<PageProps>();
     const u = props.user;
+    const postcodes = props.postcodes ?? [];
 
     const { data, setData, put, processing, errors, recentlySuccessful } = useForm({
         name: u.name ?? '',
@@ -156,7 +157,7 @@ export default function Edit() {
                                                 }
                                             >
                                                 <option value="">Veldu póstnúmer…</option>
-                                                {props.postcodes.map((pc) => (
+                                                {postcodes.map((pc) => (
                                                     <option key={pc.id} value={pc.id}>
                                                         {pc.code} {pc.name ? `· ${pc.name}` : ''}
                                                     </option>
