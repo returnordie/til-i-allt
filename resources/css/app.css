@@ -127,45 +127,6 @@ a:focus{
 .tt-navsearch--mobile .tt-navsearch-ico{ left: 14px; }
 .tt-navsearch--mobile .tt-navsearch-input{ height: 46px; }
 
-/* Buttons */
-.tt-btn-ghost{
-    --bs-btn-color: var(--tt-ink);
-    --bs-btn-bg: rgba(255,255,255,.92);
-    --bs-btn-border-color: var(--tt-border);
-
-    --bs-btn-hover-color: var(--tt-ink);
-    --bs-btn-hover-bg: rgba(20,21,26,.05);
-    --bs-btn-hover-border-color: rgba(20,21,26,.14);
-
-    --bs-btn-active-color: var(--tt-ink);
-    --bs-btn-active-bg: rgba(20,21,26,.08);
-    --bs-btn-active-border-color: rgba(20,21,26,.16);
-
-    border-radius: var(--tt-r-md);
-    font-weight: 800;
-    padding: .55rem .85rem;
-}
-
-/* ✅ CTA is ALWAYS orange */
-.tt-btn-cta{
-    --bs-btn-color: #14151a;
-    --bs-btn-bg: var(--tt-accent);
-    --bs-btn-border-color: rgba(20,21,26,.18);
-
-    --bs-btn-hover-color: #14151a;
-    --bs-btn-hover-bg: var(--tt-accent-hover);
-    --bs-btn-hover-border-color: rgba(20,21,26,.22);
-
-    /* lighter when pressed */
-    --bs-btn-active-color: #14151a;
-    --bs-btn-active-bg: var(--tt-accent-active);
-    --bs-btn-active-border-color: rgba(20,21,26,.22);
-
-    border-radius: var(--tt-r-md);
-    font-weight: 900;
-    padding: .55rem .9rem;
-}
-
 /* Icon links */
 .tt-ico{ width: 20px; height: 20px; }
 .tt-ico.sm{ width: 18px; height: 18px; }
@@ -590,24 +551,6 @@ a:focus{
 .tt-adform .tt-tile-name{
     font-size: .89rem; /* .74 * ~1.2 */
     line-height: 1.12;
-}
-
-/* AdForm ONLY: stronger success/danger buttons + lighter when pressed */
-.tt-adform .btn-success{
-    --bs-btn-bg: var(--tt-success);
-    --bs-btn-border-color: var(--tt-success);
-    --bs-btn-hover-bg: var(--tt-success-hover);
-    --bs-btn-hover-border-color: var(--tt-success-hover);
-    --bs-btn-active-bg: var(--tt-success-active);
-    --bs-btn-active-border-color: var(--tt-success-active);
-}
-.tt-adform .btn-danger{
-    --bs-btn-bg: var(--tt-danger);
-    --bs-btn-border-color: var(--tt-danger);
-    --bs-btn-hover-bg: var(--tt-danger-hover);
-    --bs-btn-hover-border-color: var(--tt-danger-hover);
-    --bs-btn-active-bg: var(--tt-danger-active);
-    --bs-btn-active-border-color: var(--tt-danger-active);
 }
 
 /* AdForm: steps inside Hero */

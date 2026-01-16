@@ -1,6 +1,7 @@
 import Pagination, { PaginatorLink } from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { Head, router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 
 interface AdListItem {
@@ -91,9 +92,9 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                                     </option>
                                 ))}
                             </select>
-                            <button type="submit" className="btn btn-dark">
+                            <TTButton type="submit" variant="dark" look="solid">
                                 Sía
-                            </button>
+                            </TTButton>
                         </form>
                     </div>
 
@@ -132,15 +133,18 @@ export default function Index({ filters, statusOptions, ads }: AdsPageProps) {
                                             </span>
                                         </td>
                                         <td className="text-end">
-                                            <Link
+                                            <TTButton
+                                                as="link"
                                                 href={route(
                                                     'admin.ads.edit',
                                                     ad.id,
                                                 )}
-                                                className="btn btn-sm btn-outline-secondary"
+                                                size="sm"
+                                                look="outline"
+                                                variant="slate"
                                             >
                                                 Breyta
-                                            </Link>
+                                            </TTButton>
                                         </td>
                                     </tr>
                                 ))}

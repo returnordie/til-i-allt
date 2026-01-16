@@ -1,4 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 type Profile = {
@@ -133,9 +134,15 @@ export default function Show() {
                                     </div>
 
                                     <div className="mt-auto pt-3">
-                                        <a className="btn btn-outline-dark w-100" href={ad.links.show}>
+                                        <TTButton
+                                            as="link"
+                                            href={ad.links.show}
+                                            look="outline"
+                                            variant="dark"
+                                            className="w-100"
+                                        >
                                             Skoða auglýsingu
-                                        </a>
+                                        </TTButton>
                                     </div>
                                 </div>
                             </div>

@@ -1,6 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { Head, router, usePage } from '@inertiajs/react';
 
 type DealRow = {
     id: number;
@@ -175,26 +176,56 @@ export default function Index() {
                                                         </td>
                                                         <td className="text-end">
                                                             {deal.can_respond ? (
-                                                                <div className="btn-group btn-group-sm" role="group">
-                                                                    <button type="button" className="btn btn-success" onClick={() => accept(deal)}>
+                                                                <div className="d-inline-flex gap-2" role="group">
+                                                                    <TTButton
+                                                                        type="button"
+                                                                        size="sm"
+                                                                        variant="green"
+                                                                        look="solid"
+                                                                        onClick={() => accept(deal)}
+                                                                    >
                                                                         Samþykkja
-                                                                    </button>
-                                                                    <button type="button" className="btn btn-danger" onClick={() => decline(deal)}>
+                                                                    </TTButton>
+                                                                    <TTButton
+                                                                        type="button"
+                                                                        size="sm"
+                                                                        variant="red"
+                                                                        look="solid"
+                                                                        onClick={() => decline(deal)}
+                                                                    >
                                                                         Hafna
-                                                                    </button>
+                                                                    </TTButton>
                                                                 </div>
                                                             ) : deal.can_cancel ? (
-                                                                <button type="button" className="btn btn-danger btn-sm" onClick={() => cancel(deal)}>
+                                                                <TTButton
+                                                                    type="button"
+                                                                    size="sm"
+                                                                    variant="red"
+                                                                    look="solid"
+                                                                    onClick={() => cancel(deal)}
+                                                                >
                                                                     Hætta við
-                                                                </button>
+                                                                </TTButton>
                                                             ) : deal.review?.can_review ? (
-                                                                <Link href={deal.review.link} className="btn btn-warning btn-sm">
+                                                                <TTButton
+                                                                    as="link"
+                                                                    href={deal.review.link}
+                                                                    size="sm"
+                                                                    variant="amber"
+                                                                    look="solid"
+                                                                >
                                                                     Gefa umsögn
-                                                                </Link>
+                                                                </TTButton>
                                                             ) : deal.review?.has_review ? (
-                                                                <Link href={deal.review.link} className="btn btn-warning btn-sm">
+                                                                <TTButton
+                                                                    as="link"
+                                                                    href={deal.review.link}
+                                                                    size="sm"
+                                                                    variant="amber"
+                                                                    look="solid"
+                                                                >
                                                                     Umsögn
-                                                                </Link>
+                                                                </TTButton>
                                                             ) : (
                                                                 <span className="text-muted small">—</span>
                                                             )}

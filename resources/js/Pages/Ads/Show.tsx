@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, router, usePage } from '@inertiajs/react';
 
 type SectionKey = 'solutorg' | 'bilatorg' | 'fasteignir';
@@ -243,23 +244,28 @@ export default function Show({ ad }: AdShowProps) {
                     </div>
 
                     <div className="d-flex flex-wrap gap-2">
-                        <button type="button" className="btn tt-btn-ghost" onClick={onShare}>
+                        <TTButton type="button" look="ghost" variant="slate" onClick={onShare}>
                             Deila
-                        </button>
+                        </TTButton>
 
                         {isOwner ? (
                             <>
-                                <Link href={route('ads.edit', ad.id)} className="btn tt-btn-ghost">
+                                <TTButton
+                                    as="link"
+                                    href={route('ads.edit', ad.id)}
+                                    look="ghost"
+                                    variant="slate"
+                                >
                                     Breyta
-                                </Link>
-                                <button type="button" className="btn btn-outline-danger" onClick={onDelete}>
+                                </TTButton>
+                                <TTButton type="button" look="outline" variant="red" onClick={onDelete}>
                                     Eyða
-                                </button>
+                                </TTButton>
                             </>
                         ) : (
-                            <button type="button" className="btn tt-btn-ghost" onClick={onReport}>
+                            <TTButton type="button" look="ghost" variant="slate" onClick={onReport}>
                                 Tilkynna
-                            </button>
+                            </TTButton>
                         )}
                     </div>
                 </div>
@@ -372,40 +378,52 @@ export default function Show({ ad }: AdShowProps) {
                         ) : null}
 
                         <div className="d-grid gap-2">
-                            <button
-                                className="btn btn-dark"
+                            <TTButton
+                                type="button"
+                                variant="dark"
+                                look="solid"
                                 onClick={() => router.post(route('conversations.startForAd', ad.id))}
                             >
                                 Senda skilaboð
-                            </button>
+                            </TTButton>
 
                             {ad.seller.links?.profile ? (
-                                <Link className="btn tt-btn-ghost" href={ad.seller.links.profile}>
+                                <TTButton
+                                    as="link"
+                                    href={ad.seller.links.profile}
+                                    look="ghost"
+                                    variant="slate"
+                                >
                                     Skoða prófíl
-                                </Link>
+                                </TTButton>
                             ) : null}
 
                             {ad.seller.phone ? (
-                                <a className="btn tt-btn-ghost" href={`tel:${ad.seller.phone}`}>
+                                <TTButton
+                                    as="link"
+                                    href={`tel:${ad.seller.phone}`}
+                                    look="ghost"
+                                    variant="slate"
+                                >
                                     Hringja: {ad.seller.phone}
-                                </a>
+                                </TTButton>
                             ) : (
-                                <button className="btn tt-btn-ghost" type="button" disabled>
+                                <TTButton type="button" look="ghost" variant="slate" disabled>
                                     Sími ekki sýnilegur
-                                </button>
+                                </TTButton>
                             )}
                         </div>
 
                         <hr className="my-4" />
 
                         <div className="d-flex flex-wrap gap-2">
-                            <Link href={backHref} className="btn tt-btn-ghost">
+                            <TTButton as="link" href={backHref} look="ghost" variant="slate">
                                 ← Til baka
-                            </Link>
+                            </TTButton>
 
-                            <Link href={route('ads.create')} className="btn tt-btn-ghost">
+                            <TTButton as="link" href={route('ads.create')} look="ghost" variant="slate">
                                 Skrá nýja
-                            </Link>
+                            </TTButton>
                         </div>
                     </div>
 

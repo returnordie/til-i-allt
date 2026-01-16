@@ -2,6 +2,7 @@
 
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, useForm } from '@inertiajs/react';
 
 type Form = { email: string };
@@ -49,9 +50,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         Til baka í innskráningu
                     </Link>
 
-                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                    <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
                         {processing ? 'Sendi…' : 'Senda endurstillingarhlekk'}
-                    </button>
+                    </TTButton>
                 </div>
             </form>
         </>

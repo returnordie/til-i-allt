@@ -2,6 +2,7 @@
 
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { useForm } from '@inertiajs/react';
 
 type Form = { password: string };
@@ -41,9 +42,9 @@ export default function ConfirmPassword() {
                 </div>
 
                 <div className="d-flex justify-content-end">
-                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                    <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
                         {processing ? 'Staðfesti…' : 'Staðfesta'}
-                    </button>
+                    </TTButton>
                 </div>
             </form>
         </>

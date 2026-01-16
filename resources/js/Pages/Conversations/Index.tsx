@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
 type ConvRow = {
@@ -57,15 +58,17 @@ export default function Index() {
                                     {['inbox', 'archived', 'all'].map((k) => {
                                         const active = filters.filter === k;
                                         return (
-                                            <button
+                                            <TTButton
                                                 key={k}
-                                                className={`btn btn-sm ${active ? 'btn-dark' : 'btn-outline-dark'}`}
+                                                size="sm"
+                                                variant="dark"
+                                                look={active ? 'solid' : 'outline'}
                                                 onClick={() =>
                                                     router.get(route('conversations.index'), { filter: k, q: filters.q }, { preserveState: true, preserveScroll: true })
                                                 }
                                             >
                                                 {k === 'inbox' ? 'Innhólf' : k === 'archived' ? 'Falin skilaboð' : 'Allt'}
-                                            </button>
+                                            </TTButton>
                                         );
                                     })}
                                 </div>

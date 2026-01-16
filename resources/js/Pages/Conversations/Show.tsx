@@ -1,5 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useMemo, useRef } from 'react';
 
@@ -156,20 +157,24 @@ export default function Show() {
                             </div>
 
                             <div className="d-flex gap-2">
-                                <button
-                                    className="btn btn-warning btn-sm"
+                                <TTButton
+                                    size="sm"
+                                    variant="amber"
+                                    look="solid"
                                     onClick={() => router.patch(conversation.links.archive, {}, { preserveScroll: true })}
                                 >
                                     {conversation.is_archived ? 'Hætta að fela' : 'Fela'}
-                                </button>
+                                </TTButton>
 
-                                <button
-                                    className="btn btn-warning btn-sm"
+                                <TTButton
+                                    size="sm"
+                                    variant="amber"
+                                    look="solid"
                                     onClick={() => router.patch(conversation.links.close, { status: 'closed' }, { preserveScroll: true })}
                                     disabled={conversation.status !== 'open'}
                                 >
                                     Til baka
-                                </button>
+                                </TTButton>
 
                             </div>
                         </div>
@@ -193,23 +198,27 @@ export default function Show() {
                                     </div>
 
                                     <div className="d-flex gap-2">
-                                        <button
+                                        <TTButton
                                             type="button"
-                                            className="btn btn-success btn-sm"
+                                            size="sm"
+                                            variant="green"
+                                            look="solid"
                                             onClick={markBuyer}
                                             disabled={buyerMarkExpired || deal?.buyer_id === conversation.other!.id}
                                         >
                                             Merkja sem kaupanda
-                                        </button>
+                                        </TTButton>
 
-                                        <button
+                                        <TTButton
                                             type="button"
-                                            className="btn btn-danger btn-sm"
+                                            size="sm"
+                                            variant="red"
+                                            look="solid"
                                             onClick={clearBuyer}
                                             disabled={buyerMarkExpired || !deal?.buyer_id}
                                         >
                                             Hætta við viðskipti
-                                        </button>
+                                        </TTButton>
                                     </div>
                                 </div>
                             </div>
@@ -275,9 +284,14 @@ export default function Show() {
                                         {errors.body ? <div className="invalid-feedback">{errors.body}</div> : null}
 
                                         <div className="d-flex justify-content-end mt-2">
-                                            <button className="btn btn-warning" type="submit" disabled={processing}>
+                                            <TTButton
+                                                type="submit"
+                                                variant="amber"
+                                                look="solid"
+                                                disabled={processing}
+                                            >
                                                 {processing ? 'Sendi...' : 'Senda'}
-                                            </button>
+                                            </TTButton>
                                         </div>
                                     </div>
                                 </div>

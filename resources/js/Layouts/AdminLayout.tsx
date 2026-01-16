@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode } from 'react';
 
@@ -81,14 +82,16 @@ export default function AdminLayout({
                                 </li>
                             ))}
                             <li className="nav-item dropdown ms-lg-3">
-                                <button
-                                    className="btn btn-outline-secondary dropdown-toggle"
+                                <TTButton
+                                    look="outline"
+                                    variant="slate"
+                                    className="dropdown-toggle"
                                     type="button"
                                     data-bs-toggle="dropdown"
                                     aria-expanded="false"
                                 >
                                     {user.name}
-                                </button>
+                                </TTButton>
                                 <ul className="dropdown-menu dropdown-menu-end">
                                     <li>
                                         <Link

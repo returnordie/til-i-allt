@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes } from 'react';
+import TTButton from '@/Components/UI/TTButton';
 
 export default function PrimaryButton({
     className = '',
@@ -7,16 +8,14 @@ export default function PrimaryButton({
     ...props
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
-        <button
+        <TTButton
             {...props}
-            className={
-                `btn btn-dark ${
-                    disabled ? 'disabled' : ''
-                } ` + className
-            }
+            variant="dark"
+            look="solid"
+            className={`${disabled ? 'disabled' : ''} ${className}`.trim()}
             disabled={disabled}
         >
             {children}
-        </button>
+        </TTButton>
     );
 }

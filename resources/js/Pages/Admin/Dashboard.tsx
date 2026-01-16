@@ -1,4 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
+import TTButton from '@/Components/UI/TTButton';
 import { Head, Link } from '@inertiajs/react';
 
 interface DashboardProps {
@@ -79,6 +80,73 @@ export default function Dashboard({ stats, recentUsers, recentAds }: DashboardPr
             </section>
 
             <section className="row g-4">
+                <div className="col-12">
+                    <div className="card shadow-sm">
+                        <div className="card-body">
+                            <div className="d-flex align-items-center justify-content-between mb-3">
+                                <h2 className="h6 fw-semibold mb-0">
+                                    Áttvísandi hnappahópur
+                                </h2>
+                                <span className="text-muted small">
+                                    Demo
+                                </span>
+                            </div>
+                            <div className="tt-dir-group">
+                                <TTButton
+                                    type="button"
+                                    variant="slate"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Yfirlit
+                                </TTButton>
+                                <TTButton
+                                    type="button"
+                                    variant="blue"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Notendur
+                                </TTButton>
+                                <TTButton
+                                    type="button"
+                                    variant="green"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Auglýsingar
+                                </TTButton>
+                                <TTButton
+                                    type="button"
+                                    variant="teal"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Flokkar
+                                </TTButton>
+                                <TTButton
+                                    type="button"
+                                    variant="amber"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Svæði
+                                </TTButton>
+                                <TTButton
+                                    type="button"
+                                    variant="red"
+                                    look="solid"
+                                    className="tt-dir-btn"
+                                >
+                                    Póstnúmer
+                                </TTButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="row g-4">
                 <div className="col-lg-6">
                     <div className="card shadow-sm h-100">
                         <div className="card-body">
@@ -86,12 +154,16 @@ export default function Dashboard({ stats, recentUsers, recentAds }: DashboardPr
                                 <h2 className="h5 fw-semibold mb-0">
                             Nýjustu notendur
                                 </h2>
-                                <Link
+                                <TTButton
+                                    as="link"
                                     href={route('admin.users.index')}
-                                    className="btn btn-link px-0"
+                                    look="ghost"
+                                    variant="slate"
+                                    size="sm"
+                                    className="px-0"
                                 >
                                     Skoða alla
-                                </Link>
+                                </TTButton>
                             </div>
                             <div className="d-flex flex-column gap-3">
                                 {recentUsers.map((user) => (
@@ -129,12 +201,16 @@ export default function Dashboard({ stats, recentUsers, recentAds }: DashboardPr
                                 <h2 className="h5 fw-semibold mb-0">
                             Nýjustu auglýsingar
                                 </h2>
-                                <Link
+                                <TTButton
+                                    as="link"
                                     href={route('admin.ads.index')}
-                                    className="btn btn-link px-0"
+                                    look="ghost"
+                                    variant="slate"
+                                    size="sm"
+                                    className="px-0"
                                 >
                                     Skoða allar
-                                </Link>
+                                </TTButton>
                             </div>
                             <div className="d-flex flex-column gap-3">
                                 {recentAds.map((ad) => (

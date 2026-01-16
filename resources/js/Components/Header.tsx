@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import TTButton from '@/Components/UI/TTButton';
 import { Link, router, usePage } from '@inertiajs/react';
 import CategorySidebar from '@/Components/CategorySidebar';
 
@@ -259,12 +260,18 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
                             {!user ? (
                                 <>
-                                    <Link href={route('login')} className="btn tt-btn-ghost">
+                                    <TTButton as="link" href={route('login')} look="ghost" variant="slate">
                                         Innskrá
-                                    </Link>
-                                    <Link href={route('register')} className="btn tt-btn-ghost d-none d-sm-inline-flex">
+                                    </TTButton>
+                                    <TTButton
+                                        as="link"
+                                        href={route('register')}
+                                        look="ghost"
+                                        variant="slate"
+                                        className="d-none d-sm-inline-flex"
+                                    >
                                         Nýskrá
-                                    </Link>
+                                    </TTButton>
                                 </>
                             ) : (
                                 <>
@@ -306,9 +313,15 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                             </div>
 
                                             <div className="tt-dropfoot">
-                                                <Link href={route('notifications.inbox')} className="btn tt-btn-ghost w-100">
+                                                <TTButton
+                                                    as="link"
+                                                    href={route('notifications.inbox')}
+                                                    look="ghost"
+                                                    variant="slate"
+                                                    className="w-100"
+                                                >
                                                     Sjá allar
-                                                </Link>
+                                                </TTButton>
                                             </div>
                                         </div>
                                     </div>
@@ -443,9 +456,15 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                             placeholder="Leita í auglýsingum…"
                             aria-label="Leita í auglýsingum"
                         />
-                        <button className="btn tt-btn-cta w-100 mt-3" type="submit" data-bs-dismiss="offcanvas">
+                        <TTButton
+                            type="submit"
+                            variant="amber"
+                            look="solid"
+                            className="w-100 mt-3"
+                            data-bs-dismiss="offcanvas"
+                        >
                             Leita
-                        </button>
+                        </TTButton>
                     </form>
                 </div>
             </div>

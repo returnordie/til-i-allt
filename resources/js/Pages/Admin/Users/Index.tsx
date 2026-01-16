@@ -1,6 +1,7 @@
 import Pagination, { PaginatorLink } from '@/Components/Pagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { Head, router } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 
 interface UserListItem {
@@ -75,9 +76,9 @@ export default function Index({ filters, users }: UsersPageProps) {
                                 className="form-control"
                                 placeholder="Leita eftir nafni, email eða notendanafni"
                             />
-                            <button type="submit" className="btn btn-dark">
+                            <TTButton type="submit" variant="dark" look="solid">
                                 Leita
-                            </button>
+                            </TTButton>
                         </form>
                     </div>
 
@@ -124,15 +125,18 @@ export default function Index({ filters, users }: UsersPageProps) {
                                             </span>
                                         </td>
                                         <td className="text-end">
-                                            <Link
+                                            <TTButton
+                                                as="link"
                                                 href={route(
                                                     'admin.users.edit',
                                                     user.id,
                                                 )}
-                                                className="btn btn-sm btn-outline-secondary"
+                                                size="sm"
+                                                look="outline"
+                                                variant="slate"
                                             >
                                                 Breyta
-                                            </Link>
+                                            </TTButton>
                                         </td>
                                     </tr>
                                 ))}

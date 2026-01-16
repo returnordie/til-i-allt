@@ -2,7 +2,8 @@
 
 import React from 'react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Link, useForm } from '@inertiajs/react';
+import TTButton from '@/Components/UI/TTButton';
+import { useForm } from '@inertiajs/react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
@@ -28,18 +29,19 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
             <form onSubmit={submit} noValidate>
                 <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <button type="submit" className="btn tt-btn-cta" disabled={processing}>
+                    <TTButton type="submit" variant="amber" look="solid" disabled={processing}>
                         {processing ? 'Sendi…' : 'Senda staðfestingarpóst aftur'}
-                    </button>
+                    </TTButton>
 
-                    <Link
+                    <TTButton
+                        as="link"
                         href={route('logout')}
                         method="post"
-                        as="button"
-                        className="btn btn-outline-secondary"
+                        look="outline"
+                        variant="slate"
                     >
                         Skrá út
-                    </Link>
+                    </TTButton>
                 </div>
             </form>
         </>

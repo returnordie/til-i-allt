@@ -1,0 +1,237 @@
+:root {
+    /* Shape + type */
+    --tt-radius: 0.45rem; /* boxy, not pill */
+    --tt-fw: 600;
+
+    /* Palette (custom, NOT bootstrap variants) */
+    --tt-slate: #e2e8f0;
+    --tt-slate-ink: #0f172a;
+
+    --tt-blue: #2563eb;
+    --tt-blue-hover: #1d4ed8;
+
+    --tt-green: #16a34a;
+    --tt-green-hover: #15803d;
+
+    --tt-teal: #0891b2;
+    --tt-teal-hover: #0e7490;
+
+    --tt-amber: #f59e0b;
+    --tt-amber-hover: #d97706;
+
+    --tt-red: #ef4444;
+    --tt-red-hover: #dc2626;
+
+    --tt-dark: #111827;
+    --tt-dark-hover: #0b1220;
+}
+
+/* ---------------------------
+   Base button system (Bootstrap 5.3 compatible)
+   Use: class="btn tt-btn tt-solid tt-md tt-c-blue"
+--------------------------- */
+.btn.tt-btn {
+    /* Sizing */
+    --bs-btn-padding-x: 1rem;
+    --bs-btn-padding-y: 0.55rem;
+    --bs-btn-font-size: 0.95rem;
+    --bs-btn-line-height: 1.15;
+
+    /* Type + shape */
+    --bs-btn-font-weight: var(--tt-fw);
+    --bs-btn-border-radius: var(--tt-radius);
+    --bs-btn-border-width: 1px;
+
+    /* Defaults (overridden by look + color classes) */
+    --tt-accent: var(--tt-blue);
+    --tt-accent-hover: var(--tt-blue-hover);
+    --tt-focus-rgb: 37, 99, 235;
+
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.05s ease;
+}
+
+.btn.tt-btn:active {
+    transform: translateY(1px);
+}
+
+.btn.tt-btn:disabled,
+.btn.tt-btn.disabled {
+    opacity: 0.6;
+    transform: none;
+}
+
+/* Focus (cleaner than default glow) */
+.btn.tt-btn:focus-visible {
+    outline: 2px solid rgba(var(--tt-focus-rgb), 0.45);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* Looks */
+.btn.tt-btn.tt-solid {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--tt-accent);
+    --bs-btn-border-color: var(--tt-accent);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--tt-accent-hover);
+    --bs-btn-hover-border-color: var(--tt-accent-hover);
+    --bs-btn-active-bg: var(--tt-accent-hover);
+    --bs-btn-active-border-color: var(--tt-accent-hover);
+    --bs-btn-focus-shadow-rgb: var(--tt-focus-rgb);
+}
+
+.btn.tt-btn.tt-outline {
+    --bs-btn-color: var(--tt-accent);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: var(--tt-accent);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--tt-accent);
+    --bs-btn-hover-border-color: var(--tt-accent);
+    --bs-btn-active-bg: var(--tt-accent-hover);
+    --bs-btn-active-border-color: var(--tt-accent-hover);
+    --bs-btn-focus-shadow-rgb: var(--tt-focus-rgb);
+}
+
+.btn.tt-btn.tt-soft {
+    --bs-btn-color: var(--tt-slate-ink);
+    --bs-btn-bg: rgba(var(--tt-focus-rgb), 0.10);
+    --bs-btn-border-color: rgba(var(--tt-focus-rgb), 0.18);
+    --bs-btn-hover-color: var(--tt-slate-ink);
+    --bs-btn-hover-bg: rgba(var(--tt-focus-rgb), 0.14);
+    --bs-btn-hover-border-color: rgba(var(--tt-focus-rgb), 0.22);
+    --bs-btn-active-bg: rgba(var(--tt-focus-rgb), 0.18);
+    --bs-btn-active-border-color: rgba(var(--tt-focus-rgb), 0.26);
+    --bs-btn-focus-shadow-rgb: var(--tt-focus-rgb);
+}
+
+.btn.tt-btn.tt-ghost {
+    --bs-btn-color: var(--tt-slate-ink);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--tt-slate-ink);
+    --bs-btn-hover-bg: rgba(15, 23, 42, 0.06);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-bg: rgba(15, 23, 42, 0.10);
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-focus-shadow-rgb: 15, 23, 42;
+}
+
+/* Sizes */
+.btn.tt-btn.tt-sm {
+    --bs-btn-padding-x: 0.7rem;
+    --bs-btn-padding-y: 0.4rem;
+    --bs-btn-font-size: 0.875rem;
+    --bs-btn-border-radius: 0.4rem;
+}
+
+.btn.tt-btn.tt-md {
+    /* defaults already */
+}
+
+.btn.tt-btn.tt-lg {
+    --bs-btn-padding-x: 1.1rem;
+    --bs-btn-padding-y: 0.65rem;
+    --bs-btn-font-size: 1rem;
+    --bs-btn-border-radius: 0.5rem;
+}
+
+/* Color modifiers (custom palette) */
+.tt-c-slate {
+    --tt-accent: var(--tt-slate);
+    --tt-accent-hover: #cbd5e1;
+    --tt-focus-rgb: 100, 116, 139; /* slate-500-ish */
+}
+
+.tt-c-blue {
+    --tt-accent: var(--tt-blue);
+    --tt-accent-hover: var(--tt-blue-hover);
+    --tt-focus-rgb: 37, 99, 235;
+}
+
+.tt-c-green {
+    --tt-accent: var(--tt-green);
+    --tt-accent-hover: var(--tt-green-hover);
+    --tt-focus-rgb: 22, 163, 74;
+}
+
+.tt-c-teal {
+    --tt-accent: var(--tt-teal);
+    --tt-accent-hover: var(--tt-teal-hover);
+    --tt-focus-rgb: 8, 145, 178;
+}
+
+.tt-c-amber {
+    --tt-accent: var(--tt-amber);
+    --tt-accent-hover: var(--tt-amber-hover);
+    --tt-focus-rgb: 245, 158, 11;
+}
+
+.tt-c-red {
+    --tt-accent: var(--tt-red);
+    --tt-accent-hover: var(--tt-red-hover);
+    --tt-focus-rgb: 239, 68, 68;
+}
+
+.tt-c-dark {
+    --tt-accent: var(--tt-dark);
+    --tt-accent-hover: var(--tt-dark-hover);
+    --tt-focus-rgb: 17, 24, 39;
+}
+
+/* ---------------------------------------
+   Directional (arrow segmented) group
+   Use: <div class="tt-dir-group"> ... </div>
+        Each button: class="btn tt-btn tt-solid tt-md tt-c-blue tt-dir-btn"
+--------------------------------------- */
+.tt-dir-group {
+    display: inline-flex;
+    align-items: stretch;
+}
+
+.tt-dir-group .tt-dir-btn {
+    --tt-notch: 16px;
+    --tt-tip: 18px;
+
+    border-radius: 0; /* boxy group */
+    position: relative;
+    padding-left: 1rem;
+    padding-right: 1.35rem;
+    line-height: 1.1;
+
+    /* Arrow shape */
+    clip-path: polygon(
+        var(--tt-notch) 0%,
+        calc(100% - var(--tt-tip)) 0%,
+        100% 50%,
+        calc(100% - var(--tt-tip)) 100%,
+        var(--tt-notch) 100%,
+        0% 50%
+    );
+}
+
+.tt-dir-group .tt-dir-btn:first-child {
+    clip-path: polygon(
+        0% 0%,
+        calc(100% - var(--tt-tip)) 0%,
+        100% 50%,
+        calc(100% - var(--tt-tip)) 100%,
+        0% 100%
+    );
+}
+
+.tt-dir-group .tt-dir-btn + .tt-dir-btn {
+    margin-left: calc(var(--tt-notch) * -1);
+}
+
+/* Thin separators like in the demo */
+.tt-dir-group .tt-dir-btn {
+    box-shadow: -1px 0 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+.tt-dir-group .tt-dir-btn:active {
+    transform: none; /* avoid “jumping” in joined segments */
+}
