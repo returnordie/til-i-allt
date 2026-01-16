@@ -6,7 +6,6 @@ use App\Http\Requests\StoreMessageRequest;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\RedirectResponse;
-use App\Notifications\NewMessageNotification;
 use App\Models\User;
 
 class MessageController extends Controller
@@ -49,14 +48,10 @@ class MessageController extends Controller
 
         $recipient = User::find($recipientId);
 
-        if ($recipient && !$recipient->banned_at && $recipient->is_active) {
-            $recipient->notify(new NewMessageNotification($conversation, $msg, $user));
-        }
-
         $conversation->save();
 
         // Email notifications (seinna): tengjum við email_on_message þegar þú vilt.
 
-        return back()->with('success', 'Skilaboð send.');
+        return back();
     }
 }

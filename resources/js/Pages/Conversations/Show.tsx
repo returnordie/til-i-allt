@@ -1,8 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout';
-import AccountNav from '@/Components/Account/AccountNav';
 import TTButton from '@/Components/UI/TTButton';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Msg = {
     id: number;
@@ -83,6 +82,16 @@ export default function Show() {
     }, [lastMsgId]);
 
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
+    const [showArchiveModal, setShowArchiveModal] = useState(false);
+
+    useEffect(() => {
+        if (showArchiveModal) {
+            document.body.classList.add('modal-open');
+            return () => document.body.classList.remove('modal-open');
+        }
+        document.body.classList.remove('modal-open');
+        return undefined;
+    }, [showArchiveModal]);
 
     const send = (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -136,12 +145,8 @@ export default function Show() {
             <Head title="Skilaboð" />
 
             <div className="container py-4">
-                <div className="row g-4">
-                    <div className="col-12 col-lg-3">
-                        <AccountNav />
-                    </div>
-
-                    <div className="col-12 col-lg-9">
+                <div className="row justify-content-center">
+                    <div className="col-12 col-lg-9 col-xl-8">
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                             <div>
                                 <div className="h5 mb-0">{conversation.other?.name ?? 'Skilaboð'}</div>
@@ -161,7 +166,13 @@ export default function Show() {
                                     size="sm"
                                     variant="amber"
                                     look="solid"
-                                    onClick={() => router.patch(conversation.links.archive, {}, { preserveScroll: true })}
+                                    onClick={() => {
+                                        if (conversation.is_archived) {
+                                            router.patch(conversation.links.archive, {}, { preserveScroll: true });
+                                        } else {
+                                            setShowArchiveModal(true);
+                                        }
+                                    }}
                                 >
                                     {conversation.is_archived ? 'Hætta að fela' : 'Fela'}
                                 </TTButton>
@@ -179,7 +190,6 @@ export default function Show() {
                             </div>
                         </div>
 
-                        {props.flash?.success ? <div className="alert alert-success">{props.flash.success}</div> : null}
                         {props.flash?.error ? <div className="alert alert-danger">{props.flash.error}</div> : null}
 
                         {showBuyerStatus ? (
@@ -300,6 +310,56 @@ export default function Show() {
                     </div>
                 </div>
             </div>
+
+            {showArchiveModal ? (
+                <>
+                    <div
+                        className="modal fade show d-block"
+                        aria-modal="true"
+                        role="dialog"
+                        tabIndex={-1}
+                    >
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Fela skilaboð</h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        aria-label="Loka"
+                                        onClick={() => setShowArchiveModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    Þegar auglýsing hefur verið falin getur viðmælandi ekki haldið áfram að senda skilaboð.
+                                </div>
+                                <div className="modal-footer">
+                                    <TTButton
+                                        type="button"
+                                        variant="slate"
+                                        look="ghost"
+                                        onClick={() => setShowArchiveModal(false)}
+                                    >
+                                        Hætta við
+                                    </TTButton>
+                                    <TTButton
+                                        type="button"
+                                        variant="amber"
+                                        look="solid"
+                                        onClick={() => {
+                                            router.patch(conversation.links.archive, {}, { preserveScroll: true });
+                                            setShowArchiveModal(false);
+                                        }}
+                                    >
+                                        Fela
+                                    </TTButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show" />
+                </>
+            ) : null}
         </AppLayout>
     );
 }

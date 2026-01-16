@@ -67,7 +67,7 @@ class AccountNotificationController extends Controller
     public function markAllRead(Request $request): RedirectResponse
     {
         $request->user()->unreadNotifications->markAsRead();
-        return back()->with('success', 'Allt merkt sem lesið.');
+        return back();
     }
     public function edit(): Response
     {

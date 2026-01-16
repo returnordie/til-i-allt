@@ -167,6 +167,11 @@ a:focus{
     border: 2px solid rgba(251,251,252,.92);
 }
 
+.tt-badge-green{
+    background: var(--tt-green);
+    color: #fff;
+}
+
 /* User button */
 .tt-userbtn{
     border-radius: 0;

@@ -316,7 +316,7 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                                     variant="slate"
                                                     className="w-100"
                                                 >
-                                                    Sjá allar
+                                                    Sjá allt
                                                 </TTButton>
                                             </div>
                                         </div>
