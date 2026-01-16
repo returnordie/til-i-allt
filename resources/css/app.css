@@ -549,6 +549,32 @@ a:focus{
     background: rgba(255,255,255,.94);
     padding: .95rem;
 }
+.tt-review-surface{
+    background: rgb(248 249 250);
+}
+.tt-review-modal{
+    max-width: 640px;
+    width: calc(100% - 2rem);
+}
+.tt-star{
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    color: #d0d4da;
+}
+.tt-star::before{
+    content: '★';
+}
+.tt-star-fill{
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: #f0ad4e;
+    display: block;
+}
+.tt-star-fill::before{
+    content: '★';
+}
 .tt-af-k{
     font-size: .86rem;
     font-weight: 900;

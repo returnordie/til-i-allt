@@ -1,10 +1,9 @@
 import AppLayout from '@/Layouts/AppLayout';
 import AccountNav from '@/Components/Account/AccountNav';
+import { StarRatingDisplay, StarRatingInput } from '@/Components/Reviews/StarRating';
 import TTButton from '@/Components/UI/TTButton';
+import type { FormEvent } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-
-const ratingOptions = [1, 2, 3, 4, 5];
 
 type DealInfo = {
     id: number;
@@ -42,24 +41,22 @@ type PageProps = {
     flash?: { success?: string; error?: string };
 };
 
-function renderStars(count: number) {
-    return '★'.repeat(count) || '—';
-}
+const formatRating = (rating: number) => {
+    const rounded = Math.round(rating * 2) / 2;
+    return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+};
 
 export default function Review() {
     const { props } = usePage<PageProps>();
     const { deal, ratee, existingReview, otherReview, canReview, storeUrl } = props;
     const showBothReviews = Boolean(existingReview && otherReview);
     const pageTitle = existingReview ? 'Umsögn' : 'Gefa umsögn';
-    const [hoverRating, setHoverRating] = useState<number | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
-
     const { data, setData, post, processing, errors } = useForm({
         rating: existingReview?.rating ?? 5,
         comment: existingReview?.comment ?? '',
     });
 
-    const submit = (event: React.FormEvent) => {
+    const submit = (event: FormEvent) => {
         event.preventDefault();
         post(storeUrl, { preserveScroll: true });
     };
@@ -110,13 +107,14 @@ export default function Review() {
                                         <div className="fw-semibold mb-2">Umsagnir frá báðum aðilum</div>
                                         <div className="row g-3">
                                             <div className="col-12 col-lg-6">
-                                                <div className="border rounded p-3 h-100 bg-light">
+                                                <div className="border rounded p-3 h-100 tt-review-surface">
                                                     <div className="fw-semibold">Þín umsögn</div>
                                                     <div className="mt-2">
                                                         <span className="me-2">Stjörnur:</span>
                                                         <span className="fw-semibold">
-                                                            {existingReview?.rating} {renderStars(existingReview?.rating ?? 0)}
+                                                            {existingReview ? formatRating(existingReview.rating) : '—'}
                                                         </span>
+                                                        <StarRatingDisplay rating={existingReview?.rating ?? 0} className="ms-2" />
                                                     </div>
                                                     {existingReview?.comment ? (
                                                         <div className="mt-2">
@@ -127,15 +125,16 @@ export default function Review() {
                                                 </div>
                                             </div>
                                             <div className="col-12 col-lg-6">
-                                                <div className="border rounded p-3 h-100 bg-light">
+                                                <div className="border rounded p-3 h-100 tt-review-surface">
                                                     <div className="fw-semibold">
                                                         Umsögn frá {otherReview?.rater_name ?? 'viðskiptaaðila'}
                                                     </div>
                                                     <div className="mt-2">
                                                         <span className="me-2">Stjörnur:</span>
                                                         <span className="fw-semibold">
-                                                            {otherReview?.rating} {renderStars(otherReview?.rating ?? 0)}
+                                                            {otherReview ? formatRating(otherReview.rating) : '—'}
                                                         </span>
+                                                        <StarRatingDisplay rating={otherReview?.rating ?? 0} className="ms-2" />
                                                     </div>
                                                     {otherReview?.comment ? (
                                                         <div className="mt-2">
@@ -148,13 +147,12 @@ export default function Review() {
                                         </div>
                                     </div>
                                 ) : existingReview ? (
-                                    <div className="alert alert-secondary">
+                                    <div className="border rounded p-3 tt-review-surface">
                                         <div className="fw-semibold">Umsögn skráð</div>
                                         <div className="mt-2">
                                             <span className="me-2">Stjörnur:</span>
-                                            <span className="fw-semibold">
-                                                {existingReview.rating} {renderStars(existingReview.rating)}
-                                            </span>
+                                            <span className="fw-semibold">{formatRating(existingReview.rating)}</span>
+                                            <StarRatingDisplay rating={existingReview.rating} className="ms-2" />
                                         </div>
                                         {existingReview.comment ? (
                                             <div className="mt-2">
@@ -169,46 +167,7 @@ export default function Review() {
                                     <form onSubmit={submit} className="mt-4">
                                         <div className="mb-3">
                                             <label className="form-label fw-semibold">Stjörnur</label>
-                                            <div
-                                                className="d-flex align-items-center gap-2"
-                                                onPointerLeave={() => {
-                                                    setHoverRating(null);
-                                                    setIsDragging(false);
-                                                }}
-                                                onPointerUp={() => setIsDragging(false)}
-                                            >
-                                                {ratingOptions.map((value) => (
-                                                    <button
-                                                        key={value}
-                                                        type="button"
-                                                        className="p-0 border-0 bg-transparent"
-                                                        onClick={() => setData('rating', value)}
-                                                        onMouseEnter={() => setHoverRating(value)}
-                                                        onFocus={() => setHoverRating(value)}
-                                                        onBlur={() => setHoverRating(null)}
-                                                        onPointerDown={(event) => {
-                                                            event.preventDefault();
-                                                            setIsDragging(true);
-                                                            setData('rating', value);
-                                                        }}
-                                                        onPointerEnter={() => {
-                                                            if (isDragging) {
-                                                                setData('rating', value);
-                                                            }
-                                                        }}
-                                                        aria-label={`${value} stjörnur`}
-                                                    >
-                                                        <span
-                                                            className={`fs-3 ${
-                                                                (hoverRating ?? data.rating) >= value ? 'text-warning' : 'text-muted'
-                                                            }`}
-                                                            aria-hidden="true"
-                                                        >
-                                                            ★
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
+                                            <StarRatingInput value={Number(data.rating)} onChange={(value) => setData('rating', value)} />
                                             {errors.rating ? <div className="text-danger small mt-2">{errors.rating}</div> : null}
                                         </div>
 

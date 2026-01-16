@@ -41,7 +41,7 @@ class DealReviewController extends Controller
             ? $deal->completed_at->copy()->addDays(14)
             : null;
 
-        return Inertia::render('Account/Deals/Review', [
+        $payload = [
             'deal' => [
                 'id' => $deal->id,
                 'status' => $deal->status,
@@ -65,12 +65,12 @@ class DealReviewController extends Controller
                 'role' => $rateeRole,
             ] : null,
             'existingReview' => $existingReview ? [
-                'rating' => $existingReview->rating,
+                'rating' => (float) $existingReview->rating,
                 'comment' => $existingReview->comment,
                 'created_at' => $existingReview->created_at?->toDateTimeString(),
             ] : null,
             'otherReview' => $existingReview && $otherReview ? [
-                'rating' => $otherReview->rating,
+                'rating' => (float) $otherReview->rating,
                 'comment' => $otherReview->comment,
                 'created_at' => $otherReview->created_at?->toDateTimeString(),
                 'rater_name' => $otherReview->rater_id === $deal->seller_id ? $deal->seller?->name : $deal->buyer?->name,
@@ -81,7 +81,13 @@ class DealReviewController extends Controller
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
-        ]);
+        ];
+
+        if ($request->wantsJson()) {
+            return response()->json($payload);
+        }
+
+        return redirect()->route('account.deals.index');
     }
 
     public function store(Request $request, Deal $deal)
@@ -100,7 +106,7 @@ class DealReviewController extends Controller
         $rateeId = $isSeller ? (int) $deal->buyer_id : (int) $deal->seller_id;
 
         $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:0', 'max:5'],
+            'rating' => ['required', 'numeric', 'min:0', 'max:5', 'multiple_of:0.5'],
             'comment' => ['nullable', 'string', 'max:5000'],
             'meta' => ['nullable', 'array'],
         ]);
@@ -110,7 +116,7 @@ class DealReviewController extends Controller
             'deal_id' => $deal->id,
             'rater_id' => $user->id,
             'ratee_id' => $rateeId,
-            'rating' => $data['rating'],
+            'rating' => (float) $data['rating'],
             'comment' => $data['comment'] ?? null,
             'meta' => $data['meta'] ?? null,
         ]);
