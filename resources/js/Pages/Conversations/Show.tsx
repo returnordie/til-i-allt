@@ -37,6 +37,7 @@ type PageProps = {
         other: { id: number; name: string; username: string | null } | null;
         ad: { title: string; link: string } | null;
         is_archived: boolean;
+        is_archived_by_other: boolean;
         links: { archive: string; close: string; block: string; send: string };
     };
     messages: {
@@ -83,6 +84,8 @@ export default function Show() {
 
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
     const [showArchiveModal, setShowArchiveModal] = useState(false);
+    const isChatArchived = conversation.is_archived || conversation.is_archived_by_other;
+    const canSendMessage = conversation.status === 'open' && !isChatArchived;
 
     useEffect(() => {
         if (showArchiveModal) {
@@ -174,15 +177,20 @@ export default function Show() {
                                         }
                                     }}
                                 >
-                                    {conversation.is_archived ? 'Hætta að fela' : 'Fela'}
+                                    {conversation.is_archived ? 'Opna fyrir spjall' : 'Loka spjalli'}
                                 </TTButton>
 
                                 <TTButton
                                     size="sm"
                                     variant="amber"
                                     look="solid"
-                                    onClick={() => router.patch(conversation.links.close, { status: 'closed' }, { preserveScroll: true })}
-                                    disabled={conversation.status !== 'open'}
+                                    onClick={() =>
+                                        router.get(
+                                            route('conversations.index'),
+                                            { filter: 'all' },
+                                            { preserveState: true, preserveScroll: true }
+                                        )
+                                    }
                                 >
                                     Til baka
                                 </TTButton>
@@ -273,6 +281,12 @@ export default function Show() {
                             <div className="alert alert-warning">
                                 Þessi þráður er {conversation.status === 'closed' ? 'lokaður' : 'blokkuður'}.
                             </div>
+                        ) : isChatArchived ? (
+                            <div className="alert alert-warning">
+                                {conversation.is_archived_by_other
+                                    ? 'Viðmælandi hefur lokað spjalli. Opnaðu fyrir spjall til að senda skilaboð.'
+                                    : 'Þú hefur lokað spjalli. Opnaðu fyrir spjall til að senda skilaboð.'}
+                            </div>
                         ) : (
                             <form onSubmit={send}>
                                 <div className="card">
@@ -298,7 +312,7 @@ export default function Show() {
                                                 type="submit"
                                                 variant="amber"
                                                 look="solid"
-                                                disabled={processing}
+                                                disabled={processing || !canSendMessage}
                                             >
                                                 {processing ? 'Sendi...' : 'Senda'}
                                             </TTButton>
@@ -322,7 +336,7 @@ export default function Show() {
                         <div className="modal-dialog modal-dialog-centered">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h5 className="modal-title">Fela skilaboð</h5>
+                                    <h5 className="modal-title">Loka spjalli</h5>
                                     <button
                                         type="button"
                                         className="btn-close"
@@ -331,7 +345,7 @@ export default function Show() {
                                     />
                                 </div>
                                 <div className="modal-body">
-                                    Þegar auglýsing hefur verið falin getur viðmælandi ekki haldið áfram að senda skilaboð.
+                                    Þegar spjall er lokað getur hvorugur aðili sent skilaboð fyrr en opnað er aftur.
                                 </div>
                                 <div className="modal-footer">
                                     <TTButton
@@ -351,7 +365,7 @@ export default function Show() {
                                             setShowArchiveModal(false);
                                         }}
                                     >
-                                        Fela
+                                        Loka spjalli
                                     </TTButton>
                                 </div>
                             </div>
