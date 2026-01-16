@@ -42,6 +42,7 @@ const TTButton = React.forwardRef<
         size = 'md',
         className,
         children,
+        as,
         ...rest
     } = props as any;
 
