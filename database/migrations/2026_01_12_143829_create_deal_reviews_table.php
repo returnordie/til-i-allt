@@ -27,7 +27,7 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             // 0-5
-            $table->unsignedTinyInteger('rating')->index();
+            $table->decimal('rating', 3, 1)->unsigned()->index();
 
             $table->text('comment')->nullable();
             $table->json('meta')->nullable(); // tags, structured feedback
