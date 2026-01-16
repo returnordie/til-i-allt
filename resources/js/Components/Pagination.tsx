@@ -15,7 +15,7 @@ export default function Pagination({ links }: { links: PaginatorLink[] }) {
 
     return (
         <nav aria-label="Síður" className="mt-4">
-            <ul className="pagination mb-0 flex-wrap">
+            <ul className="pagination mb-0 flex-wrap tt-pagination-slate">
                 {links.map((link, index) => {
                     const text = decodeLabel(link.label);
                     const isDisabled = !link.url;

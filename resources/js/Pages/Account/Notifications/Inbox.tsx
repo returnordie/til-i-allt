@@ -92,7 +92,7 @@ export default function Inbox() {
 
                         {notifications.links?.length ? (
                             <nav className="mt-3">
-                                <ul className="pagination pagination-sm mb-0 flex-wrap">
+                                <ul className="pagination pagination-sm mb-0 flex-wrap tt-pagination-slate">
                                     {notifications.links.map((l, idx) => (
                                         <li key={idx} className={`page-item ${l.active ? 'active' : ''} ${!l.url ? 'disabled' : ''}`}>
                                             {l.url ? (

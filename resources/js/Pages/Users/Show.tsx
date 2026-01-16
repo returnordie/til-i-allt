@@ -163,7 +163,7 @@ export default function Show() {
                 {/* Pagination */}
                 {ads.links?.length ? (
                     <nav className="mt-4">
-                        <ul className="pagination pagination-sm mb-0 flex-wrap">
+                        <ul className="pagination pagination-sm mb-0 flex-wrap tt-pagination-slate">
                             {ads.links.map((l, idx) => (
                                 <li
                                     key={idx}

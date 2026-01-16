@@ -247,12 +247,12 @@ export default function Index() {
                                         key={b.key}
                                         type="button"
                                         size="sm"
-                                        variant="dark"
+                                        variant="slate"
                                         look={active ? 'solid' : 'outline'}
                                         onClick={() => setFilter(b.key)}
                                     >
                                         {b.label}{' '}
-                                        <span className={`ms-1 badge ${active ? 'text-bg-light' : 'text-bg-secondary'}`}>
+                                        <span className={`ms-1 badge ${active ? 'text-bg-dark' : 'text-bg-secondary'}`}>
                                             {counts[b.key] ?? 0}
                                         </span>
                                     </TTButton>
@@ -497,7 +497,7 @@ export default function Index() {
                 {/* Pagination */}
                 {ads.links?.length ? (
                     <nav className="mt-3">
-                        <ul className="pagination pagination-sm mb-0">
+                        <ul className="pagination pagination-sm mb-0 tt-pagination-slate">
                             {ads.links.map((l, idx) => (
                                 <li key={idx} className={`page-item ${l.active ? 'active' : ''} ${!l.url ? 'disabled' : ''}`}>
                                     {l.url ? (

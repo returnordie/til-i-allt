@@ -63,7 +63,7 @@ function Pagination({ links }: { links: PaginatorLink[] }) {
 
     return (
         <nav aria-label="Síður" className="mt-4">
-            <ul className="pagination justify-content-center flex-wrap gap-1">
+            <ul className="pagination justify-content-center flex-wrap gap-1 tt-pagination-slate">
                 {links.map((l, i) => {
                     const text = decodeLabel(l.label);
                     const isDisabled = !l.url;
