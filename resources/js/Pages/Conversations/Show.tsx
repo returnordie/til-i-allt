@@ -34,7 +34,7 @@ type PageProps = {
         status: 'open' | 'closed' | 'blocked';
         context: string;
         subject: string | null;
-        other: { id: number; name: string; username: string | null } | null;
+        other: { id: number; name: string; username: string | null; show_name: boolean } | null;
         ad: { title: string; link: string } | null;
         is_archived: boolean;
         is_archived_by_other: boolean;
@@ -48,7 +48,7 @@ type PageProps = {
         last_message_at: string | null;
         unread: boolean;
         snippet: string | null;
-        other: { name: string; username: string | null } | null;
+        other: { name: string; username: string | null; show_name: boolean } | null;
         ad: { title: string; link: string | null } | null;
         links: { show: string };
     }>;
@@ -57,6 +57,7 @@ type PageProps = {
         links: Array<{ url: string | null; label: string; active: boolean }>;
     };
     deal: DealProps;
+    filters: { filter: string };
     flash?: { success?: string; error?: string };
 };
 
@@ -65,10 +66,16 @@ function fmtTime(s: string | null) {
     return new Date(s).toLocaleString('is-IS');
 }
 
+function displayName(user: { name: string; username: string | null; show_name: boolean } | null) {
+    if (!user) return '—';
+    return user.show_name ? user.name : (user.username ?? user.name);
+}
+
 export default function Show() {
     const { props } = usePage<PageProps>();
-    const { conversation, messages, authUserId, deal, conversationList } = props;
+    const { conversation, messages, authUserId, deal, conversationList, filters } = props;
     const [isListOpen, setIsListOpen] = useState(false);
+    const otherDisplayName = conversation.other ? displayName(conversation.other) : '';
 
     // --- scroll to bottom behavior (no live chat) ---
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -164,10 +171,11 @@ export default function Show() {
 
             <div className="container py-4">
                 <div className="row justify-content-center" style={{ minHeight: 'calc(100vh - 180px)' }}>
-                    <div className="col-12 col-lg-4 col-xl-3 mb-3 mb-lg-0 d-lg-flex" style={{ minHeight: 'calc(100vh - 180px)' }}>
-                        <div
-                            className={`card h-100 flex-column ${isListOpen ? 'd-flex' : 'd-none'} d-lg-flex`}
-                        >
+                    <div
+                        className={`col-12 col-lg-4 col-xl-3 mb-3 mb-lg-0 ${isListOpen ? 'd-flex' : 'd-none d-lg-flex'}`}
+                        style={{ minHeight: 'calc(100vh - 180px)' }}
+                    >
+                        <div className="card h-100 flex-column d-flex">
                             {isListOpen ? (
                                 <div className="d-flex align-items-center justify-content-end gap-2 border-bottom p-2 d-lg-none">
                                     <TTButton
@@ -180,24 +188,49 @@ export default function Show() {
                                     </TTButton>
                                 </div>
                             ) : null}
+                            <div className="border-bottom p-2">
+                                <div className="d-flex flex-wrap gap-2">
+                                    {['inbox', 'archived'].map((k) => {
+                                        const active = filters.filter === k;
+                                        return (
+                                            <TTButton
+                                                key={k}
+                                                size="sm"
+                                                variant="dark"
+                                                look={active ? 'solid' : 'outline'}
+                                                onClick={() =>
+                                                    router.get(
+                                                        route('conversations.show', conversation.id),
+                                                        { filter: k },
+                                                        { preserveState: true, preserveScroll: true }
+                                                    )
+                                                }
+                                            >
+                                                {k === 'inbox' ? 'Innhólf' : 'Lokuð skilaboð'}
+                                            </TTButton>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                             <div className="list-group list-group-flush flex-grow-1 overflow-auto">
                                 {conversationList.map((c) => (
                                     <Link
                                         key={c.id}
-                                        href={c.links.show}
-                                        className={`list-group-item list-group-item-action ${c.id === conversation.id ? 'active' : ''} ${c.unread ? 'fw-semibold' : ''}`}
+                                        href={route('conversations.show', { conversation: c.id, filter: filters.filter })}
+                                        className={`list-group-item list-group-item-action ${c.id === conversation.id ? 'bg-light border border-1' : ''} ${c.unread ? 'fw-semibold' : ''}`}
                                     >
                                         <div className="d-flex justify-content-between gap-3">
                                             <div className="text-truncate">
                                                 <div className="d-flex align-items-center gap-2">
                                                     {c.unread ? <span className="badge text-bg-danger">Nýtt</span> : null}
-                                                    <span>{c.other?.name ?? '—'}</span>
-                                                    <span className="text-muted small">{c.context === 'support' ? 'Support' : 'Auglýsing'}</span>
+                                                    <span>{displayName(c.other)}</span>
                                                 </div>
-                                                <div className="text-muted small text-truncate">
-                                                    {c.ad?.title ? `„${c.ad.title}“ · ` : ''}
-                                                    {c.snippet ?? ''}
-                                                </div>
+                                                {c.ad?.title ? (
+                                                    <div className="text-muted small text-truncate">Vegna auglýsingar: {c.ad.title}</div>
+                                                ) : (
+                                                    <div className="text-muted small">{c.context === 'support' ? 'Support' : 'Þráður'}</div>
+                                                )}
+                                                {c.snippet ? <div className="text-muted small text-truncate">{c.snippet}</div> : null}
                                             </div>
                                             <div className="text-muted small text-nowrap">
                                                 {fmtTime(c.last_message_at)}
@@ -214,7 +247,7 @@ export default function Show() {
                     <div className="col-12 col-lg-8 col-xl-9 d-flex flex-column" style={{ minHeight: 'calc(100vh - 180px)' }}>
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                             <div>
-                                <div className="h5 mb-0">{conversation.other?.name ?? 'Skilaboð'}</div>
+                                <div className="h5 mb-0">{otherDisplayName || 'Skilaboð'}</div>
                                 {conversation.ad?.title ? (
                                     <div className="text-muted small">
                                         Auglýsing: <a href={conversation.ad.link}>{conversation.ad.title}</a>
@@ -234,7 +267,7 @@ export default function Show() {
                                     className="d-lg-none"
                                     onClick={() => setIsListOpen((prev) => !prev)}
                                 >
-                                    Skilaboðalisti
+                                    Innhólf
                                 </TTButton>
                                 <TTButton
                                     size="sm"
@@ -322,7 +355,7 @@ export default function Show() {
                                         <div key={m.id} className={`d-flex mb-3 ${mine ? 'justify-content-end' : 'justify-content-start'}`}>
                                             <div style={{ maxWidth: 680 }} className={`p-2 rounded border ${mine ? 'bg-white' : 'bg-light'}`}>
                                                 <div className="small text-muted mb-1">
-                                                    {mine ? 'Þú' : (m.sender_name ?? 'Notandi')} · {fmtTime(m.created_at)}
+                                                    {mine ? 'Þú' : (otherDisplayName || m.sender_name || 'Notandi')} · {fmtTime(m.created_at)}
                                                 </div>
                                                 <div style={{ whiteSpace: 'pre-wrap' }}>{m.body}</div>
                                             </div>

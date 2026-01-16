@@ -159,6 +159,7 @@ Route::get('/i/{adImage}', [AdImageController::class, 'show'])->name('ad-images.
 
 Route::middleware(['auth'])->prefix('mitt-svaedi')->group(function () {
     Route::get('skilabod', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('skilabod/sidast', [ConversationController::class, 'latest'])->name('conversations.latest');
     Route::get('skilabod/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
 
     Route::patch('skilabod/{conversation}/read', [ConversationController::class, 'markRead'])->name('conversations.read');
