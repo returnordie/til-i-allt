@@ -1,6 +1,6 @@
 import AppLayout from '@/Layouts/AppLayout';
 import TTButton from '@/Components/UI/TTButton';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Msg = {
@@ -40,6 +40,18 @@ type PageProps = {
         is_archived_by_other: boolean;
         links: { archive: string; close: string; block: string; send: string };
     };
+    conversationList: Array<{
+        id: number;
+        status: string;
+        context: string;
+        subject: string | null;
+        last_message_at: string | null;
+        unread: boolean;
+        snippet: string | null;
+        other: { name: string; username: string | null } | null;
+        ad: { title: string; link: string | null } | null;
+        links: { show: string };
+    }>;
     messages: {
         data: Msg[];
         links: Array<{ url: string | null; label: string; active: boolean }>;
@@ -55,7 +67,7 @@ function fmtTime(s: string | null) {
 
 export default function Show() {
     const { props } = usePage<PageProps>();
-    const { conversation, messages, authUserId, deal } = props;
+    const { conversation, messages, authUserId, deal, conversationList } = props;
 
     // --- scroll to bottom behavior (no live chat) ---
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -85,6 +97,8 @@ export default function Show() {
     const { data, setData, post, processing, errors, reset } = useForm({ body: '' });
     const [showArchiveModal, setShowArchiveModal] = useState(false);
     const isChatArchived = conversation.is_archived || conversation.is_archived_by_other;
+    const isChatClosed = conversation.status === 'closed' || isChatArchived;
+    const isChatBlocked = conversation.status === 'blocked';
     const canSendMessage = conversation.status === 'open' && !isChatArchived;
 
     useEffect(() => {
@@ -149,7 +163,44 @@ export default function Show() {
 
             <div className="container py-4">
                 <div className="row justify-content-center">
-                    <div className="col-12 col-lg-9 col-xl-8">
+                    <div className="col-12 col-lg-4 col-xl-3 mb-3 mb-lg-0">
+                        <div className="card h-100">
+                            <div className="card-body border-bottom">
+                                <div className="fw-semibold">Skilaboð</div>
+                                <div className="text-muted small">Þræðir raðaðir eftir nýjustu skilaboðum.</div>
+                            </div>
+                            <div className="list-group list-group-flush">
+                                {conversationList.map((c) => (
+                                    <Link
+                                        key={c.id}
+                                        href={c.links.show}
+                                        className={`list-group-item list-group-item-action ${c.id === conversation.id ? 'active' : ''} ${c.unread ? 'fw-semibold' : ''}`}
+                                    >
+                                        <div className="d-flex justify-content-between gap-3">
+                                            <div className="text-truncate">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    {c.unread ? <span className="badge text-bg-danger">Nýtt</span> : null}
+                                                    <span>{c.other?.name ?? '—'}</span>
+                                                    <span className="text-muted small">{c.context === 'support' ? 'Support' : 'Auglýsing'}</span>
+                                                </div>
+                                                <div className="text-muted small text-truncate">
+                                                    {c.ad?.title ? `„${c.ad.title}“ · ` : ''}
+                                                    {c.snippet ?? ''}
+                                                </div>
+                                            </div>
+                                            <div className="text-muted small text-nowrap">
+                                                {fmtTime(c.last_message_at)}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                                {conversationList.length === 0 ? (
+                                    <div className="list-group-item text-center text-muted py-5">Engin skilaboð.</div>
+                                ) : null}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-8 col-xl-9">
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                             <div>
                                 <div className="h5 mb-0">{conversation.other?.name ?? 'Skilaboð'}</div>
@@ -179,22 +230,6 @@ export default function Show() {
                                 >
                                     {conversation.is_archived ? 'Opna fyrir spjall' : 'Loka spjalli'}
                                 </TTButton>
-
-                                <TTButton
-                                    size="sm"
-                                    variant="amber"
-                                    look="solid"
-                                    onClick={() =>
-                                        router.get(
-                                            route('conversations.index'),
-                                            { filter: 'all' },
-                                            { preserveState: true, preserveScroll: true }
-                                        )
-                                    }
-                                >
-                                    Til baka
-                                </TTButton>
-
                             </div>
                         </div>
 
@@ -277,16 +312,10 @@ export default function Show() {
                             </div>
                         </div>
 
-                        {conversation.status !== 'open' ? (
-                            <div className="alert alert-warning">
-                                Þessi þráður er {conversation.status === 'closed' ? 'lokaður' : 'blokkuður'}.
-                            </div>
-                        ) : isChatArchived ? (
-                            <div className="alert alert-warning">
-                                {conversation.is_archived_by_other
-                                    ? 'Viðmælandi hefur lokað spjalli. Opnaðu fyrir spjall til að senda skilaboð.'
-                                    : 'Þú hefur lokað spjalli. Opnaðu fyrir spjall til að senda skilaboð.'}
-                            </div>
+                        {isChatBlocked ? (
+                            <div className="alert alert-warning">Þessi þráður er blokkaður.</div>
+                        ) : isChatClosed ? (
+                            <div className="alert alert-warning">Samtal fyrir þessa auglýsingu hefur verið lokað.</div>
                         ) : (
                             <form onSubmit={send}>
                                 <div className="card">
