@@ -157,19 +157,20 @@ export default function Show() {
                                         </div>
 
                                         <div className="card-body d-flex flex-column">
-                                            <div className="d-flex justify-content-between gap-2">
+                                            <div className="d-flex justify-content-between align-items-start gap-2">
                                                 <Link href={ad.links.show} className="fw-semibold text-truncate text-decoration-none text-dark">
                                                     {ad.title}
                                                 </Link>
+                                                <div className="fw-semibold text-nowrap">
+                                                    {fmtPrice(ad.price, ad.currency)}
+                                                </div>
                                             </div>
 
-                                            <div className="text-muted small mt-1">
-                                                {ad.category?.name ?? ''}{ad.location_text ? ` · ${ad.location_text}` : ''}
-                                            </div>
-
-                                            <div className="mt-2 fw-semibold">
-                                                {fmtPrice(ad.price, ad.currency)}
-                                            </div>
+                                            {ad.location_text ? (
+                                                <div className="text-muted small mt-1">
+                                                    {ad.location_text}
+                                                </div>
+                                            ) : null}
 
                                             <div className="mt-auto pt-3" />
                                         </div>
