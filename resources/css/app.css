@@ -54,7 +54,7 @@ a:focus{
 .tt-topwrap{
     position: sticky;
     top: 0;
-    z-index: 1030;
+    z-index: 1060;
     backdrop-filter: blur(10px);
     background: rgba(251,251,252,.82);
     border-bottom: 1px solid var(--tt-border);
@@ -196,6 +196,7 @@ a:focus{
     border: 1px solid var(--tt-border);
     border-radius: var(--tt-r-lg);
     box-shadow: var(--tt-shadow);
+    z-index: 1070;
 }
 .tt-drop{
     width: 380px;
