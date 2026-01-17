@@ -131,6 +131,11 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
     // Ekki “active” section á account síðum. Notum samt default fyrir leit.
     const resolvedSection: SectionKey = currentSection ?? 'solutorg';
+    const [mobileSection, setMobileSection] = useState<SectionKey>(resolvedSection);
+
+    useEffect(() => {
+        setMobileSection(resolvedSection);
+    }, [resolvedSection]);
 
     const unreadNotif = props.auth?.unreadNotificationsCount ?? 0;
     const unreadMsg = props.auth?.unreadConversationsCount ?? 0;
@@ -414,20 +419,20 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                     <div className="offcanvas-body">
                         <div className="tt-sections tt-sections--mini mb-3">
                             {(['solutorg', 'bilatorg', 'fasteignir'] as SectionKey[]).map((s) => (
-                                <Link
+                                <button
                                     key={s}
-                                    href={sectionHref(s)}
-                                    className={`tt-sec ${resolvedSection === s ? 'active' : ''}`}
-                                    data-bs-dismiss="offcanvas"
+                                    type="button"
+                                    className={`tt-sec tt-sec--btn ${mobileSection === s ? 'active' : ''}`}
+                                    onClick={() => setMobileSection(s)}
                                 >
                                     {sectionLabel(s)}
-                                </Link>
+                                </button>
                             ))}
                         </div>
 
                         <CategorySidebar
                             mode="panel"
-                            section={resolvedSection}
+                            section={mobileSection}
                             currentCategorySlug={currentCategorySlug}
                             dismissOnClick
                         />

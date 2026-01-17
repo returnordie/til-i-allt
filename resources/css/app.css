@@ -136,8 +136,9 @@ a:focus{
 .tt-ico.sm{ width: 18px; height: 18px; }
 
 .tt-iconlink{
-    display:inline-grid;
-    place-items:center;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
     width: 42px;
     height: 42px;
     border-radius: 0;
@@ -146,6 +147,12 @@ a:focus{
     background: transparent;
     border: 0;
     padding: 0;
+}
+
+.tt-sec--btn{
+    background: transparent;
+    border: 0;
+    padding: .65rem .1rem;
 }
 .tt-iconlink:hover{
     background: rgba(20,21,26,.05);
