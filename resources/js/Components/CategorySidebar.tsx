@@ -86,6 +86,7 @@ export default function CategorySidebar({
     }, [isLeafSection, openObj]);
 
     const tileCls = `tt-tile ${mode === 'panel' ? 'tt-tile--panel' : ''}`;
+    const isPanel = mode === 'panel';
 
     const TileLink = (p: {
         href: string;
@@ -120,60 +121,145 @@ export default function CategorySidebar({
         </button>
     );
 
+    const PanelLink = (p: {
+        href: string;
+        active?: boolean;
+        icon?: string | null;
+        label: string;
+        indent?: boolean;
+    }) => (
+        <Link
+            href={p.href}
+            className={`tt-panel-item ${p.active ? 'active' : ''} ${p.indent ? 'tt-panel-item--indent' : ''}`}
+            data-bs-dismiss={dismissOnClick ? 'offcanvas' : undefined}
+            aria-current={p.active ? 'page' : undefined}
+        >
+            <MsIcon icon={p.icon} className="tt-panel-ico" />
+            <span className="tt-panel-label">{p.label}</span>
+        </Link>
+    );
+
+    const PanelBtn = (p: { onClick: () => void; active?: boolean; icon?: string | null; label: string; open?: boolean }) => (
+        <button
+            type="button"
+            className={`tt-panel-item tt-panel-item--btn ${p.active ? 'active' : ''}`}
+            onClick={p.onClick}
+            aria-expanded={p.open}
+        >
+            <MsIcon icon={p.icon} className="tt-panel-ico" />
+            <span className="tt-panel-label">{p.label}</span>
+            <span className="material-symbols-rounded tt-panel-caret" aria-hidden="true">
+                {p.open ? 'expand_less' : 'expand_more'}
+            </span>
+        </button>
+    );
+
     return (
-        <div className={`tt-cnav ${mode === 'panel' ? 'tt-cnav--panel' : 'tt-cnav--dock'}`}>
-            <div className="tt-grid">
-                {view === 'leaf' ? (
-                    leafTiles.map((t) => (
-                        <TileLink
-                            key={`leaf_${t.slug}`}
-                            href={`/${section}/${t.slug}`}
-                            active={currentCategorySlug === t.slug}
-                            icon={t.icon ?? null}
-                            label={t.name}
-                        />
-                    ))
-                ) : view === 'parents' ? (
-                    parents.map((p) => (
-                        <TileBtn
-                            key={`p_${p.slug}`}
-                            onClick={() => setOpenParent(p.slug)}
-                            active={activeParentSlug === p.slug}
-                            icon={p.icon ?? null}
-                            label={p.name}
-                        />
-                    ))
-                ) : (
-                    <>
-                        <TileBtn
-                            key="back"
-                            onClick={() => setOpenParent(null)}
-                            icon="arrow_back"
-                            label="Til baka"
-                        />
-
-                        {openObj ? (
-                            <TileLink
-                                key={`all_${openObj.slug}`}
-                                href={`/${section}/${openObj.slug}`}
-                                active={currentCategorySlug === openObj.slug}
-                                icon={openObj.icon ?? null}
-                                label={`Allt í ${openObj.name}`}
+        <div className={`tt-cnav ${isPanel ? 'tt-cnav--panel' : 'tt-cnav--dock'}`}>
+            {isPanel ? (
+                <div className="tt-panel-list">
+                    {isLeafSection ? (
+                        leafTiles.map((t) => (
+                            <PanelLink
+                                key={`leaf_${t.slug}`}
+                                href={`/${section}/${t.slug}`}
+                                active={currentCategorySlug === t.slug}
+                                icon={t.icon ?? null}
+                                label={t.name}
                             />
-                        ) : null}
-
-                        {(openObj?.children ?? []).map((ch) => (
+                        ))
+                    ) : (
+                        parents.map((p) => {
+                            const isOpen = openParent === p.slug;
+                            return (
+                                <div key={`p_${p.slug}`} className="tt-panel-group">
+                                    <PanelBtn
+                                        onClick={() => setOpenParent(isOpen ? null : p.slug)}
+                                        active={activeParentSlug === p.slug}
+                                        icon={p.icon ?? null}
+                                        label={p.name}
+                                        open={isOpen}
+                                    />
+                                    {isOpen ? (
+                                        <div className="tt-panel-children">
+                                            <PanelLink
+                                                href={`/${section}/${p.slug}`}
+                                                active={currentCategorySlug === p.slug}
+                                                icon={p.icon ?? null}
+                                                label={`Allt í ${p.name}`}
+                                                indent
+                                            />
+                                            {(p.children ?? []).map((ch) => (
+                                                <PanelLink
+                                                    key={`ch_${ch.slug}`}
+                                                    href={`/${section}/${ch.slug}`}
+                                                    active={currentCategorySlug === ch.slug}
+                                                    icon={ch.icon ?? null}
+                                                    label={ch.name}
+                                                    indent
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            ) : (
+                <div className="tt-grid tt-grid--dock">
+                    {view === 'leaf' ? (
+                        leafTiles.map((t) => (
                             <TileLink
-                                key={`ch_${ch.slug}`}
-                                href={`/${section}/${ch.slug}`}
-                                active={currentCategorySlug === ch.slug}
-                                icon={ch.icon ?? null}
-                                label={ch.name}
+                                key={`leaf_${t.slug}`}
+                                href={`/${section}/${t.slug}`}
+                                active={currentCategorySlug === t.slug}
+                                icon={t.icon ?? null}
+                                label={t.name}
                             />
-                        ))}
-                    </>
-                )}
-            </div>
+                        ))
+                    ) : view === 'parents' ? (
+                        parents.map((p) => (
+                            <TileBtn
+                                key={`p_${p.slug}`}
+                                onClick={() => setOpenParent(p.slug)}
+                                active={activeParentSlug === p.slug}
+                                icon={p.icon ?? null}
+                                label={p.name}
+                            />
+                        ))
+                    ) : (
+                        <>
+                            <TileBtn
+                                key="back"
+                                onClick={() => setOpenParent(null)}
+                                icon="arrow_back"
+                                label="Til baka"
+                            />
+
+                            {openObj ? (
+                                <TileLink
+                                    key={`all_${openObj.slug}`}
+                                    href={`/${section}/${openObj.slug}`}
+                                    active={currentCategorySlug === openObj.slug}
+                                    icon={openObj.icon ?? null}
+                                    label={`Allt í ${openObj.name}`}
+                                />
+                            ) : null}
+
+                            {(openObj?.children ?? []).map((ch) => (
+                                <TileLink
+                                    key={`ch_${ch.slug}`}
+                                    href={`/${section}/${ch.slug}`}
+                                    active={currentCategorySlug === ch.slug}
+                                    icon={ch.icon ?? null}
+                                    label={ch.name}
+                                />
+                            ))}
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
