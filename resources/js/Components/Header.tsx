@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import TTButton from '@/Components/UI/TTButton';
+import Dropdown from '@/Components/Dropdown';
 import { Link, router, usePage } from '@inertiajs/react';
 import CategorySidebar from '@/Components/CategorySidebar';
 
@@ -45,11 +46,6 @@ function parseCategorySlugFromUrl(url: string, section: SectionKey | null): stri
     if (!section) return null;
     const segs = (url || '').split('?')[0].split('/').filter(Boolean);
     return segs[1] ?? null;
-}
-
-function isHomeUrl(url: string) {
-    const segs = (url || '').split('?')[0].split('/').filter(Boolean);
-    return segs.length === 0;
 }
 
 function pickDefaultCategorySlug(nav: Record<SectionKey, any[]>, section: SectionKey) {
@@ -127,8 +123,6 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
     const currentSection = useMemo(() => parseSectionFromUrl(url), [url]);
     const currentCategorySlug = useMemo(() => parseCategorySlugFromUrl(url, currentSection), [url, currentSection]);
-    const isHome = useMemo(() => isHomeUrl(url), [url]);
-
     // Ekki “active” section á account síðum. Notum samt default fyrir leit.
     const resolvedSection: SectionKey = currentSection ?? 'solutorg';
     const [mobileSection, setMobileSection] = useState<SectionKey>(resolvedSection);
@@ -141,8 +135,8 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
     const unreadMsg = props.auth?.unreadConversationsCount ?? 0;
     const recent = props.auth?.recentNotifications ?? [];
 
-    // Sýna flokka á home + section/category síðum, en ekki á account pages.
-    const showDock = !hideCatbar && (isHome || currentSection !== null);
+    // Sýna flokka alls staðar nema þegar því er sérstaklega falið.
+    const showDock = !hideCatbar;
 
     const sectionHref = (section: SectionKey) => {
         if (section === 'solutorg') return `/${section}`;
@@ -282,20 +276,20 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                             ) : (
                                 <>
                                     {/* Notifications */}
-                                    <div className="dropdown">
-                                        <button
-                                            type="button"
-                                            className="tt-iconlink position-relative"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            aria-label="Tilkynningar"
-                                            title="Tilkynningar"
-                                            onClick={markAllNotificationsRead}
-                                        >
-                                            {Ico.bell}
-                                        </button>
-
-                                        <div className="dropdown-menu dropdown-menu-end tt-drop">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <button
+                                                type="button"
+                                                className="tt-iconlink position-relative"
+                                                aria-expanded="false"
+                                                aria-label="Tilkynningar"
+                                                title="Tilkynningar"
+                                                onClick={markAllNotificationsRead}
+                                            >
+                                                {Ico.bell}
+                                            </button>
+                                        </Dropdown.Trigger>
+                                        <Dropdown.Content align="right" menuClasses="tt-drop">
                                             <div className="tt-droplist">
                                                 {recent.length === 0 ? (
                                                     <div className="tt-empt">Engar tilkynningar ennþá.</div>
@@ -325,8 +319,8 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                                     Sjá allt
                                                 </TTButton>
                                             </div>
-                                        </div>
-                                    </div>
+                                        </Dropdown.Content>
+                                    </Dropdown>
 
                                     {/* Messages */}
                                     <Link
@@ -340,53 +334,39 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                     </Link>
 
                                     {/* User dropdown */}
-                                    <div className="dropdown">
-                                        <button
-                                            className="tt-userbtn dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            {Ico.user}
-                                            <span className="d-none d-sm-inline">{user.username ?? user.name}</span>
-                                        </button>
-
-                                        <ul className="dropdown-menu dropdown-menu-end tt-menu">
-                                            <li>
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <button className="tt-userbtn" type="button" aria-expanded="false">
+                                                {Ico.user}
+                                                <span className="d-none d-md-inline">{user.username ?? user.name}</span>
+                                            </button>
+                                        </Dropdown.Trigger>
+                                        <Dropdown.Content align="right" menuClasses="tt-menu">
+                                            <div>
                                                 <Link className="dropdown-item tt-menuitem" href={profileHref}>
                                                     <span className="tt-mi">{Ico.user}</span>
                                                     {profileLabel}
                                                 </Link>
-                                            </li>
-                                            <li>
                                                 <Link className="dropdown-item tt-menuitem" href={route('account.settings.edit')}>
                                                     <span className="tt-mi">{Ico.gear}</span>
                                                     Stillingar
                                                 </Link>
-                                            </li>
-                                            <li>
                                                 <Link className="dropdown-item tt-menuitem" href={route('account.ads.index')}>
                                                     <span className="tt-mi">{Ico.list}</span>
                                                     Mínar auglýsingar
                                                 </Link>
-                                            </li>
-                                            <li>
                                                 <Link className="dropdown-item tt-menuitem" href={route('account.deals.index')}>
                                                     <span className="tt-mi">{Ico.list}</span>
                                                     Mín viðskipti
                                                 </Link>
-                                            </li>
-                                            <li>
                                                 <hr className="dropdown-divider" />
-                                            </li>
-                                            <li>
                                                 <Link className="dropdown-item tt-menuitem text-danger" href={route('logout')} method="post" as="button">
                                                     <span className="tt-mi">{Ico.logout}</span>
                                                     Útskrá
                                                 </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                            </div>
+                                        </Dropdown.Content>
+                                    </Dropdown>
                                 </>
                             )}
                         </div>
