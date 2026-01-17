@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Offcanvas } from 'bootstrap';
 import { Link, usePage } from '@inertiajs/react';
 
 type SectionKey = 'solutorg' | 'bilatorg' | 'fasteignir';
@@ -87,6 +88,13 @@ export default function CategorySidebar({
 
     const tileCls = `tt-tile ${mode === 'panel' ? 'tt-tile--panel' : ''}`;
     const isPanel = mode === 'panel';
+    const handleDismiss = () => {
+        if (!dismissOnClick) return;
+        const offcanvasEl = document.getElementById('ttCats');
+        if (!offcanvasEl) return;
+        const instance = Offcanvas.getInstance(offcanvasEl) ?? new Offcanvas(offcanvasEl);
+        instance.hide();
+    };
 
     const TileLink = (p: {
         href: string;
@@ -97,8 +105,8 @@ export default function CategorySidebar({
         <Link
             href={p.href}
             className={`${tileCls} ${p.active ? 'active' : ''}`}
-            data-bs-dismiss={dismissOnClick ? 'offcanvas' : undefined}
             aria-current={p.active ? 'page' : undefined}
+            onClick={handleDismiss}
         >
             <MsIcon icon={p.icon} className="tt-tile-ico" />
             <span className="tt-tile-name">{p.label}</span>
@@ -131,8 +139,8 @@ export default function CategorySidebar({
         <Link
             href={p.href}
             className={`tt-panel-item ${p.active ? 'active' : ''} ${p.indent ? 'tt-panel-item--indent' : ''}`}
-            data-bs-dismiss={dismissOnClick ? 'offcanvas' : undefined}
             aria-current={p.active ? 'page' : undefined}
+            onClick={handleDismiss}
         >
             <MsIcon icon={p.icon} className="tt-panel-ico" />
             <span className="tt-panel-label">{p.label}</span>
