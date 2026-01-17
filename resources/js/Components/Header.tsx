@@ -137,6 +137,8 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
     // Sýna flokka alls staðar nema þegar því er sérstaklega falið.
     const showDock = !hideCatbar;
+    const showCatsButton = true;
+    const showCatsPanel = showDock || showCatsButton;
 
     const sectionHref = (section: SectionKey) => {
         if (section === 'solutorg') return `/${section}`;
@@ -186,6 +188,29 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
         };
     }, [user?.id]);
 
+    useEffect(() => {
+        const ids = ['ttSearch', 'ttCats'];
+        const cleanupBackdrop = () => {
+            document.querySelectorAll('.offcanvas-backdrop').forEach((el) => el.remove());
+            document.body.classList.remove('offcanvas-backdrop');
+            document.body.style.removeProperty('overflow');
+        };
+
+        const listeners = ids
+            .map((id) => {
+                const el = document.getElementById(id);
+                if (!el) return null;
+                const handler = () => cleanupBackdrop();
+                el.addEventListener('hidden.bs.offcanvas', handler as EventListener);
+                return { el, handler };
+            })
+            .filter(Boolean) as Array<{ el: HTMLElement; handler: EventListener }>;
+
+        return () => {
+            listeners.forEach(({ el, handler }) => el.removeEventListener('hidden.bs.offcanvas', handler));
+        };
+    }, []);
+
     const profileHref = user?.username ? route('users.show', user.username) : route('account.settings.edit');
     const profileLabel = user?.username ? 'Notendasíðan mín' : 'Búa til notendanafn';
     const markAllNotificationsRead = () => {
@@ -230,21 +255,21 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
 
                         <div className="ms-auto d-flex align-items-center gap-2">
                             {/* Mobile buttons */}
-                            {!hideOffcanvasButtons ? (
-                                <>
-                                    {showDock ? (
-                                        <button
-                                            type="button"
-                                            className="tt-iconlink d-inline-flex"
-                                            data-bs-toggle="offcanvas"
-                                            data-bs-target="#ttCats"
-                                            aria-controls="ttCats"
-                                            title="Flokkar"
-                                        >
-                                            {Ico.cats}
-                                        </button>
-                                    ) : null}
+                            <>
+                                {showCatsButton ? (
+                                    <button
+                                        type="button"
+                                        className="tt-iconlink d-inline-flex"
+                                        data-bs-toggle="offcanvas"
+                                        data-bs-target="#ttCats"
+                                        aria-controls="ttCats"
+                                        title="Flokkar"
+                                    >
+                                        {Ico.cats}
+                                    </button>
+                                ) : null}
 
+                                {!hideOffcanvasButtons ? (
                                     <button
                                         type="button"
                                         className="tt-iconlink d-inline-flex d-md-none"
@@ -255,8 +280,8 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                     >
                                         {Ico.search}
                                     </button>
-                                </>
-                            ) : null}
+                                ) : null}
+                            </>
 
                             {!user ? (
                                 <>
@@ -388,7 +413,7 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
             ) : null}
 
             {/* Mobile: categories offcanvas */}
-            {showDock ? (
+            {showCatsPanel ? (
                 <div className="offcanvas offcanvas-start tt-catscanvas" tabIndex={-1} id="ttCats" aria-labelledby="ttCatsLabel">
                     <div className="offcanvas-header">
                         <h5 className="offcanvas-title" id="ttCatsLabel">

@@ -197,6 +197,11 @@ a:focus{
     border-radius: var(--tt-r-lg);
     box-shadow: var(--tt-shadow);
     z-index: 1070;
+    max-width: calc(100vw - 18px);
+}
+.dropdown-menu-end{
+    right: 0;
+    left: auto;
 }
 .tt-drop{
     width: 380px;
@@ -249,7 +254,7 @@ a:focus{
 .tt-dropfoot{ padding: .75rem 1rem; border-top: 1px solid var(--tt-border); }
 
 /* Menu w icons */
-.tt-menu{ width: 320px; padding: .35rem; }
+.tt-menu{ width: 320px; max-width: calc(100vw - 18px); padding: .35rem; }
 .tt-menuitem{
     display:flex;
     align-items:center;
