@@ -53,11 +53,13 @@ const Content = ({
     align = 'right',
     width = '48',
     contentClasses = '',
+    menuClasses = '',
     children,
 }: PropsWithChildren<{
     align?: 'left' | 'right';
     width?: '48';
     contentClasses?: string;
+    menuClasses?: string;
 }>) => {
     const { open, setOpen } = useContext(DropDownContext);
 
@@ -79,7 +81,7 @@ const Content = ({
         <>
             {open && (
                 <div
-                    className={`dropdown-menu show ${alignmentClasses} ${widthClasses}`}
+                    className={`dropdown-menu show ${alignmentClasses} ${widthClasses} ${menuClasses}`}
                     onClick={() => setOpen(false)}
                 >
                     <div className={contentClasses}>{children}</div>
