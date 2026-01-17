@@ -94,6 +94,9 @@ export default function CategorySidebar({
         if (!offcanvasEl) return;
         const instance = Offcanvas.getInstance(offcanvasEl) ?? new Offcanvas(offcanvasEl);
         instance.hide();
+        document.querySelectorAll('.offcanvas-backdrop').forEach((el) => el.remove());
+        document.body.classList.remove('offcanvas-backdrop');
+        document.body.style.removeProperty('overflow');
     };
 
     const TileLink = (p: {
