@@ -140,6 +140,7 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
     const showDock = !hideCatbar && (isHome || currentSection !== null);
 
     const sectionHref = (section: SectionKey) => {
+        if (section === 'solutorg') return `/${section}`;
         const slug = pickDefaultCategorySlug(nav, section);
         return slug ? `/${section}/${slug}` : `/${section}`;
     };

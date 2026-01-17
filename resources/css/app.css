@@ -265,6 +265,7 @@ a:focus{
 .tt-cnav--dock .tt-grid{
     width: fit-content;
     margin: 0 auto;
+    justify-content: center;
 }
 
 /* Compact grid */
@@ -278,6 +279,10 @@ a:focus{
 }
 @media (max-width: 991px){
     .tt-grid{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+.tt-grid--dock{
+    justify-content: center;
 }
 
 .tt-tile{
@@ -317,6 +322,62 @@ a:focus{
     font-size: 26px;
     color: rgba(20,21,26,.78);
     opacity: .92;
+}
+
+/* Panel (mobile) categories */
+.tt-panel-list{
+    display:flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+.tt-panel-group{
+    display:flex;
+    flex-direction: column;
+    gap: .45rem;
+}
+.tt-panel-item{
+    display:flex;
+    align-items:center;
+    gap: .55rem;
+    width: 100%;
+    border: 1px solid rgba(20,21,26,.10);
+    background: rgba(255,255,255,.94);
+    border-radius: var(--tt-r-md);
+    padding: .65rem .75rem;
+    text-decoration:none;
+    color: rgba(20,21,26,.85);
+    transition: background .12s ease, border-color .12s ease;
+}
+.tt-panel-item:hover{ background: rgba(255,255,255,.99); }
+.tt-panel-item.active{
+    border-color: rgba(20,21,26,.26);
+    background: rgba(20,21,26,.03);
+}
+.tt-panel-item--btn{
+    justify-content: space-between;
+    background: rgba(249,249,250,.96);
+}
+.tt-panel-label{
+    font-weight: 600;
+    font-size: .92rem;
+}
+.tt-panel-ico{
+    font-size: 22px;
+    color: rgba(20,21,26,.78);
+}
+.tt-panel-caret{
+    font-size: 20px;
+    color: rgba(20,21,26,.6);
+    margin-left: auto;
+}
+.tt-panel-children{
+    display:flex;
+    flex-direction: column;
+    gap: .45rem;
+    padding-left: .75rem;
+}
+.tt-panel-item--indent{
+    padding-left: 1rem;
 }
 
 /* Offcanvas cats */
