@@ -1,6 +1,5 @@
 import AppLayout from '@/Layouts/AppLayout';
 import { StarRatingDisplay } from '@/Components/Reviews/StarRating';
-import TTButton from '@/Components/UI/TTButton';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -116,13 +115,8 @@ function ReviewModal({ show, onClose, reviews }: { show: boolean; onClose: () =>
 }
 
 function fmtPrice(p: number | null, cur: string) {
-    if (p === null) return '—';
+    if (p === null) return 'Tilboð';
     return `${p.toLocaleString()} ${cur}`;
-}
-
-function fmtDate(s: string | null) {
-    if (!s) return '—';
-    return new Date(s).toLocaleDateString();
 }
 
 export default function Show() {
@@ -133,7 +127,7 @@ export default function Show() {
 
     return (
         <AppLayout headerProps={{ hideCatbar: true }} mainClassName="bg-light">
-            <Head title={`${profile.display_name} (@${profile.username})`} />
+            <Head title={profile.display_name} />
 
             <div className="container py-4">
                 <div className="row g-3">
@@ -144,23 +138,29 @@ export default function Show() {
                                 <div key={ad.id} className="col-12 col-sm-6 col-xl-4">
                                     <div className="card h-100">
                                         <div className="bg-white border-bottom" style={{ aspectRatio: '16 / 10' }}>
-                                            {ad.main_image_url ? (
-                                                <img
-                                                    src={ad.main_image_url}
-                                                    alt=""
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                />
-                                            ) : (
-                                                <div className="d-flex align-items-center justify-content-center h-100 text-muted">
-                                                    Engin mynd
-                                                </div>
-                                            )}
+                                            <Link href={ad.links.show} className="d-block h-100">
+                                                {ad.main_image_url ? (
+                                                    <img
+                                                        src={ad.main_image_url}
+                                                        alt=""
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                                        <span className="material-symbols-rounded tt-msym fs-1" aria-hidden="true">
+                                                            image_not_supported
+                                                        </span>
+                                                        <div className="small mt-1">Engin mynd</div>
+                                                    </div>
+                                                )}
+                                            </Link>
                                         </div>
 
                                         <div className="card-body d-flex flex-column">
                                             <div className="d-flex justify-content-between gap-2">
-                                                <div className="fw-semibold text-truncate">{ad.title}</div>
-                                                <span className="badge text-bg-light">{ad.section}</span>
+                                                <Link href={ad.links.show} className="fw-semibold text-truncate text-decoration-none text-dark">
+                                                    {ad.title}
+                                                </Link>
                                             </div>
 
                                             <div className="text-muted small mt-1">
@@ -171,21 +171,7 @@ export default function Show() {
                                                 {fmtPrice(ad.price, ad.currency)}
                                             </div>
 
-                                            <div className="text-muted small mt-1">
-                                                Birt: {fmtDate(ad.published_at)}
-                                            </div>
-
-                                            <div className="mt-auto pt-3">
-                                                <TTButton
-                                                    as="link"
-                                                    href={ad.links.show}
-                                                    look="outline"
-                                                    variant="dark"
-                                                    className="w-100"
-                                                >
-                                                    Skoða auglýsingu
-                                                </TTButton>
-                                            </div>
+                                            <div className="mt-auto pt-3" />
                                         </div>
                                     </div>
                                 </div>
@@ -234,7 +220,6 @@ export default function Show() {
                                 <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
                                     <div>
                                         <div className="h4 mb-1">{profile.display_name}</div>
-                                        <div className="text-muted small">@{profile.username}</div>
                                     </div>
 
                                     <div className="text-end">
@@ -246,23 +231,9 @@ export default function Show() {
                                         >
                                             <div className="d-flex align-items-center justify-content-end gap-2">
                                                 <StarRatingDisplay rating={displayRating} />
-                                                <div className="text-muted">
-                                                    <div className="fw-semibold">{formatRatingValue(displayRating)}</div>
-                                                    <div className="small">({profile.rating.count})</div>
-                                                </div>
+                                                <div className="text-muted small">({profile.rating.count})</div>
                                             </div>
                                         </button>
-                                    </div>
-                                </div>
-
-                                <div className="mt-3 border-top pt-3">
-                                    <div className="d-flex flex-column gap-2 text-muted small">
-                                        <div>
-                                            Skráður: <span className="text-dark">{fmtDate(profile.member_since)}</span>
-                                        </div>
-                                        <div>
-                                            Virkar auglýsingar: <span className="text-dark">{profile.active_ads_count}</span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

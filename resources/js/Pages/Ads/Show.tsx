@@ -281,7 +281,12 @@ export default function Show({ ad }: AdShowProps) {
                                 </div>
                             ) : (
                                 <div className="ratio ratio-16x9 rounded-4 overflow-hidden bg-light d-flex align-items-center justify-content-center">
-                                    <div className="text-muted fw-semibold">Engar myndir</div>
+                                    <div className="d-flex flex-column align-items-center justify-content-center text-muted">
+                                        <span className="material-symbols-rounded tt-msym fs-1" aria-hidden="true">
+                                            image_not_supported
+                                        </span>
+                                        <div className="small mt-1">Engin mynd</div>
+                                    </div>
                                 </div>
                             )}
                         </div>
