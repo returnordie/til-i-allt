@@ -88,6 +88,7 @@ function Pagination({ links }: { links: PaginatorLink[] }) {
 
 export default function Index({ section, category, ads, filters }: Props) {
     const isHome = !section && !category;
+    const isCategory = !!category;
 
     const [q, setQ] = useState(filters?.q ?? '');
     const [sort, setSort] = useState<NonNullable<Props['filters']>['sort']>(filters?.sort ?? 'newest');
@@ -148,7 +149,9 @@ export default function Index({ section, category, ads, filters }: Props) {
                 sectionLabel={sectionLabel(section)}
                 categoryLabel={category?.name ?? undefined}
                 meta={ads?.meta}
-                showMeta={!isHome}
+                showMeta={!isHome && !isCategory}
+                hideKicker={isCategory}
+                subtextOverride={isCategory ? '' : undefined}
                 artUrl={artUrl}
             />
 
@@ -219,28 +222,39 @@ export default function Index({ section, category, ads, filters }: Props) {
                     <div className="row g-3 g-md-4">
                         {ads.data.map((ad) => (
                             <div key={ad.id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
-                                <Link href={ad.show_url} className="text-decoration-none">
-                                    <div className="tt-ad-card h-100">
-                                        <div className="tt-ad-media">
+                                <div className="card h-100">
+                                    <div className="bg-white border-bottom position-relative" style={{ aspectRatio: '16 / 10' }}>
+                                        <Link href={ad.show_url} className="d-block h-100">
                                             {ad.main_image_url ? (
-                                                <img src={ad.main_image_url} alt={ad.title} loading="lazy" />
+                                                <img
+                                                    src={ad.main_image_url}
+                                                    alt={ad.title}
+                                                    loading="lazy"
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
                                             ) : (
-                                                <div className="tt-ad-placeholder">
-                                                    <div className="small text-muted">Engin mynd</div>
+                                                <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted">
+                                                    <span className="material-symbols-rounded tt-msym fs-1" aria-hidden="true">
+                                                        image_not_supported
+                                                    </span>
+                                                    <div className="small mt-1">Engin mynd</div>
                                                 </div>
                                             )}
-                                            <div className="tt-ad-pill">{ad.category?.name ?? sectionLabel(ad.section)}</div>
+                                        </Link>
+                                        <div className="tt-ad-pill">{ad.category?.name ?? sectionLabel(ad.section)}</div>
+                                    </div>
+
+                                    <div className="card-body d-flex flex-column">
+                                        <div className="d-flex justify-content-between align-items-start gap-2">
+                                            <Link href={ad.show_url} className="fw-semibold text-truncate text-decoration-none text-dark">
+                                                {ad.title}
+                                            </Link>
+                                            <div className="fw-semibold text-nowrap">{formatISK(ad.price)}</div>
                                         </div>
 
-                                        <div className="p-3">
-                                            <div className="tt-ad-title">{ad.title}</div>
-                                            <div className="d-flex align-items-center justify-content-between mt-2">
-                                                <div className="tt-ad-price">{formatISK(ad.price)}</div>
-                                                <div className="tt-ad-cta">Skoða →</div>
-                                            </div>
-                                        </div>
+                                        <div className="mt-auto pt-3" />
                                     </div>
-                                </Link>
+                                </div>
                             </div>
                         ))}
                     </div>
