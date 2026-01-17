@@ -235,7 +235,7 @@ export default function Header({ hideCatbar = false, hideOffcanvasButtons = fals
                                     {showDock ? (
                                         <button
                                             type="button"
-                                            className="tt-iconlink d-inline-flex d-lg-none"
+                                            className="tt-iconlink d-inline-flex"
                                             data-bs-toggle="offcanvas"
                                             data-bs-target="#ttCats"
                                             aria-controls="ttCats"
